@@ -1,0 +1,37 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Core", "src\MyPlasm.Inspector.Core\MyPlasm.Inspector.Core.csproj", "{67CA21C1-5CF8-47E2-916B-9FDDA6100D31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Transport.Fake", "src\MyPlasm.Inspector.Transport.Fake\MyPlasm.Inspector.Transport.Fake.csproj", "{3A795EF8-9A52-4976-9E82-8D50EF7D3647}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.App", "src\MyPlasm.Inspector.App\MyPlasm.Inspector.App.csproj", "{82D85728-B525-4406-906C-2050205547E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Tests", "tests\MyPlasm.Inspector.Tests\MyPlasm.Inspector.Tests.csproj", "{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67CA21C1-5CF8-47E2-916B-9FDDA6100D31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67CA21C1-5CF8-47E2-916B-9FDDA6100D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67CA21C1-5CF8-47E2-916B-9FDDA6100D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67CA21C1-5CF8-47E2-916B-9FDDA6100D31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82D85728-B525-4406-906C-2050205547E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82D85728-B525-4406-906C-2050205547E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82D85728-B525-4406-906C-2050205547E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82D85728-B525-4406-906C-2050205547E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

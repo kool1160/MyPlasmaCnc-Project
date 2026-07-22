@@ -56,3 +56,11 @@ The application fails closed:
 - unknown command prevents transmission;
 - decoder failure preserves raw bytes and reports unknown data;
 - export failure does not delete the original session capture.
+
+## Foundation implementation status
+
+- The production command allowlist is empty.
+- `SafeControllerSession` is the sole application command gateway and checks the centralized policy before creating a transport-valid command.
+- Transport writes accept only a validated command object whose constructor is internal to the core assembly.
+- The initial Windows shell uses `FakeFtdiTransport`; it contains no native D2XX binding and no command-send UI.
+- Automated tests use synthetic sentinel bytes, not inferred controller commands, to prove motion, homing/probing, output, plasma, configuration, firmware, EEPROM, unknown, and unverified read-only intents are blocked before transport.
