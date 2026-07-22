@@ -4,9 +4,17 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <AssemblyName>MyPlasm Inspector</AssemblyName>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyPlasm.Inspector.Core\MyPlasm.Inspector.Core.csproj" />
+    <ProjectReference Include="..\MyPlasm.Inspector.Transport.D2xx\MyPlasm.Inspector.Transport.D2xx.csproj" />
     <ProjectReference Include="..\MyPlasm.Inspector.Transport.Fake\MyPlasm.Inspector.Transport.Fake.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\native\local\ftd2xx.dll')">
+    <None Include="..\..\native\local\ftd2xx.dll"
+          Link="native\ftd2xx.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

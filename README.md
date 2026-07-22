@@ -43,14 +43,16 @@ See GitHub Issue #1: **Project 1: Build read-only MyPlasm Inspector for Windows*
 
 ## Current foundation
 
-The first bounded Issue #1 slice contains:
+The completed Issue #1 foundation slices contain:
 
 - `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
 - `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
-- `MyPlasm.Inspector.App` — an initial WPF shell that uses only the fake transport;
+- `MyPlasm.Inspector.Transport.D2xx` — enumeration-only production D2XX interop;
+- `MyPlasm.Inspector.App` — a WPF shell with explicit fake and D2XX inspection modes;
 - `MyPlasm.Inspector.Tests` — offline fake-transport and safety-policy tests.
+- `MyPlasm.Inspector.PeInspector` — local vendor-DLL architecture, version, and hash inspection.
 
-The production allowlist is intentionally empty because no controller request bytes are confirmed yet. The app does not load D2XX and cannot access controller hardware in this slice.
+The production command allowlist remains empty because no controller request bytes are confirmed. D2XX mode can list device metadata but cannot open, read, configure, or write a device. Driver version is deliberately not queried because FTDI documents that operation as requiring an open device handle.
 
 ### Build and test
 
@@ -62,11 +64,23 @@ dotnet build MyPlasm.Inspector.sln --configuration Release --no-restore
 dotnet test MyPlasm.Inspector.sln --configuration Release --no-build
 ```
 
-Launch the fake-only Windows shell with:
+Launch the Windows shell with:
 
 ```powershell
 dotnet run --project src/MyPlasm.Inspector.App/MyPlasm.Inspector.App.csproj
 ```
+
+### Local vendor DLL
+
+The historical evidence in Git does not contain `ftd2xx.dll`. Obtain the DLL separately and place it at `native/local/ftd2xx.dll`; that directory and filename are ignored by Git. Do not place vendor binaries under `Old installed software/` or force-add them.
+
+Inspect a local DLL before running D2XX mode:
+
+```powershell
+dotnet run --project tools/MyPlasm.Inspector.PeInspector -- native/local/ftd2xx.dll
+```
+
+Use `--architecture x86` or `--architecture x64` to check a chosen application architecture. See `native/README.md` for the complete local-only setup.
 
 ## Ground rule
 
