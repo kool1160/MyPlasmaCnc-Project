@@ -1,0 +1,52 @@
+|000| 12:17:32 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 12:17:32 PM Run as administrator
+|000| 12:17:32 PM Read advanced file
+|000| 12:17:32 PM Backup create
+|051| 12:17:32 PM Error: Software doesn`t closed previous.
+|051| 12:17:32 PM found : MyPlasm CNC
+|051| 12:17:32 PM FirmwareVer 1.2 1
+|051| 12:17:33 PM Machine not referenced
+|051| 12:17:33 PM Communication OK
+|002| 12:17:48 PM found : MyPlasm CNC
+|002| 12:17:48 PM FirmwareVer 1.2 1
+|002| 12:17:48 PM Communication OK
+|050| 12:17:53 PM Warning: Microsteping X Axis not recomended value
+|050| 12:17:53 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:17:53 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:19:03 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:19:44 PM Warning: Microsteping X Axis not recomended value
+|050| 12:19:44 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:19:50 PM Warning: Microsteping X Axis not recomended value
+|050| 12:19:50 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:19:50 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:19:55 PM Warning: Microsteping X Axis not recomended value
+|050| 12:19:55 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:19:55 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:20:06 PM Warning: Microsteping X Axis not recomended value
+|050| 12:20:06 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:20:35 PM Warning: Microsteping X Axis not recomended value
+|050| 12:20:35 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:20:38 PM Warning: Microsteping X Axis not recomended value
+|050| 12:20:38 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:20:51 PM Warning: Microsteping Y Axis not recomended value
+|050| 12:20:58 PM Warning: Microsteping Z Axis not recomended value
+|002| 12:34:01 PM Assign:0 -103297 0 0
+|002| 12:34:01 PM X axis referenced
+|002| 12:34:01 PM Assign:0 0 0 0
+|002| 12:34:01 PM Y axis referenced
+|002| 12:34:07 PM Assign:0 0 0 0
+|002| 12:34:07 PM Mat:X0 Y0
+|002| 12:34:10 PM Assign:0 0 0 0
+|002| 12:34:10 PM Mat:X0 Y0
+|002| 12:34:11 PM Assign:0 0 0 0
+|002| 12:34:11 PM Mat:X0 Y0
+|002| 12:34:11 PM Assign:0 0 0 0
+|002| 12:34:11 PM Mat:X0 Y0
+|002| 12:34:11 PM Assign:0 0 0 0
+|002| 12:34:11 PM Mat:X0 Y0
+|002| 12:34:13 PM Assign:0 0 0 0
+|002| 12:34:13 PM Mat:X0 Y0
+|050| 12:37:07 PM Warning: Microsteping Z Axis not recomended value
+|100| 12:37:13 PM Preview: MyPlasmCNC.plt
+|050| 12:37:25 PM Warning: Microsteping Z Axis not recomended value
+|050| 12:37:48 PM Warning: Microsteping Z Axis not recomended value

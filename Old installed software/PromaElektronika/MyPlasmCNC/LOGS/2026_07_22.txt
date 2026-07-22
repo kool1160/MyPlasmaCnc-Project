@@ -1,0 +1,16 @@
+|000| 3:42:54 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 3:42:54 PM Run as administrator
+|000| 3:42:54 PM Read advanced file
+|000| 3:42:54 PM Backup create
+|051| 3:42:55 PM Error: Software doesn`t closed previous.
+|051| 3:42:55 PM found : MyPlasm CNC
+|051| 3:42:55 PM TXCorr:2
+|051| 3:42:56 PM Old_TX_err
+|051| 3:42:56 PM Communication Error
+|050| 3:44:36 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:47:19 PM Warning: Microsteping Z Axis not recomended value
+|051| 3:48:32 PM found : MyPlasm CNC
+|051| 3:48:32 PM FirmwareVer 1.2 1
+|051| 3:48:32 PM Machine not referenced
+|051| 3:48:32 PM Communication OK
+|050| 3:48:37 PM Warning: Microsteping Z Axis not recomended value

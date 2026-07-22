@@ -1,0 +1,20 @@
+MCodeOn=M09
+MCodeOff=M10
+AntyDive=8
+show_err=1
+AutoWelding=0.03
+CloseDxf=0
+//title=my title
+//SpaceBar=disable
+//HomingZ=disable
+//AutoConnect=disable
+//HommingSeq=2
+//GCodeSignX=-
+
+[ Functions : 1:Out1 2:Out2 3:outermove 4:STOP ]
+
+//Gamepad8=1
+//Gamepad2=2
+
+//FuncF11=1
+//FuncF12=3

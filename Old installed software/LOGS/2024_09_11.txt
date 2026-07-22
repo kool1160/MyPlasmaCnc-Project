@@ -1,0 +1,15 @@
+|000| 4:52:27 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 4:52:27 PM Run as administrator
+|000| 4:52:27 PM Read advanced file
+|000| 4:52:27 PM Backup create
+|051| 4:52:28 PM Error: Software doesn`t closed previous.
+|051| 4:52:28 PM found : MyPlasm CNC
+|051| 4:52:28 PM TXCorr:2
+|051| 4:52:29 PM Old_TX_err
+|051| 4:52:29 PM Communication Error
+|051| 4:52:31 PM Game Controller detected OK
+|002| 4:53:37 PM found : MyPlasm CNC
+|002| 4:53:37 PM TXCorr:2
+|002| 4:53:38 PM Old_TX_err
+|002| 4:53:38 PM Communication Error
+|002| 4:56:16 PM CloseApp

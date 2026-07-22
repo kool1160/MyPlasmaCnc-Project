@@ -1,0 +1,705 @@
+|000| 5:46:49 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 5:46:49 PM Run as administrator
+|000| 5:46:49 PM Read advanced file
+|000| 5:46:49 PM Backup create
+|051| 5:46:50 PM found : MyPlasm CNC
+|051| 5:46:50 PM TXCorr:2
+|051| 5:46:51 PM Old_TX_err
+|051| 5:46:51 PM Communication Error
+|051| 5:47:20 PM found : MyPlasm CNC
+|051| 5:47:20 PM FirmwareVer 1.2 1
+|051| 5:47:20 PM Machine not referenced
+|051| 5:47:20 PM Communication OK
+|002| 5:47:25 PM Assign:101600 101600 11465 0
+|002| 5:47:25 PM Z axis referenced
+|002| 5:48:27 PM Assign:-500 101600 11265 0
+|002| 5:48:27 PM X axis referenced
+|050| 5:48:58 PM Warning: Microsteping X Axis not recomended value
+|050| 5:48:58 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:48:58 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:49:30 PM Assign:0 -500 11265 0
+|051| 5:49:30 PM Y axis referenced
+|050| 5:51:33 PM Warning: Microsteping X Axis not recomended value
+|050| 5:51:33 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:51:33 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping X Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping X Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:51:50 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:52:30 PM Warning: Microsteping X Axis not recomended value
+|050| 5:52:30 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:52:30 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping X Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping X Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:52:59 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:54:01 PM warring: Machine not referenced!
+|010| 5:54:01 PM ---- Work start ----
+|010| 5:54:01 PM Speed:6350 / 2997.2
+|011| 5:54:09 PM Work time :00:08
+|011| 5:54:09 PM Working stopped
+|002| 5:54:33 PM Assign:8399 8991 11465 0
+|002| 5:54:33 PM Z axis referenced
+|002| 5:54:39 PM Assign:-500 8991 11265 0
+|002| 5:54:39 PM X axis referenced
+|002| 5:54:47 PM Assign:0 -500 11265 0
+|002| 5:54:47 PM Y axis referenced
+|010| 5:54:59 PM ---- Work start ----
+|010| 5:54:59 PM Speed:6350 / 2997.2
+|011| 5:55:09 PM Work time :00:10
+|011| 5:55:09 PM Working stopped
+|002| 5:55:51 PM Assign:4373 4554 11465 0
+|002| 5:55:51 PM Z axis referenced
+|002| 5:55:55 PM Assign:-500 4554 11265 0
+|002| 5:55:55 PM X axis referenced
+|002| 5:56:00 PM Assign:0 -500 11265 0
+|002| 5:56:00 PM Y axis referenced
+|050| 5:56:27 PM Warning: Microsteping X Axis not recomended value
+|050| 5:56:27 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:56:27 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping X Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping X Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:57:00 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:57:06 PM warring: Machine not referenced!
+|010| 5:57:06 PM ---- Work start ----
+|010| 5:57:06 PM Speed:250 / 118
+|002| 5:57:06 PM "0..05" is not a Float2 Value!
+|002| 5:57:06 PM "0..05" is not a Float2 Value!
+|002| 5:57:06 PM "0..05" is not a Float2 Value!
+|011| 5:57:14 PM Work time :00:07
+|011| 5:57:14 PM Working stopped
+|011| 5:57:27 PM "0..05" is not a Float Value!
+|050| 5:57:27 PM Warning: Microsteping X Axis not recomended value
+|050| 5:57:27 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:57:27 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:57:48 PM Warning: Microsteping X Axis not recomended value
+|050| 5:57:48 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:57:48 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:58:36 PM warring: Machine not referenced!
+|010| 5:58:36 PM ---- Work start ----
+|010| 5:58:36 PM Speed:6350 / 2997.2
+|011| 5:58:47 PM Work time :00:10
+|011| 5:58:47 PM Working stopped
+|011| 5:58:57 PM Assign:36834 98809 11465 0
+|011| 5:58:57 PM Z axis referenced
+|011| 5:59:20 PM Assign:-500 98809 11265 0
+|011| 5:59:20 PM X axis referenced
+|011| 6:00:21 PM Assign:0 -500 11265 0
+|011| 6:00:21 PM Y axis referenced
+|050| 6:01:24 PM Warning: Microsteping X Axis not recomended value
+|050| 6:01:24 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:01:24 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:01:24 PM Warning: Microsteping X Axis not recomended value
+|050| 6:01:24 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:01:24 PM Warning: Microsteping Z Axis not recomended value
+|010| 6:01:39 PM ---- Work start ----
+|010| 6:01:39 PM Speed:6350 / 2997.2
+|011| 6:02:07 PM Work time :00:27
+|011| 6:02:07 PM Working stopped
+|011| 6:02:17 PM Assign:18397 21836 11465 0
+|011| 6:02:17 PM Z axis referenced
+|011| 6:02:29 PM Assign:-500 21836 11265 0
+|011| 6:02:29 PM X axis referenced
+|050| 6:02:35 PM Warning: Microsteping X Axis not recomended value
+|050| 6:02:35 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:02:35 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:02:35 PM Warning: Microsteping X Axis not recomended value
+|050| 6:02:35 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:02:35 PM Warning: Microsteping Z Axis not recomended value
+|051| 6:02:44 PM Assign:0 -500 11265 0
+|051| 6:02:44 PM Y axis referenced
+|050| 6:02:59 PM Warning: Microsteping X Axis not recomended value
+|050| 6:02:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:02:59 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:02:59 PM Warning: Microsteping X Axis not recomended value
+|050| 6:02:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:02:59 PM Warning: Microsteping Z Axis not recomended value
+|051| 6:03:09 PM Assign:0 0 11465 0
+|051| 6:03:09 PM Z axis referenced
+|010| 6:03:11 PM ---- Work start ----
+|010| 6:03:11 PM Speed:6350 / 2997.2
+|011| 6:03:51 PM Work time :00:39
+|011| 6:03:51 PM Working stopped
+|011| 6:03:59 PM Assign:80042 18077 11465 0
+|011| 6:03:59 PM Z axis referenced
+|011| 6:04:49 PM Assign:-500 18077 11265 0
+|011| 6:04:49 PM X axis referenced
+|011| 6:05:02 PM Assign:0 -500 11265 0
+|011| 6:05:02 PM Y axis referenced
+|050| 6:05:34 PM Warning: Microsteping X Axis not recomended value
+|050| 6:05:34 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:05:34 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:06:01 PM Warning: Microsteping X Axis not recomended value
+|050| 6:06:01 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:06:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:06:10 PM Warning: Microsteping X Axis not recomended value
+|050| 6:06:10 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:06:10 PM Warning: Microsteping Z Axis not recomended value
+|051| 6:06:18 PM found : MyPlasm CNC
+|051| 6:06:18 PM FirmwareVer 1.2 1
+|051| 6:06:18 PM Machine is referenced OK
+|051| 6:06:18 PM Communication OK
+|002| 6:06:30 PM Assign:0 0 11465 0
+|002| 6:06:30 PM Z axis referenced
+|002| 6:06:31 PM Assign:-500 0 11265 0
+|002| 6:06:31 PM X axis referenced
+|002| 6:06:33 PM Assign:0 -500 11265 0
+|002| 6:06:33 PM Y axis referenced
+|002| 6:14:32 PM Assign:108666 13572 11465 0
+|002| 6:14:32 PM Z axis referenced
+|002| 6:15:39 PM Assign:-500 13572 11265 0
+|002| 6:15:39 PM X axis referenced
+|002| 6:15:49 PM Assign:0 -500 11265 0
+|002| 6:15:49 PM Y axis referenced
+|002| 6:17:08 PM Assign:1627 1507 11465 0
+|002| 6:17:08 PM Z axis referenced
+|002| 6:17:23 PM Assign:1627 1507 11265 0
+|002| 6:17:23 PM Mat:X1627 Y1507
+|050| 6:17:38 PM Warning: Microsteping X Axis not recomended value
+|050| 6:17:38 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:17:38 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping X Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping X Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:17:41 PM Warning: Microsteping Z Axis not recomended value
+|010| 6:17:51 PM ---- Work start ----
+|010| 6:17:51 PM Speed:6350 / 2997.2
+|011| 6:18:07 PM Work time :00:15
+|011| 6:18:07 PM Working stopped
+|010| 6:18:38 PM ---- Work start ----
+|010| 6:18:38 PM Speed:6350 / 2997.2
+|011| 6:18:53 PM Work time :00:14
+|011| 6:18:53 PM Working stopped
+|002| 6:19:24 PM Assign:93668 31583 11465 0
+|002| 6:19:24 PM Z axis referenced
+|002| 6:20:21 PM Assign:-500 31583 11265 0
+|002| 6:20:21 PM X axis referenced
+|002| 6:20:42 PM Assign:0 -500 11265 0
+|002| 6:20:42 PM Y axis referenced
+|010| 6:22:07 PM ---- Work start ----
+|010| 6:22:07 PM Speed:6350 / 2997.2
+|011| 6:22:30 PM Work time :00:22
+|011| 6:22:30 PM Working stopped
+|050| 6:22:44 PM Warning: Microsteping X Axis not recomended value
+|050| 6:22:44 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:22:44 PM Warning: Microsteping Z Axis not recomended value
+|010| 6:23:19 PM ---- Work start ----
+|010| 6:23:19 PM Speed:6350 / 2997.2
+|011| 6:23:36 PM Work time :00:16
+|011| 6:23:36 PM Working stopped
+|010| 6:24:00 PM ---- Work start ----
+|010| 6:24:00 PM Speed:6350 / 2997.2
+|011| 6:28:03 PM Work time :04:02
+|011| 6:28:03 PM Finish work OK
+|010| 6:30:32 PM ---- Work start ----
+|010| 6:30:32 PM Speed:6350 / 2997.2
+|011| 6:36:27 PM Work time :05:54
+|011| 6:36:27 PM Finish work OK
+|100| 6:37:16 PM Preview: Silas Gray.DXF
+|110| 6:37:16 PM DXF err int: line: 1660
+|100| 6:40:16 PM Preview: Silas Gray.DXF
+|110| 6:40:16 PM DXF err int: line: 1660
+|110| 6:40:21 PM Preview: Hex Smodge pot base.plt
+|120| 6:40:28 PM LoadFile: Hex Smodge pot base.plt
+|120| 6:40:28 PM Raw pathes : 57
+|120| 6:40:28 PM Simplyfy to: 57 pathes
+|121| 6:43:22 PM TXCorr:2
+|121| 3:50:33 PM found : MyPlasm CNC
+|121| 3:50:33 PM FirmwareVer 1.2 1
+|121| 3:50:33 PM Machine not referenced
+|121| 3:50:33 PM Communication OK
+|050| 3:50:55 PM Warning: Microsteping X Axis not recomended value
+|050| 3:50:55 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:50:55 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping X Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping X Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:51:03 PM Warning: Microsteping Z Axis not recomended value
+|100| 3:51:08 PM Preview: Hex Smodge pot base.plt
+|110| 3:52:03 PM Assign:1627 1507 11465 0
+|110| 3:52:03 PM Z axis referenced
+|050| 3:52:39 PM Warning: Microsteping X Axis not recomended value
+|050| 3:52:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:52:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:52:39 PM Warning: Microsteping X Axis not recomended value
+|050| 3:52:40 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:52:40 PM Warning: Microsteping Z Axis not recomended value
+|010| 3:53:39 PM warring: Machine not referenced!
+|010| 3:53:39 PM ---- Work start ----
+|010| 3:53:39 PM Speed:6350 / 2997.2
+|002| 3:53:46 PM ARC_OK_ERROR ( 1V )
+|011| 3:53:46 PM Work time :00:07
+|011| 3:53:46 PM Working stopped
+|010| 3:54:34 PM warring: Machine not referenced!
+|010| 3:54:34 PM ---- Work start ----
+|010| 3:54:34 PM Speed:6350 / 2997.2
+|011| 3:54:39 PM Work time :00:04
+|011| 3:54:39 PM Working stopped
+|050| 3:55:27 PM Warning: Microsteping X Axis not recomended value
+|050| 3:55:27 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:55:27 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping X Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping X Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:55:36 PM Warning: Microsteping Z Axis not recomended value
+|010| 3:56:14 PM warring: Machine not referenced!
+|010| 3:56:14 PM ---- Work start ----
+|010| 3:56:14 PM Speed:6350 / 2997.2
+|011| 3:56:19 PM Work time :00:05
+|011| 3:56:19 PM Working stopped
+|010| 3:56:33 PM warring: Machine not referenced!
+|010| 3:56:33 PM ---- Work start ----
+|010| 3:56:33 PM Speed:6350 / 2997.2
+|011| 3:56:38 PM Work time :00:05
+|011| 3:56:38 PM Working stopped
+|010| 4:07:35 PM warring: Machine not referenced!
+|010| 4:07:35 PM ---- Work start ----
+|010| 4:07:35 PM Speed:6350 / 2997.2
+|011| 4:07:41 PM Work time :00:05
+|011| 4:07:41 PM Working stopped
+|011| 4:08:01 PM Assign:25393 94933 11465 0
+|011| 4:08:01 PM Z axis referenced
+|011| 4:08:17 PM Assign:-500 94933 11265 0
+|011| 4:08:17 PM X axis referenced
+|011| 4:09:16 PM Assign:0 -500 11265 0
+|011| 4:09:16 PM Y axis referenced
+|010| 4:09:41 PM ---- Work start ----
+|010| 4:09:41 PM Speed:6350 / 2997.2
+|011| 4:09:54 PM Work time :00:13
+|011| 4:09:54 PM Working stopped
+|100| 4:11:09 PM Preview: Hex Smodge pot base.plt
+|110| 4:11:22 PM Preview: paddle 16 x 16.DXF
+|110| 4:11:22 PM DXF err int: line: 1660
+|120| 4:11:28 PM LoadFile: paddle 16 x 16.DXF
+|120| 4:11:28 PM Raw pathes : 32
+|120| 4:11:28 PM Simplyfy to: 12 pathes
+|131| 4:13:15 PM Preview: Paddle.DXF
+|110| 4:13:15 PM DXF err int: line: 1700
+|120| 4:13:18 PM LoadFile: Paddle.DXF
+|120| 4:13:18 PM Raw pathes : 32
+|120| 4:13:18 PM Simplyfy to: 12 pathes
+|120| 4:13:20 PM LoadFile: Paddle.DXF
+|120| 4:13:20 PM Raw pathes : 32
+|120| 4:13:20 PM Simplyfy to: 12 pathes
+|121| 4:13:23 PM Preview: Paddle.DXF
+|110| 4:13:23 PM DXF err int: line: 1700
+|110| 4:13:31 PM Preview: Paddle.DXF
+|110| 4:13:31 PM DXF err int: line: 1700
+|110| 4:13:31 PM Preview: Paddle.DXF
+|110| 4:13:31 PM DXF err int: line: 1700
+|120| 4:13:38 PM LoadFile: Paddle.DXF
+|120| 4:13:38 PM Raw pathes : 32
+|120| 4:13:38 PM Simplyfy to: 12 pathes
+|121| 4:17:06 PM Preview: Silas Gray.DXF
+|110| 4:17:06 PM DXF err int: line: 1660
+|110| 4:17:07 PM Preview: Short Tray.DXF
+|110| 4:17:08 PM DXF err int: line: 1660
+|131| 4:29:16 PM Preview: Felon (1).dxf
+|110| 4:29:16 PM DXF err int: line: 1502
+|110| 4:29:16 PM DXF err int: line: 1516
+|120| 4:29:22 PM LoadFile: Felon (1).dxf
+|120| 4:29:22 PM Raw pathes : 10469
+|120| 4:29:24 PM Simplyfy to: 68 pathes
+|131| 4:30:49 PM Preview: Trump 2024 With Shades.dxf
+|120| 4:30:55 PM LoadFile: Trump 2024 With Shades.dxf
+|120| 4:30:55 PM Raw pathes : 706
+|120| 4:30:55 PM Simplyfy to: 40 pathes
+|002| 4:37:32 PM Assign:3459 108669 11465 0
+|002| 4:37:32 PM Z axis referenced
+|050| 4:38:01 PM Warning: Microsteping X Axis not recomended value
+|050| 4:38:01 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:38:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:38:01 PM Warning: Microsteping X Axis not recomended value
+|050| 4:38:01 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:38:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping X Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping X Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:39:28 PM ---- Work start ----
+|010| 4:39:28 PM Speed:6096 / 2997.2
+|011| 4:39:36 PM Work time :00:08
+|011| 4:39:36 PM Working stopped
+|050| 4:39:59 PM Warning: Microsteping X Axis not recomended value
+|050| 4:39:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:39:59 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping X Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping X Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:58:02 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:58:12 PM ARC_OK_ERROR ( 1V )
+|010| 5:00:17 PM ---- Work start ----
+|010| 5:00:17 PM Speed:6096 / 2997.2
+|011| 5:00:25 PM Work time :00:08
+|011| 5:00:25 PM Working stopped
+|050| 5:00:36 PM Warning: Microsteping X Axis not recomended value
+|050| 5:00:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:00:36 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping X Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping X Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:00:45 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:00:48 PM ---- Work start ----
+|010| 5:00:48 PM Speed:6096 / 2997.2
+|011| 5:06:21 PM Work time :05:33
+|011| 5:06:21 PM Finish work OK
+|011| 5:06:21 PM Save : LastGood
+|011| 5:11:58 PM TXCorr:2
+|100| 3:57:46 PM Preview: Trump 2024 With Shades.dxf
+|110| 3:58:04 PM Preview: jax dxf.dxf
+|110| 3:58:07 PM Preview: Harley wings.DXF
+|110| 3:58:09 PM DXF err int: line: 1700
+|110| 3:58:18 PM Preview: mopar skull.dxf
+|110| 3:58:25 PM Preview: Trump punisher.dxf
+|110| 3:58:25 PM DXF err int: line: 1636
+|110| 3:58:26 PM Preview: USA Liberty V2.dxf
+|110| 3:58:31 PM Preview: USA Liberty.dxf
+|110| 3:58:33 PM Preview: USA Liberty V2.dxf
+|110| 3:58:34 PM Preview: Trump2024letsgobrandonplaque.dxf
+|110| 3:58:51 PM Preview: Chevy Symbol2.dxf
+|110| 3:59:20 PM Preview: hd.dxf
+|110| 3:59:20 PM DXF err int: line: 4376
+|110| 3:59:26 PM Preview: Gamer Zone sign.dxf
+|110| 3:59:27 PM DXF INSERT function error
+|110| 3:59:27 PM Preview: harley davidson dxf files & Vector.dxf
+|110| 3:59:29 PM Preview: Harley Firepit side 1 dxf.DXF
+|110| 3:59:29 PM DXF err int: line: 1700
+|110| 3:59:30 PM Preview: hd.dxf
+|110| 3:59:30 PM DXF err int: line: 4376
+|110| 3:59:31 PM Preview: jax.dxf
+|110| 3:59:33 PM Preview: MODIFIED HD WINGS.dxf
+|110| 3:59:35 PM Preview: Owl on Branch.dxf
+|110| 3:59:36 PM Preview: Turtle-2.dxf
+|110| 3:59:36 PM DXF err int: line: 1830
+|110| 3:59:36 PM DXF INSERT function error
+|110| 3:59:40 PM Preview: hd.dxf
+|110| 3:59:40 PM DXF err int: line: 4376
+|110| 4:01:50 PM Preview: Harley_Davidson_clock.dxf
+|110| 4:01:50 PM DXF err int: line: 1768
+|110| 4:01:50 PM DXF INSERT function error
+|110| 4:01:51 PM Preview: Harley_Davidson_clock.dxf
+|110| 4:01:51 PM DXF err int: line: 1768
+|110| 4:01:51 PM DXF INSERT function error
+|110| 4:09:10 PM Preview: 00.dxf
+|110| 4:09:10 PM DXF err int: line: 1742
+|110| 4:09:17 PM Preview: 00.dxf
+|110| 4:09:17 PM DXF err int: line: 1742
+|110| 4:09:29 PM Preview: jax1.dxf
+|110| 4:09:29 PM Preview: Owl on Branch.dxf
+|110| 4:09:30 PM Preview: MODIFIED HD WINGS.dxf
+|110| 4:09:34 PM Preview: hd.dxf
+|110| 4:09:34 PM DXF err int: line: 4376
+|120| 4:09:39 PM LoadFile: hd.dxf
+|120| 4:09:39 PM Raw pathes : 704
+|120| 4:09:39 PM Simplyfy to: 40 pathes
+|131| 4:29:13 PM found : MyPlasm CNC
+|131| 4:29:13 PM FirmwareVer 1.2 1
+|131| 4:29:13 PM Machine not referenced
+|131| 4:29:13 PM Communication OK
+|010| 4:32:34 PM warring: Machine not referenced!
+|010| 4:32:34 PM ---- Work start ----
+|010| 4:32:34 PM Speed:6096 / 2997.2
+|011| 4:32:53 PM Work time :00:18
+|011| 4:32:53 PM Working stopped
+|010| 4:34:04 PM warring: Machine not referenced!
+|010| 4:34:04 PM ---- Work start ----
+|010| 4:34:04 PM Speed:6096 / 2997.2
+|011| 4:35:32 PM Work time :01:27
+|011| 4:35:32 PM Working stopped
+|010| 4:35:49 PM warring: Machine not referenced!
+|010| 4:35:49 PM ---- Work start ----
+|010| 4:35:49 PM Speed:6096 / 2997.2
+|011| 4:36:34 PM Work time :00:44
+|011| 4:36:34 PM Working stopped
+|010| 4:37:44 PM warring: Machine not referenced!
+|010| 4:37:44 PM ---- Work start ----
+|010| 4:37:44 PM Speed:6096 / 2997.2
+|011| 4:38:11 PM Work time :00:26
+|011| 4:38:11 PM Working stopped
+|050| 4:38:23 PM Warning: Microsteping X Axis not recomended value
+|050| 4:38:23 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:38:23 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:38:23 PM Warning: Microsteping X Axis not recomended value
+|050| 4:38:23 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:38:23 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:41:52 PM warring: Machine not referenced!
+|010| 4:41:52 PM ---- Work start ----
+|010| 4:41:52 PM Speed:5000 / 2997.2
+|011| 4:47:57 PM Work time :06:04
+|011| 4:47:57 PM Finish work OK
+|011| 4:47:57 PM Save : LastGood
+|011| 4:51:45 PM TXCorr:2
+|011| 4:12:03 PM found : MyPlasm CNC
+|011| 4:12:03 PM FirmwareVer 1.2 1
+|011| 4:12:03 PM Machine not referenced
+|011| 4:12:03 PM Communication OK
+|050| 4:12:17 PM Warning: Microsteping X Axis not recomended value
+|050| 4:12:17 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:12:17 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:12:22 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:12:22 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:12:26 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:12:41 PM Warning: Microsteping X Axis not recomended value
+|050| 4:12:41 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:13:08 PM Assign:52701 238559 11465 0
+|002| 4:13:09 PM Z axis referenced
+|002| 4:13:41 PM Assign:-500 238559 11265 0
+|002| 4:13:41 PM X axis referenced
+|002| 4:14:14 PM Assign:0 -500 11265 0
+|002| 4:14:14 PM Y axis referenced
+|002| 4:14:29 PM TXCorr:2
+|050| 4:15:37 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:15:39 PM found : MyPlasm CNC
+|051| 4:15:39 PM FirmwareVer 1.2 1
+|051| 4:15:39 PM Machine not referenced
+|051| 4:15:39 PM Communication OK
+|002| 4:15:46 PM Assign:0 0 11465 0
+|002| 4:15:46 PM Z axis referenced
+|002| 4:15:48 PM Assign:-500 0 11265 0
+|002| 4:15:48 PM X axis referenced
+|002| 4:15:50 PM Assign:0 -500 11265 0
+|002| 4:15:50 PM Y axis referenced
+|002| 4:16:59 PM Assign:-500 1000 11265 0
+|002| 4:16:59 PM X axis referenced
+|002| 4:17:02 PM Assign:0 -500 11265 0
+|002| 4:17:02 PM Y axis referenced
+|002| 4:17:22 PM Assign:0 0 11465 0
+|002| 4:17:22 PM Z axis referenced
+|050| 4:17:50 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:17:50 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:17:53 PM Warning: Microsteping X Axis not recomended value
+|050| 4:17:53 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:17:53 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:17:56 PM Assign:-500 500 11265 0
+|051| 4:17:56 PM X axis referenced
+|051| 4:17:57 PM Assign:0 -500 11265 0
+|051| 4:17:57 PM Y axis referenced
+|050| 4:18:02 PM Warning: Microsteping X Axis not recomended value
+|050| 4:18:02 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:18:02 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:18:11 PM Warning: Microsteping X Axis not recomended value
+|050| 4:18:11 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:18:11 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:18:31 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:18:31 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:18:39 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:18:44 PM Assign:0 2000 11465 0
+|051| 4:18:44 PM Z axis referenced
+|051| 4:18:47 PM Assign:-500 2000 11265 0
+|051| 4:18:47 PM X axis referenced
+|051| 4:18:50 PM Assign:0 -500 11265 0
+|051| 4:18:50 PM Y axis referenced
+|050| 4:18:55 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:18:58 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:18:58 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:19:22 PM Assign:0 1000 11465 0
+|002| 4:19:22 PM Z axis referenced
+|002| 4:19:23 PM Assign:-500 1000 11265 0
+|002| 4:19:23 PM X axis referenced
+|002| 4:19:26 PM Assign:0 -500 11265 0
+|002| 4:19:26 PM Y axis referenced
+|100| 4:21:25 PM Preview: hd.dxf
+|110| 4:21:25 PM DXF err int: line: 4376
+|110| 4:21:29 PM Preview: Turtle-2.dxf
+|110| 4:21:29 PM DXF err int: line: 1830
+|110| 4:21:29 PM DXF INSERT function error
+|110| 4:22:25 PM Preview: Silas Gray.DXF
+|110| 4:22:25 PM DXF err int: line: 1660
+|120| 4:22:29 PM LoadFile: Silas Gray.DXF
+|120| 4:22:29 PM Raw pathes : 1293
+|120| 4:22:29 PM Simplyfy to: 15 pathes
+|131| 4:24:22 PM Preview: Hex Smodge pot.DXF
+|110| 4:24:22 PM DXF err int: line: 1660
+|110| 4:24:27 PM Preview: ModernHexagonSmudgepot.dxf
+|120| 4:24:37 PM LoadFile: ModernHexagonSmudgepot.dxf
+|120| 4:24:37 PM Raw pathes : 497
+|120| 4:24:37 PM Simplyfy to: 246 pathes
+|002| 4:28:13 PM Assign:19196 64115 11465 0
+|002| 4:28:13 PM Z axis referenced
+|002| 4:28:26 PM Assign:-500 64115 11265 0
+|002| 4:28:26 PM X axis referenced
+|002| 4:29:06 PM Assign:0 -500 11265 0
+|002| 4:29:06 PM Y axis referenced
+|050| 4:29:51 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:29:51 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:30:28 PM Assign:44237 109781 11465 0
+|002| 4:30:28 PM Z axis referenced
+|002| 4:30:56 PM Assign:-500 109781 11265 0
+|002| 4:30:56 PM X axis referenced
+|002| 4:32:04 PM Assign:0 -500 11265 0
+|002| 4:32:04 PM Y axis referenced
+|050| 4:38:31 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:38:46 PM Assign:21780 8494 11465 0
+|051| 4:38:46 PM Z axis referenced
+|050| 4:38:52 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:39:13 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:39:23 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:40:05 PM Assign:21780 8494 11465 0
+|002| 4:40:05 PM Z axis referenced
+|050| 4:40:36 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:43:00 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:43:00 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:43:02 PM ---- Work start ----
+|010| 4:43:02 PM Speed:5000 / 2997.2
+|011| 4:43:26 PM Work time :00:23
+|011| 4:43:26 PM Working stopped
+|010| 4:43:42 PM ---- Work start ----
+|010| 4:43:42 PM Speed:5000 / 2997.2
+|011| 4:43:54 PM Work time :00:12
+|011| 4:43:54 PM Working stopped
+|050| 4:49:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:49:39 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:49:46 PM ---- Work start ----
+|010| 4:49:46 PM Speed:5000 / 2997.2
+|011| 5:09:04 PM Work time :19:17
+|011| 5:09:04 PM Finish work OK
+|011| 5:09:04 PM Save : LastGood
+|011| 5:13:19 PM TXCorr:2
+|011| 2:21:00 PM found : MyPlasm CNC
+|011| 2:21:00 PM FirmwareVer 1.2 1
+|011| 2:21:00 PM Machine not referenced
+|011| 2:21:00 PM Communication OK
+|100| 2:26:29 PM Preview: ModernHexagonSmudgepot.dxf
+|120| 2:26:33 PM LoadFile: ModernHexagonSmudgepot.dxf
+|120| 2:26:33 PM Raw pathes : 497
+|120| 2:26:33 PM Simplyfy to: 246 pathes
+|050| 2:55:11 PM Warning: Microsteping Z Axis not recomended value
+|050| 2:55:12 PM Warning: Microsteping Z Axis not recomended value
+|050| 2:55:12 PM Warning: Microsteping Z Axis not recomended value
+|100| 2:55:16 PM Preview: ModernHexagonSmudgepot.dxf
+|131| 2:56:46 PM TXCorr:2
+|131| 4:58:35 PM Assign:25857 170740 11465 0
+|131| 4:58:35 PM Z axis referenced
+|131| 4:58:35 PM Assign:0 170740 11465 0
+|131| 4:58:35 PM X axis referenced
+|131| 4:58:36 PM Assign:0 0 11465 0
+|131| 4:58:36 PM Y axis referenced
+|002| 4:58:36 PM found : MyPlasm CNC
+|002| 4:58:36 PM FirmwareVer 1.2 1
+|002| 4:58:36 PM Machine not referenced
+|002| 4:58:36 PM Communication OK
+|002| 4:59:05 PM Assign:25857 170740 11465 0
+|002| 4:59:05 PM Z axis referenced
+|002| 4:59:22 PM Assign:-500 170740 11265 0
+|002| 4:59:22 PM X axis referenced
+|002| 5:00:48 PM " " is not a Float2 Value!
+|002| 5:00:57 PM Assign:500 100265 11465 0
+|002| 5:00:57 PM Z axis referenced
+|002| 5:00:59 PM Assign:-500 100265 11265 0
+|002| 5:00:59 PM X axis referenced
+|002| 5:02:01 PM Assign:0 -500 11265 0
+|002| 5:02:01 PM Y axis referenced
+|100| 5:05:02 PM Preview: ModernHexagonSmudgepot.dxf
+|002| 5:18:49 PM Assign:2659 900 11465 0
+|002| 5:18:49 PM Z axis referenced
+|002| 5:18:52 PM Assign:-500 900 11265 0
+|002| 5:18:52 PM X axis referenced
+|002| 5:18:55 PM Assign:0 -500 11265 0
+|002| 5:18:55 PM Y axis referenced
+|050| 5:20:22 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:22:04 PM Assign:13600 19118 11465 0
+|002| 5:22:04 PM Z axis referenced
+|002| 5:23:01 PM " " is not a Float2 Value!
+|002| 5:23:01 PM " " is not a Float2 Value!
+|002| 5:23:01 PM " " is not a Float2 Value!
+|010| 5:26:17 PM ---- Work start ----
+|010| 5:26:17 PM Speed:6096 / 2997.2
+|011| 5:26:35 PM Work time :00:17
+|011| 5:26:35 PM Working stopped
+|050| 5:26:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:26:39 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:29:22 PM ---- Work start ----
+|010| 5:29:22 PM Speed:6096 / 2997.2
+|011| 5:35:37 PM Work time :06:15
+|011| 5:35:37 PM Finish work OK
+|011| 5:35:37 PM Save : LastGood
+|002| 5:51:00 PM TXCorr:2
+|002| 4:41:00 PM found : MyPlasm CNC
+|002| 4:41:00 PM FirmwareVer 1.2 1
+|002| 4:41:00 PM Machine not referenced
+|002| 4:41:00 PM Communication OK
+|002| 4:42:30 PM TXCorr:2
+|002| 4:43:01 PM found : MyPlasm CNC
+|002| 4:43:01 PM FirmwareVer 1.2 1
+|002| 4:43:01 PM Machine not referenced
+|002| 4:43:01 PM Communication OK
+|050| 4:43:27 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:57:31 PM TXCorr:2
+|002| 5:04:24 PM found : MyPlasm CNC
+|002| 5:04:24 PM FirmwareVer 1.2 1
+|002| 5:04:24 PM Machine not referenced
+|002| 5:04:24 PM Communication OK
+|002| 5:07:30 PM Assign:13014 69956 11465 0
+|002| 5:07:30 PM Z axis referenced
+|002| 5:07:39 PM Assign:-500 69956 11265 0
+|002| 5:07:39 PM X axis referenced
+|002| 5:08:23 PM Assign:0 -500 11265 0
+|002| 5:08:23 PM Y axis referenced
+|002| 5:08:39 PM TXCorr:2
+|002| 6:41:59 PM found : MyPlasm CNC
+|002| 6:41:59 PM FirmwareVer 1.2 1
+|002| 6:41:59 PM Machine not referenced
+|002| 6:41:59 PM Communication OK
+|002| 6:42:06 PM Assign:0 3800 11465 0
+|002| 6:42:07 PM Z axis referenced
+|002| 6:42:08 PM Assign:-500 3800 11265 0
+|002| 6:42:08 PM X axis referenced
+|002| 6:42:13 PM Assign:0 -500 11265 0
+|002| 6:42:13 PM Y axis referenced
+|002| 6:47:11 PM TXCorr:2
+|002| 4:19:14 PM found : MyPlasm CNC
+|002| 4:19:14 PM FirmwareVer 1.2 1
+|002| 4:19:14 PM Machine not referenced
+|002| 4:19:14 PM Communication OK
+|002| 4:20:26 PM Assign:71593 98615 11465 0
+|002| 4:20:26 PM Z axis referenced
+|002| 4:20:45 PM Assign:-500 98615 11265 0
+|002| 4:20:45 PM X axis referenced
+|002| 4:21:46 PM Assign:0 -500 11265 0
+|002| 4:21:46 PM Y axis referenced
+|100| 4:23:37 PM Preview: ModernHexagonSmudgepot.dxf
+|110| 4:23:56 PM Preview: sLpsS-heart-love-sign-gift-for-valentine.dxf
+|110| 4:23:57 PM DXF err int: line: 1520
+|110| 4:23:57 PM Preview: Silas Gray.DXF
+|110| 4:23:57 PM DXF err int: line: 1660
+|002| 4:28:49 PM Assign:21784 69407 5518 0
+|002| 4:28:49 PM Mat:X21784 Y69407
+|050| 4:31:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:31:01 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:31:29 PM ---- Work start ----
+|010| 4:31:29 PM Speed:6096 / 2997.2
+|011| 4:31:46 PM Work time :00:17
+|011| 4:31:46 PM Working stopped
+|011| 4:33:02 PM Assign:84144 82140 6153 0
+|011| 4:33:02 PM Mat:X84144 Y82140
+|002| 4:34:24 PM Assign:20163 69085 6153 0
+|002| 4:34:24 PM Mat:X20163 Y69085
+|010| 4:35:01 PM ---- Work start ----
+|010| 4:35:01 PM Speed:6096 / 2997.2
+|011| 4:35:11 PM Work time :00:09
+|011| 4:35:11 PM Working stopped
+|010| 4:36:31 PM ---- Work start ----
+|010| 4:36:31 PM Speed:6096 / 2997.2
+|011| 4:39:57 PM Work time :03:25
+|011| 4:39:57 PM Finish work OK
+|011| 4:39:57 PM Save : LastGood
+|002| 4:45:05 PM TXCorr:2

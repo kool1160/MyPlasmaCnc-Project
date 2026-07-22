@@ -1,0 +1,456 @@
+2024-11-01 09:17:13 [INFO]     myminicad    | MyMiniCAD ver.v0.7.8_rc2
+2024-11-01 09:17:13 [INFO]     myminicad    | Starting with arguments: ['C:\\Program Files (x86)\\MyPlasmCNC\\MyMiniCad\\MyMiniCAD.exe']
+2024-11-01 09:17:13 [INFO]     myminicad    | Application directory: C:\Program Files (x86)\MyPlasmCNC\MyMiniCad\
+2024-11-01 09:17:13 [INFO]     myminicad    | Program Data directory: C:\ProgramData\PromaElektronika\MyMiniCAD\
+2024-11-01 09:17:13 [INFO]     myminicad    | User documents directory: C:\Users\Laser X Design\documents\
+2024-11-01 09:17:13 [INFO]     myminicad    | Checking configuration status: 
+2024-11-01 09:17:13 [INFO]     myminicad    | config.toml processed correctly.
+2024-11-01 09:17:13 [INFO]     myminicad    | Loading user-settings.toml.
+2024-11-01 09:17:13 [WARNING]  myminicad    | Configuration does not exist yet. Leaving with defaults. [Errno 2] No such file or directory: 'C:\\ProgramData\\PromaElektronika\\MyMiniCAD\\user-settings.toml'
+2024-11-01 09:17:13 [INFO]     myminicad    | Log's file status: OK - C:\ProgramData\PromaElektronika\MyMiniCAD\logs\log.txt
+2024-11-01 09:17:13 [INFO]     myminicad    | Starting the application...
+2024-11-01 09:17:13 [INFO]     myminicad    | Creating a document...
+2024-11-01 09:17:13 [INFO]     myminicad    | Crating a window...
+2024-11-01 09:17:15 [INFO]     myminicad    | Connecting the view with the document...
+2024-11-01 09:17:15 [INFO]     myminicad    | Installing the control handlers...
+2024-11-01 09:17:15 [INFO]     myminicad    | Showing the window...
+2024-11-01 09:17:15 [INFO]     myminicad    | Running...
+2024-11-01 09:17:50 [INFO]     Action       | Starting action: DrawRectangle_Action
+2024-11-01 09:17:50 [DEBUG]    Document     | (preview) Creating a Vertex V1 at (-9999999.0000, 9999999.0000)
+2024-11-01 09:17:51 [DEBUG]    Document     | (preview) Removing entity V1
+2024-11-01 09:17:51 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:17:51 [INFO]     Action       | Starting action: DrawLine_Action
+2024-11-01 09:17:51 [DEBUG]    Document     | (preview) Creating a Vertex V2 at (-9999999.0000, 9999999.0000)
+2024-11-01 09:17:51 [INFO]     Document     | Creating a Vertex V3 at (-1600.0000, 900.0000)
+2024-11-01 09:17:51 [DEBUG]    Document     | (preview) Creating a Line E1 between V3 and V2
+2024-11-01 09:17:53 [DEBUG]    Document     | (preview) Removing entity E1
+2024-11-01 09:17:53 [DEBUG]    Document     | (preview) Creating a Line E2 between V3 and V2
+2024-11-01 09:17:53 [DEBUG]    Document     | (preview) Removing entity V2
+2024-11-01 09:17:53 [DEBUG]    Document     | (preview) Removing entity E2
+2024-11-01 09:17:53 [DEBUG]    Document     | (preview) Creating a Vertex V4 at (-1600.0000, 900.0000)
+2024-11-01 09:17:55 [INFO]     Document     | Creating a Vertex V5 at (400.0000, 900.0000)
+2024-11-01 09:17:55 [DEBUG]    Document     | (preview) Creating a Line E3 between V5 and V4
+2024-11-01 09:17:56 [DEBUG]    Document     | (preview) Removing entity E3
+2024-11-01 09:17:56 [INFO]     Document     | Creating a Vertex V6 at (400.0000, 837.2703)
+2024-11-01 09:17:56 [INFO]     Document     | Creating a Line E4 between V5 and V6
+2024-11-01 09:17:56 [DEBUG]    Document     | (preview) Creating a Line E5 between V6 and V4
+2024-11-01 09:18:06 [DEBUG]    Document     | (preview) Removing entity E5
+2024-11-01 09:18:06 [INFO]     Document     | Creating a Vertex V7 at (238.8451, -700.0000)
+2024-11-01 09:18:06 [INFO]     Document     | Creating a Line E6 between V6 and V7
+2024-11-01 09:18:06 [DEBUG]    Document     | (preview) Creating a Line E7 between V7 and V4
+2024-11-01 09:18:09 [DEBUG]    Document     | (preview) Removing entity E7
+2024-11-01 09:18:09 [DEBUG]    Document     | (preview) Removing entity V4
+2024-11-01 09:18:09 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:18:14 [INFO]     Action       | Starting action: DrawRectangle_Action
+2024-11-01 09:18:14 [DEBUG]    Document     | (preview) Creating a Vertex V8 at (-9999999.0000, 9999999.0000)
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Vertex V9 at (-999.0000, -999.0000)
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Vertex V10 at (-999.0000, -999.0000)
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Vertex V11 at (-999.0000, -999.0000)
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Line E8 between V8 and V10
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Line E9 between V8 and V11
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Line E10 between V9 and V10
+2024-11-01 09:18:15 [DEBUG]    Document     | (preview) Creating a Line E11 between V9 and V11
+2024-11-01 09:18:17 [INFO]     Document     | Creating a Vertex V12 at (-1600.0000, -800.0000)
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Removing entity E8
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Removing entity E9
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Removing entity E10
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Removing entity E11
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Removing entity V9
+2024-11-01 09:18:17 [INFO]     Document     | Remove preview from vertex: V8 (-1600.0000, -800.0000)
+2024-11-01 09:18:17 [INFO]     Document     | Remove preview from vertex: V10 (-1600.0000, -800.0000)
+2024-11-01 09:18:17 [INFO]     Document     | Remove preview from vertex: V11 (-1600.0000, -800.0000)
+2024-11-01 09:18:17 [INFO]     Document     | Creating a Line E12 between V8 and V10
+2024-11-01 09:18:17 [INFO]     Document     | Creating a Line E13 between V8 and V11
+2024-11-01 09:18:17 [INFO]     Document     | Creating a Line E14 between V12 and V10
+2024-11-01 09:18:17 [INFO]     Document     | Creating a Line E15 between V12 and V11
+2024-11-01 09:18:17 [DEBUG]    Document     | (preview) Creating a Vertex V13 at (-1600.0000, -800.0000)
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Vertex V14 at (-999.0000, -999.0000)
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Vertex V15 at (-999.0000, -999.0000)
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Vertex V16 at (-999.0000, -999.0000)
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Line E16 between V13 and V15
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Line E17 between V13 and V16
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Line E18 between V14 and V15
+2024-11-01 09:18:21 [DEBUG]    Document     | (preview) Creating a Line E19 between V14 and V16
+2024-11-01 09:18:23 [INFO]     Document     | Creating a Vertex V17 at (800.0000, 700.0000)
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity E16
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity E17
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity E18
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity E19
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity V14
+2024-11-01 09:18:23 [INFO]     Document     | Remove preview from vertex: V13 (800.0000, 700.0000)
+2024-11-01 09:18:23 [INFO]     Document     | Remove preview from vertex: V15 (800.0000, 700.0000)
+2024-11-01 09:18:23 [INFO]     Document     | Remove preview from vertex: V16 (800.0000, 700.0000)
+2024-11-01 09:18:23 [INFO]     Document     | Creating a Line E20 between V13 and V15
+2024-11-01 09:18:23 [INFO]     Document     | Creating a Line E21 between V13 and V16
+2024-11-01 09:18:23 [INFO]     Document     | Creating a Line E22 between V17 and V15
+2024-11-01 09:18:23 [INFO]     Document     | Creating a Line E23 between V17 and V16
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Vertex V18 at (800.0000, 700.0000)
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Removing entity V18
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Vertex V19 at (-999.0000, -999.0000)
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Vertex V20 at (-999.0000, -999.0000)
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Vertex V21 at (-999.0000, -999.0000)
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Line E24 between V17 and V20
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Line E25 between V17 and V21
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Line E26 between V19 and V20
+2024-11-01 09:18:23 [DEBUG]    Document     | (preview) Creating a Line E27 between V19 and V21
+2024-11-01 09:18:29 [INFO]     Document     | Creating a Vertex V22 at (-1300.0000, -800.0000)
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Removing entity E24
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Removing entity E25
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Removing entity E26
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Removing entity E27
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Removing entity V19
+2024-11-01 09:18:29 [INFO]     Document     | Remove preview from vertex: V20 (800.0000, -800.0000)
+2024-11-01 09:18:29 [INFO]     Document     | Remove preview from vertex: V21 (-1300.0000, 700.0000)
+2024-11-01 09:18:29 [INFO]     Document     | Creating a Line E28 between V17 and V20
+2024-11-01 09:18:29 [INFO]     Document     | Creating a Line E29 between V17 and V21
+2024-11-01 09:18:29 [INFO]     Document     | Creating a Line E30 between V22 and V20
+2024-11-01 09:18:29 [INFO]     Document     | Creating a Line E31 between V22 and V21
+2024-11-01 09:18:29 [DEBUG]    Document     | (preview) Creating a Vertex V23 at (-1300.0000, -800.0000)
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Removing entity V23
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Vertex V24 at (-999.0000, -999.0000)
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Vertex V25 at (-999.0000, -999.0000)
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Vertex V26 at (-999.0000, -999.0000)
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Line E32 between V22 and V25
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Line E33 between V22 and V26
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Line E34 between V24 and V25
+2024-11-01 09:18:30 [DEBUG]    Document     | (preview) Creating a Line E35 between V24 and V26
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity E32
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity E33
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity E34
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity E35
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity V25
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity V26
+2024-11-01 09:18:33 [DEBUG]    Document     | (preview) Removing entity V24
+2024-11-01 09:18:33 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:18:38 [INFO]     Action       | Starting action: DrawRectangle_Action
+2024-11-01 09:18:38 [DEBUG]    Document     | (preview) Creating a Vertex V27 at (-9999999.0000, 9999999.0000)
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Vertex V28 at (-999.0000, -999.0000)
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Vertex V29 at (-999.0000, -999.0000)
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Vertex V30 at (-999.0000, -999.0000)
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Line E36 between V27 and V29
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Line E37 between V27 and V30
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Line E38 between V28 and V29
+2024-11-01 09:18:39 [DEBUG]    Document     | (preview) Creating a Line E39 between V28 and V30
+2024-11-01 09:18:40 [INFO]     Document     | Creating a Vertex V31 at (-1600.0000, -800.0000)
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Removing entity E36
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Removing entity E37
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Removing entity E38
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Removing entity E39
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Removing entity V28
+2024-11-01 09:18:40 [INFO]     Document     | Remove preview from vertex: V27 (-1600.0000, -800.0000)
+2024-11-01 09:18:40 [INFO]     Document     | Remove preview from vertex: V29 (-1600.0000, -800.0000)
+2024-11-01 09:18:40 [INFO]     Document     | Remove preview from vertex: V30 (-1600.0000, -800.0000)
+2024-11-01 09:18:40 [INFO]     Document     | Creating a Line E40 between V27 and V29
+2024-11-01 09:18:40 [INFO]     Document     | Creating a Line E41 between V27 and V30
+2024-11-01 09:18:40 [INFO]     Document     | Creating a Line E42 between V31 and V29
+2024-11-01 09:18:40 [INFO]     Document     | Creating a Line E43 between V31 and V30
+2024-11-01 09:18:40 [DEBUG]    Document     | (preview) Creating a Vertex V32 at (-1600.0000, -800.0000)
+2024-11-01 09:18:43 [DEBUG]    Document     | (preview) Removing entity V32
+2024-11-01 09:18:43 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:18:45 [INFO]     Action       | Starting action: DrawRectangle_Action
+2024-11-01 09:18:45 [DEBUG]    Document     | (preview) Creating a Vertex V33 at (-9999999.0000, 9999999.0000)
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Vertex V34 at (-999.0000, -999.0000)
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Vertex V35 at (-999.0000, -999.0000)
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Vertex V36 at (-999.0000, -999.0000)
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Line E44 between V33 and V35
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Line E45 between V33 and V36
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Line E46 between V34 and V35
+2024-11-01 09:18:46 [DEBUG]    Document     | (preview) Creating a Line E47 between V34 and V36
+2024-11-01 09:19:10 [INFO]     Document     | Creating a Vertex V37 at (1656.1680, 900.0000)
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Removing entity E44
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Removing entity E45
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Removing entity E46
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Removing entity E47
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Removing entity V34
+2024-11-01 09:19:10 [INFO]     Document     | Remove preview from vertex: V33 (-1600.0000, -800.0000)
+2024-11-01 09:19:10 [INFO]     Document     | Remove preview from vertex: V35 (-1600.0000, 900.0000)
+2024-11-01 09:19:10 [INFO]     Document     | Remove preview from vertex: V36 (1656.1680, -800.0000)
+2024-11-01 09:19:10 [INFO]     Document     | Creating a Line E48 between V33 and V35
+2024-11-01 09:19:10 [INFO]     Document     | Creating a Line E49 between V33 and V36
+2024-11-01 09:19:10 [INFO]     Document     | Creating a Line E50 between V37 and V35
+2024-11-01 09:19:10 [INFO]     Document     | Creating a Line E51 between V37 and V36
+2024-11-01 09:19:10 [DEBUG]    Document     | (preview) Creating a Vertex V38 at (1656.1680, 900.0000)
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Vertex V39 at (-999.0000, -999.0000)
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Vertex V40 at (-999.0000, -999.0000)
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Vertex V41 at (-999.0000, -999.0000)
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Line E52 between V38 and V40
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Line E53 between V38 and V41
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Line E54 between V39 and V40
+2024-11-01 09:19:12 [DEBUG]    Document     | (preview) Creating a Line E55 between V39 and V41
+2024-11-01 09:19:14 [INFO]     Document     | Creating a Vertex V42 at (-300.0000, 165.3543)
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Removing entity E52
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Removing entity E53
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Removing entity E54
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Removing entity E55
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Removing entity V39
+2024-11-01 09:19:14 [INFO]     Document     | Remove preview from vertex: V38 (400.0000, 300.0000)
+2024-11-01 09:19:14 [INFO]     Document     | Remove preview from vertex: V40 (400.0000, 165.3543)
+2024-11-01 09:19:14 [INFO]     Document     | Remove preview from vertex: V41 (-300.0000, 300.0000)
+2024-11-01 09:19:14 [INFO]     Document     | Creating a Line E56 between V38 and V40
+2024-11-01 09:19:14 [INFO]     Document     | Creating a Line E57 between V38 and V41
+2024-11-01 09:19:14 [INFO]     Document     | Creating a Line E58 between V42 and V40
+2024-11-01 09:19:14 [INFO]     Document     | Creating a Line E59 between V42 and V41
+2024-11-01 09:19:14 [DEBUG]    Document     | (preview) Creating a Vertex V43 at (-300.0000, 165.3543)
+2024-11-01 09:19:17 [DEBUG]    Document     | (preview) Removing entity V43
+2024-11-01 09:19:17 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:19:30 [INFO]     Action       | Starting action: Intersection_Action
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E56
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E56
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E56
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E56
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E57
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E57
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E57
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E57
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E58
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E58
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E58
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E58
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E59
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E59
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E59
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [ERROR]    Document     | 'Called boundingRect' on deleted entity: E59
+  File "MyMiniCAD.py", line 165, in <module>
+  File "MyMiniCAD.py", line 145, in run_app
+  File "myminicad\view\ui\button_templates.py", line 38, in clicked_action
+  File "myminicad\controler\action_handler.py", line 99, in set_active_action
+  File "myminicad\controler\actions\manual_intersection.py", line 21, in start_action
+  File "myminicad\controler\intersections\intersection_handler.py", line 26, in check_manual_intersection
+  File "myminicad\controler\intersections\i_edge_edge.py", line 33, in edges_intersections
+  File "myminicad\model\shapes\edge.py", line 159, in boundingRect
+  File "myminicad\model\cad_entity.py", line 123, in check_existance
+
+2024-11-01 09:19:30 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:20:22 [INFO]     Action       | Starting action: Translate_Action
+2024-11-01 09:20:22 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:11 [INFO]     Action       | Starting action: Stub_Action
+2024-11-01 09:21:11 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:11 [INFO]     Action       | Starting action: Stub_Action
+2024-11-01 09:21:13 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:13 [INFO]     Action       | Starting action: ZoomFitToScene_Action
+2024-11-01 09:21:13 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:42 [INFO]     Action       | Starting action: Delete_Action
+2024-11-01 09:21:42 [INFO]     Document     | Removing entity E49
+2024-11-01 09:21:42 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:59 [INFO]     Action       | Starting action: Delete_Action
+2024-11-01 09:21:59 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 09:21:59 [INFO]     Action       | Starting action: Delete_Action
+2024-11-01 09:21:59 [INFO]     Action       | Starting action: Default_Action
+2024-11-01 10:02:23 [INFO]     myminicad    | Exiting...
+2024-11-01 10:02:23 [INFO]     myminicad    | Saving user-settings.toml.
+2024-11-01 10:02:23 [INFO]     myminicad    | user-settings.toml saved correctly.
+2024-11-01 10:02:23 [INFO]     myminicad    | Application has finished.
+2024-11-04 16:13:46 [INFO]     myminicad    | MyMiniCAD ver.v0.7.8_rc2
+2024-11-04 16:13:46 [INFO]     myminicad    | Starting with arguments: ['C:\\Program Files (x86)\\MyPlasmCNC\\MyMiniCad\\MyMiniCad.exe']
+2024-11-04 16:13:46 [INFO]     myminicad    | Application directory: C:\Program Files (x86)\MyPlasmCNC\MyMiniCad\
+2024-11-04 16:13:46 [INFO]     myminicad    | Program Data directory: C:\ProgramData\PromaElektronika\MyMiniCAD\
+2024-11-04 16:13:46 [INFO]     myminicad    | User documents directory: C:\Users\Laser X Design\documents\
+2024-11-04 16:13:46 [INFO]     myminicad    | Checking configuration status: 
+2024-11-04 16:13:46 [INFO]     myminicad    | config.toml processed correctly.
+2024-11-04 16:13:46 [INFO]     myminicad    | Loading user-settings.toml.
+2024-11-04 16:13:46 [INFO]     myminicad    | user-settings.toml processed correctly.
+2024-11-04 16:13:46 [INFO]     myminicad    | Log's file status: OK - C:\ProgramData\PromaElektronika\MyMiniCAD\logs\log.txt
+2024-11-04 16:13:46 [INFO]     myminicad    | Starting the application...
+2024-11-04 16:13:46 [INFO]     myminicad    | Creating a document...
+2024-11-04 16:13:46 [INFO]     myminicad    | Crating a window...
+2024-11-04 16:13:46 [INFO]     myminicad    | Connecting the view with the document...
+2024-11-04 16:13:46 [INFO]     myminicad    | Installing the control handlers...
+2024-11-04 16:13:46 [INFO]     myminicad    | Showing the window...
+2024-11-04 16:13:46 [INFO]     myminicad    | Running...
+2024-11-04 16:16:56 [INFO]     myminicad    | Exiting...
+2024-11-04 16:16:56 [INFO]     myminicad    | Saving user-settings.toml.
+2024-11-04 16:16:56 [INFO]     myminicad    | user-settings.toml saved correctly.
+2024-11-04 16:16:56 [INFO]     myminicad    | Application has finished.
+2024-11-04 16:17:43 [INFO]     myminicad    | MyMiniCAD ver.v0.7.8_rc2
+2024-11-04 16:17:43 [INFO]     myminicad    | Starting with arguments: ['C:\\Program Files (x86)\\MyPlasmCNC\\MyMiniCad\\MyMiniCad.exe']
+2024-11-04 16:17:43 [INFO]     myminicad    | Application directory: C:\Program Files (x86)\MyPlasmCNC\MyMiniCad\
+2024-11-04 16:17:43 [INFO]     myminicad    | Program Data directory: C:\ProgramData\PromaElektronika\MyMiniCAD\
+2024-11-04 16:17:43 [INFO]     myminicad    | User documents directory: C:\Users\Laser X Design\documents\
+2024-11-04 16:17:43 [INFO]     myminicad    | Checking configuration status: 
+2024-11-04 16:17:43 [INFO]     myminicad    | config.toml processed correctly.
+2024-11-04 16:17:43 [INFO]     myminicad    | Loading user-settings.toml.
+2024-11-04 16:17:43 [INFO]     myminicad    | user-settings.toml processed correctly.
+2024-11-04 16:17:43 [INFO]     myminicad    | Log's file status: OK - C:\ProgramData\PromaElektronika\MyMiniCAD\logs\log.txt
+2024-11-04 16:17:43 [INFO]     myminicad    | Starting the application...
+2024-11-04 16:17:43 [INFO]     myminicad    | Creating a document...
+2024-11-04 16:17:43 [INFO]     myminicad    | Crating a window...
+2024-11-04 16:17:43 [INFO]     myminicad    | Connecting the view with the document...
+2024-11-04 16:17:43 [INFO]     myminicad    | Installing the control handlers...
+2024-11-04 16:17:43 [INFO]     myminicad    | Showing the window...
+2024-11-04 16:17:43 [INFO]     myminicad    | Running...
+2024-11-06 16:21:20 [INFO]     myminicad    | MyMiniCAD ver.v0.7.8_rc2
+2024-11-06 16:21:20 [INFO]     myminicad    | Starting with arguments: ['C:\\Program Files (x86)\\MyPlasmCNC\\MyMiniCad\\MyMiniCAD.exe']
+2024-11-06 16:21:20 [INFO]     myminicad    | Application directory: C:\Program Files (x86)\MyPlasmCNC\MyMiniCad\
+2024-11-06 16:21:20 [INFO]     myminicad    | Program Data directory: C:\ProgramData\PromaElektronika\MyMiniCAD\
+2024-11-06 16:21:20 [INFO]     myminicad    | User documents directory: C:\Users\Laser X Design\documents\
+2024-11-06 16:21:20 [INFO]     myminicad    | Checking configuration status: 
+2024-11-06 16:21:20 [INFO]     myminicad    | config.toml processed correctly.
+2024-11-06 16:21:20 [INFO]     myminicad    | Loading user-settings.toml.
+2024-11-06 16:21:20 [INFO]     myminicad    | user-settings.toml processed correctly.
+2024-11-06 16:21:20 [INFO]     myminicad    | Log's file status: OK - C:\ProgramData\PromaElektronika\MyMiniCAD\logs\log.txt
+2024-11-06 16:21:20 [INFO]     myminicad    | Starting the application...
+2024-11-06 16:21:20 [INFO]     myminicad    | Creating a document...
+2024-11-06 16:21:20 [INFO]     myminicad    | Crating a window...
+2024-11-06 16:21:20 [INFO]     myminicad    | Connecting the view with the document...
+2024-11-06 16:21:20 [INFO]     myminicad    | Installing the control handlers...
+2024-11-06 16:21:20 [INFO]     myminicad    | Showing the window...
+2024-11-06 16:21:21 [INFO]     myminicad    | Running...
+2024-11-06 16:21:21 [INFO]     Document     | No backup was found
+2024-11-06 16:21:24 [INFO]     myminicad    | Exiting...
+2024-11-06 16:21:24 [INFO]     myminicad    | Saving user-settings.toml.
+2024-11-06 16:21:24 [INFO]     myminicad    | user-settings.toml saved correctly.
+2024-11-06 16:21:24 [INFO]     myminicad    | Application has finished.
+2024-11-06 16:25:00 [INFO]     myminicad    | Exiting...
+2024-11-06 16:25:00 [INFO]     myminicad    | Saving user-settings.toml.
+2024-11-06 16:25:00 [INFO]     myminicad    | user-settings.toml saved correctly.
+2024-11-06 16:25:00 [INFO]     myminicad    | Application has finished.

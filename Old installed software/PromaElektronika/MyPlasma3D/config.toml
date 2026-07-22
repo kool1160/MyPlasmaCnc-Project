@@ -1,0 +1,21 @@
+[general]
+#How many times the shapes are sliced to produce the curvature - higher means a smoother surface
+profile_bend_quality = 32
+pipe_bend_quality = 128
+
+#Lets to define cuts outside the material - these will be transposed back to the material area
+#This parameter indicates how far from the material area these cuts will be looked for
+#pipe_and_profile_multiplication * material_width - in both left and right directions
+pipe_and_profile_multiplication = 5
+
+[view]
+element_color = "#9494c6"
+element_color_inner = "#606074"
+background_color = "#1e2837"
+
+[debug]
+visual = false
+randomize_triangle_color = false
+logger = true
+level = "info"
+console = false

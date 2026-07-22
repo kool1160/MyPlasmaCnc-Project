@@ -1,0 +1,9 @@
+|000| 1:08:53 PM Created : "Plasma" profile in:
+|000| 1:08:53 PM C:\ProgramData\PromaElektronika\MyPlasmCNC\Plasma\
+|000| 1:08:53 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 1:08:53 PM Run as administrator
+|000| 1:08:53 PM Read advanced file
+|000| 1:08:53 PM Backup create
+|051| 1:08:54 PM Error: Software doesn`t closed previous.
+|051| 1:08:54 PM NoDev found
+|051| 1:08:56 PM Game Controller detected OK

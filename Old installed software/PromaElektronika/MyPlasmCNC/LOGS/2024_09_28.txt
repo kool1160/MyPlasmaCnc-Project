@@ -1,0 +1,8 @@
+|000| 6:00:07 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 6:00:07 PM Run as administrator
+|000| 6:00:07 PM Read advanced file
+|000| 6:00:07 PM Backup create
+|051| 6:00:08 PM Error: Software doesn`t closed previous.
+|051| 6:00:08 PM NoDev found
+|051| 6:00:10 PM Game Controller detected OK
+|002| 6:03:04 PM CloseApp

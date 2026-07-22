@@ -1,0 +1,326 @@
+|000| 6:08:37 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 6:08:37 PM Run as administrator
+|000| 6:08:37 PM Read advanced file
+|000| 6:08:37 PM Backup create
+|051| 6:08:38 PM found : MyPlasm CNC
+|051| 6:08:38 PM TXCorr:2
+|051| 6:08:39 PM Old_TX_err
+|051| 6:08:39 PM Communication Error
+|051| 6:08:46 PM found : MyPlasm CNC
+|051| 6:08:46 PM TXCorr:2
+|051| 6:08:47 PM Old_TX_err
+|051| 6:08:47 PM Communication Error
+|051| 6:11:36 PM found : MyPlasm CNC
+|051| 6:11:36 PM FirmwareVer 1.2 1
+|051| 6:11:36 PM Machine not referenced
+|051| 6:11:36 PM Communication OK
+|050| 6:11:39 PM Warning: Microsteping Z Axis not recomended value
+|002| 6:17:05 PM found : MyPlasm CNC
+|002| 6:17:05 PM FirmwareVer 1.2 1
+|002| 6:17:05 PM Communication OK
+|002| 10:32:34 AM found : MyPlasm CNC
+|002| 10:32:34 AM FirmwareVer 1.2 1
+|002| 10:32:34 AM Machine not referenced
+|002| 10:32:34 AM Communication OK
+|002| 10:46:37 AM TXCorr:2
+|002| 11:45:37 AM found : MyPlasm CNC
+|002| 11:45:37 AM FirmwareVer 1.2 1
+|002| 11:45:37 AM Machine not referenced
+|002| 11:45:37 AM Communication OK
+|002| 11:50:45 AM TXCorr:2
+|002| 2:35:48 PM found : MyPlasm CNC
+|002| 2:35:48 PM FirmwareVer 1.2 1
+|002| 2:35:48 PM Machine not referenced
+|002| 2:35:48 PM Communication OK
+|050| 2:39:21 PM Warning: Microsteping Z Axis not recomended value
+|050| 2:41:56 PM Warning: Microsteping X Axis not recomended value
+|050| 2:41:56 PM Warning: Microsteping Y Axis not recomended value
+|050| 2:41:56 PM Warning: Microsteping Z Axis not recomended value
+|002| 2:59:04 PM Assign:0 0 61 0
+|002| 2:59:04 PM Mat:X0 Y0
+|002| 3:05:17 PM Assign:121920 243840 10160 0
+|002| 3:05:17 PM Z axis referenced
+|002| 3:05:17 PM Assign:0 243840 10160 0
+|002| 3:05:17 PM X axis referenced
+|002| 3:05:17 PM Assign:0 0 10160 0
+|002| 3:05:17 PM Y axis referenced
+|002| 3:05:18 PM Assign:0 0 10160 0
+|002| 3:05:18 PM X axis referenced
+|002| 3:05:18 PM Assign:0 0 10160 0
+|002| 3:05:18 PM Y axis referenced
+|002| 3:05:20 PM Assign:0 0 10160 0
+|002| 3:05:20 PM X axis referenced
+|002| 3:05:21 PM Assign:0 0 10160 0
+|002| 3:05:21 PM Y axis referenced
+|010| 3:05:38 PM ---- Work start ----
+|010| 3:05:38 PM Speed:100 / 50
+|011| 3:05:39 PM Work time :00:00
+|011| 3:05:39 PM Working stopped
+|050| 3:08:27 PM Warning: Microsteping X Axis not recomended value
+|050| 3:08:27 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:08:27 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:08:40 PM Warning: Microsteping X Axis not recomended value
+|050| 3:08:40 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:08:40 PM Warning: Microsteping Z Axis not recomended value
+|002| 3:08:56 PM found : MyPlasm CNC
+|002| 3:08:56 PM FirmwareVer 1.2 1
+|002| 3:08:56 PM Machine is referenced OK
+|002| 3:08:56 PM Communication OK
+|002| 3:10:36 PM found : MyPlasm CNC
+|002| 3:10:36 PM FirmwareVer 1.2 1
+|002| 3:10:36 PM Machine is referenced OK
+|002| 3:10:36 PM Communication OK
+|050| 3:11:30 PM Warning: Microsteping X Axis not recomended value
+|050| 3:11:30 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:11:30 PM Warning: Microsteping Z Axis not recomended value
+|002| 3:12:40 PM Assign:0 0 10160 0
+|002| 3:12:40 PM Mat:X0 Y0
+|002| 3:12:42 PM Assign:0 0 10160 0
+|002| 3:12:42 PM Z axis referenced
+|002| 3:12:42 PM Assign:0 0 10160 0
+|002| 3:12:42 PM X axis referenced
+|002| 3:12:42 PM Assign:0 0 10160 0
+|002| 3:12:42 PM Y axis referenced
+|050| 3:13:09 PM Warning: Microsteping X Axis not recomended value
+|050| 3:13:09 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:13:09 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:13:09 PM Warning: Microsteping X Axis not recomended value
+|050| 3:13:09 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:13:09 PM Warning: Microsteping Z Axis not recomended value
+|051| 3:13:11 PM Assign:0 0 10160 0
+|051| 3:13:11 PM Mat:X0 Y0
+|051| 3:13:12 PM Assign:-22687 0 10160 0
+|051| 3:13:12 PM Z axis referenced
+|051| 3:13:12 PM Assign:0 0 10160 0
+|051| 3:13:12 PM X axis referenced
+|051| 3:13:13 PM Assign:0 0 10160 0
+|051| 3:13:13 PM Y axis referenced
+|002| 3:13:33 PM found : MyPlasm CNC
+|002| 3:13:33 PM FirmwareVer 1.2 1
+|002| 3:13:33 PM Machine is referenced OK
+|002| 3:13:33 PM Communication OK
+|002| 3:13:36 PM Assign:0 0 10160 0
+|002| 3:13:36 PM Mat:X0 Y0
+|002| 3:13:37 PM Assign:0 0 10160 0
+|002| 3:13:37 PM Z axis referenced
+|002| 3:13:37 PM Assign:0 0 10160 0
+|002| 3:13:37 PM X axis referenced
+|002| 3:13:37 PM Assign:0 0 10160 0
+|002| 3:13:37 PM Y axis referenced
+|002| 3:20:33 PM TXCorr:2
+|002| 3:26:45 PM found : MyPlasm CNC
+|002| 3:26:45 PM FirmwareVer 1.2 1
+|002| 3:26:45 PM Machine not referenced
+|002| 3:26:45 PM Communication OK
+|050| 3:26:59 PM Warning: Microsteping X Axis not recomended value
+|050| 3:26:59 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:26:59 PM Warning: Microsteping Z Axis not recomended value
+|002| 3:27:43 PM Assign:71 6944 10160 0
+|002| 3:27:43 PM Mat:X71 Y6944
+|002| 3:28:25 PM Assign:71 6944 12704 0
+|002| 3:28:25 PM Mat:X71 Y6944
+|002| 3:28:29 PM Assign:-500 6944 12704 0
+|002| 3:28:29 PM X axis referenced
+|002| 3:30:46 PM TXCorr:2
+|050| 10:15:42 AM Warning: Microsteping X Axis not recomended value
+|050| 10:15:42 AM Warning: Microsteping Y Axis not recomended value
+|050| 10:15:42 AM Warning: Microsteping Z Axis not recomended value
+|051| 10:15:52 AM found : MyPlasm CNC
+|051| 10:15:52 AM FirmwareVer 1.2 1
+|051| 10:15:52 AM Machine not referenced
+|051| 10:15:52 AM Communication OK
+|050| 10:24:01 AM Warning: Microsteping X Axis not recomended value
+|050| 10:24:01 AM Warning: Microsteping Y Axis not recomended value
+|050| 10:24:01 AM Warning: Microsteping Z Axis not recomended value
+|050| 10:45:09 AM Warning: Microsteping X Axis not recomended value
+|050| 10:45:09 AM Warning: Microsteping Y Axis not recomended value
+|050| 10:45:09 AM Warning: Microsteping Z Axis not recomended value
+|002| 10:47:49 AM Assign:0 59185 16090 0
+|002| 10:47:49 AM Mat:X0 Y59185
+|002| 10:47:56 AM Assign:0 59185 16090 0
+|002| 10:47:56 AM Mat:X0 Y59185
+|002| 10:48:01 AM Assign:0 59185 16090 0
+|002| 10:48:01 AM Mat:X0
+|002| 10:48:28 AM Assign:3274 59185 16090 0
+|002| 10:48:28 AM Mat:X3274
+|002| 10:48:37 AM Assign:3274 59185 16090 0
+|002| 10:48:37 AM Mat:X3274 Y59185
+|002| 10:48:44 AM Assign:-500 59185 16090 0
+|002| 10:48:44 AM X axis referenced
+|002| 10:51:43 AM Assign:-500 -4536 16090 0
+|002| 10:51:43 AM X axis referenced
+|002| 10:52:14 AM Assign:0 0 16090 0
+|002| 10:52:14 AM Mat:X0 Y0
+|002| 10:54:30 AM Assign:-500 76200 16090 0
+|002| 10:54:30 AM X axis referenced
+|002| 11:00:13 AM Assign:-500 17351 16090 0
+|002| 11:00:13 AM X axis referenced
+|050| 11:02:56 AM Warning: Microsteping X Axis not recomended value
+|050| 11:02:56 AM Warning: Microsteping Y Axis not recomended value
+|050| 11:02:56 AM Warning: Microsteping Z Axis not recomended value
+|051| 11:29:33 AM TXCorr:2
+|002| 11:33:59 AM found : MyPlasm CNC
+|002| 11:33:59 AM FirmwareVer 1.2 1
+|002| 11:33:59 AM Machine not referenced
+|002| 11:33:59 AM Communication OK
+|002| 11:34:11 AM TXCorr:2
+|002| 3:41:27 PM Assign:0 72176 16090 0
+|002| 3:41:27 PM X axis referenced
+|002| 3:41:28 PM Assign:0 0 16090 0
+|002| 3:41:28 PM Y axis referenced
+|002| 3:41:29 PM Assign:0 0 16090 0
+|002| 3:41:29 PM X axis referenced
+|002| 3:41:29 PM Assign:0 0 16090 0
+|002| 3:41:29 PM Y axis referenced
+|002| 3:41:31 PM found : MyPlasm CNC
+|002| 3:41:31 PM FirmwareVer 1.2 1
+|002| 3:41:31 PM Machine not referenced
+|002| 3:41:31 PM Communication OK
+|002| 3:41:58 PM Assign:3464 72176 16090 0
+|002| 3:41:58 PM Mat:X3464 Y72176
+|002| 3:42:08 PM Assign:7863 72176 16090 0
+|002| 3:42:08 PM Mat:X7863 Y72176
+|002| 3:42:11 PM Assign:9060 72176 16090 0
+|002| 3:42:11 PM Mat:X9060 Y72176
+|002| 3:42:15 PM Assign:9958 72176 16090 0
+|002| 3:42:15 PM Mat:X9958 Y72176
+|050| 3:44:09 PM Warning: Microsteping X Axis not recomended value
+|050| 3:44:09 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:44:09 PM Warning: Microsteping Z Axis not recomended value
+|050| 3:44:23 PM Warning: Microsteping X Axis not recomended value
+|050| 3:44:23 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:44:23 PM Warning: Microsteping Z Axis not recomended value
+|051| 3:45:30 PM found : MyPlasm CNC
+|051| 3:45:30 PM FirmwareVer 1.2 1
+|051| 3:45:30 PM Machine not referenced
+|051| 3:45:30 PM Communication OK
+|002| 3:45:50 PM found : MyPlasm CNC
+|002| 3:45:50 PM FirmwareVer 1.2 1
+|002| 3:45:50 PM Communication OK
+|002| 3:45:55 PM TXCorr:2
+|002| 3:45:59 PM found : MyPlasm CNC
+|002| 3:45:59 PM FirmwareVer 1.2 1
+|002| 3:45:59 PM Machine not referenced
+|002| 3:45:59 PM Communication OK
+|002| 3:50:46 PM found : MyPlasm CNC
+|002| 3:50:46 PM FirmwareVer 1.2 1
+|002| 3:50:46 PM Machine not referenced
+|002| 3:50:46 PM Communication OK
+|002| 3:50:46 PM found : MyPlasm CNC
+|002| 3:50:46 PM FirmwareVer 1.2 1
+|002| 3:50:46 PM Communication OK
+|002| 3:50:48 PM found : MyPlasm CNC
+|002| 3:50:48 PM FirmwareVer 1.2 1
+|002| 3:50:48 PM Communication OK
+|002| 3:51:12 PM found : MyPlasm CNC
+|002| 3:51:13 PM TXCorr:2
+|002| 3:51:13 PM FirmwareVer 1.2 1
+|002| 3:51:13 PM Machine not referenced
+|002| 3:51:13 PM Communication OK
+|002| 3:51:36 PM found : MyPlasm CNC
+|002| 3:51:36 PM FirmwareVer 1.2 1
+|002| 3:51:36 PM Communication OK
+|002| 3:52:42 PM found : MyPlasm CNC
+|002| 3:52:42 PM TXCorr:2
+|002| 3:52:43 PM Old_TX_err
+|002| 3:52:43 PM Communication Error
+|002| 3:52:55 PM found : MyPlasm CNC
+|002| 3:52:55 PM FirmwareVer 1.2 1
+|002| 3:52:55 PM Machine not referenced
+|002| 3:52:55 PM Communication OK
+|002| 3:53:09 PM Assign:6202 72176 16090 0
+|002| 3:53:09 PM Mat:X6202 Y72176
+|002| 3:53:15 PM Assign:6196 72176 16090 0
+|002| 3:53:15 PM Mat:X6196 Y72176
+|002| 3:53:30 PM TXCorr:2
+|002| 3:53:46 PM found : MyPlasm CNC
+|002| 3:53:46 PM FirmwareVer 1.2 1
+|002| 3:53:46 PM Machine not referenced
+|002| 3:53:46 PM Communication OK
+|002| 3:53:55 PM Assign:6096 72089 16090 0
+|002| 3:53:55 PM Mat:X6096 Y72089
+|002| 3:54:16 PM Assign:5930 72089 16090 0
+|002| 3:54:16 PM Mat:X5930 Y72089
+|002| 3:54:22 PM Assign:-500 72089 16090 0
+|002| 3:54:22 PM X axis referenced
+|002| 3:55:11 PM Assign:0 -500 16090 0
+|002| 3:55:11 PM Y axis referenced
+|002| 3:55:56 PM TXCorr:2
+|002| 4:38:41 PM found : MyPlasm CNC
+|002| 4:38:41 PM FirmwareVer 1.2 1
+|002| 4:38:41 PM Machine not referenced
+|002| 4:38:41 PM Communication OK
+|002| 5:51:20 PM Assign:3447 8716 16090 0
+|002| 5:51:20 PM Mat:X3447 Y8716
+|002| 5:51:24 PM Assign:4531 8716 16090 0
+|002| 5:51:24 PM Mat:X4531 Y8716
+|002| 5:51:40 PM Assign:7432 8716 16090 0
+|002| 5:51:40 PM Mat:Y8716
+|002| 5:52:01 PM Assign:0 8716 16090 0
+|002| 5:52:01 PM Mat:X0
+|002| 5:53:07 PM Assign:0 0 16090 0
+|002| 5:53:07 PM Mat:X0 Y0
+|002| 5:53:15 PM Assign:2314 0 16090 0
+|002| 5:53:15 PM Mat:X2314 Y0
+|050| 5:54:15 PM Warning: Microsteping X Axis not recomended value
+|050| 5:54:15 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:54:15 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:54:44 PM TXCorr:2
+|002| 5:56:21 PM found : MyPlasm CNC
+|002| 5:56:21 PM TXCorr:2
+|002| 5:56:22 PM Old_TX_err
+|002| 5:56:22 PM Communication Error
+|002| 3:59:49 PM found : MyPlasm CNC
+|002| 3:59:49 PM FirmwareVer 1.2 1
+|002| 3:59:49 PM Machine not referenced
+|002| 3:59:49 PM Communication OK
+|002| 4:03:18 PM NoDev found
+|002| 4:03:47 PM found : MyPlasm CNC
+|002| 4:03:47 PM FirmwareVer 1.2 1
+|002| 4:03:47 PM Machine not referenced
+|002| 4:03:47 PM Communication OK
+|002| 4:04:17 PM Assign:12770 17990 16090 0
+|002| 4:04:17 PM Mat:Y17990
+|002| 4:04:18 PM Assign:12770 17990 16090 0
+|002| 4:04:18 PM Mat:Y17990
+|002| 4:05:37 PM TXCorr:2
+|002| 4:05:42 PM found : MyPlasm CNC
+|002| 4:05:42 PM FirmwareVer 1.2 1
+|002| 4:05:42 PM Machine not referenced
+|002| 4:05:42 PM Communication OK
+|002| 4:06:03 PM Assign:9590 14268 16090 0
+|002| 4:06:03 PM Mat:X9590 Y14268
+|002| 4:06:04 PM Assign:9590 14268 16090 0
+|002| 4:06:04 PM Mat:X9590 Y14268
+|002| 4:06:05 PM Assign:9590 14268 16090 0
+|002| 4:06:05 PM Mat:X9590 Y14268
+|002| 4:06:10 PM Assign:-500 14268 16090 0
+|002| 4:06:10 PM X axis referenced
+|002| 4:06:23 PM Assign:0 -500 16090 0
+|002| 4:06:23 PM Y axis referenced
+|050| 4:07:29 PM Warning: Microsteping X Axis not recomended value
+|050| 4:07:29 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:07:29 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:13:02 PM Assign:36914 240489 16090 0
+|002| 4:13:02 PM Mat:X36914 Y240489
+|002| 4:13:07 PM Assign:33282 240489 16090 0
+|002| 4:13:07 PM Mat:X33282 Y240489
+|002| 4:13:32 PM Assign:-500 240489 16090 0
+|002| 4:13:33 PM X axis referenced
+|002| 4:15:58 PM Assign:0 -500 16090 0
+|002| 4:15:58 PM Y axis referenced
+|002| 4:17:23 PM Assign:0 0 16090 0
+|002| 4:17:23 PM Mat:X0 Y0
+|050| 4:21:24 PM Warning: Microsteping X Axis not recomended value
+|050| 4:21:24 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:21:24 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:21:24 PM Warning: Microsteping X Axis not recomended value
+|050| 4:21:24 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:21:24 PM Warning: Microsteping Z Axis not recomended value
+|010| 4:23:21 PM warring: Machine not referenced!
+|010| 4:23:21 PM ---- Work start ----
+|010| 4:23:21 PM Speed:100 / 50
+|011| 4:23:40 PM Work time :00:18
+|011| 4:23:40 PM Working stopped
+|011| 4:26:21 PM TXCorr:2
+|002| 4:37:23 PM CloseApp

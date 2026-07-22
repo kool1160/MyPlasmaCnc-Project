@@ -1,0 +1,57 @@
+|000| 5:42:27 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 5:42:27 PM Run as administrator
+|000| 5:42:27 PM Read advanced file
+|000| 5:42:27 PM Backup create
+|051| 5:42:28 PM Error: Software doesn`t closed previous.
+|051| 5:42:28 PM found : MyPlasm CNC
+|051| 5:42:28 PM FirmwareVer 1.2 1
+|051| 5:42:28 PM Machine not referenced
+|051| 5:42:28 PM Communication OK
+|050| 5:42:40 PM Warning: Microsteping X Axis not recomended value
+|050| 5:42:40 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:42:40 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping X Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping X Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:42:54 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:42:58 PM Warning: Microsteping X Axis not recomended value
+|050| 5:42:58 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:42:58 PM Warning: Microsteping Z Axis not recomended value
+|002| 6:32:40 PM TXCorr:2
+|002| 8:57:36 AM found : MyPlasm CNC
+|002| 8:57:36 AM FirmwareVer 1.2 1
+|002| 8:57:36 AM Machine not referenced
+|002| 8:57:36 AM Communication OK
+|050| 8:58:30 AM Warning: Microsteping X Axis not recomended value
+|050| 8:58:30 AM Warning: Microsteping Y Axis not recomended value
+|050| 8:58:30 AM Warning: Microsteping Z Axis not recomended value
+|050| 8:58:30 AM Warning: Microsteping X Axis not recomended value
+|050| 8:58:30 AM Warning: Microsteping Y Axis not recomended value
+|050| 8:58:30 AM Warning: Microsteping Z Axis not recomended value
+|050| 9:03:11 AM Warning: Microsteping X Axis not recomended value
+|050| 9:03:11 AM Warning: Microsteping Y Axis not recomended value
+|050| 9:03:11 AM Warning: Microsteping Z Axis not recomended value
+|051| 9:05:58 AM TXCorr:2
+|051| 9:09:06 AM found : MyPlasm CNC
+|051| 9:09:06 AM FirmwareVer 1.2 1
+|051| 9:09:06 AM Machine not referenced
+|051| 9:09:06 AM Communication OK
+|050| 9:09:08 AM Warning: Microsteping X Axis not recomended value
+|050| 9:09:08 AM Warning: Microsteping Y Axis not recomended value
+|050| 9:09:08 AM Warning: Microsteping Z Axis not recomended value
+|051| 9:10:03 AM found : MyPlasm CNC
+|051| 9:10:03 AM FirmwareVer 1.2 1
+|051| 9:10:03 AM Communication OK
+|002| 9:32:16 AM TXCorr:2
+|002| 11:40:30 AM found : MyPlasm CNC
+|002| 11:40:31 AM FirmwareVer 1.2 1
+|002| 11:40:31 AM Machine not referenced
+|002| 11:40:31 AM Communication OK
+|050| 11:41:07 AM Warning: Microsteping X Axis not recomended value
+|050| 11:41:07 AM Warning: Microsteping Y Axis not recomended value
+|050| 11:41:07 AM Warning: Microsteping Z Axis not recomended value
+|002| 11:48:05 AM Assign:0 0 0 0
+|002| 11:48:05 AM Mat:X0 Y0
+|002| 11:55:16 AM TXCorr:2

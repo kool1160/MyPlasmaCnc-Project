@@ -1,0 +1,43 @@
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | MyPlasma3D ver.v3.3 - (32bit)
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Paths:
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | ['D:\\Moje Projekty\\MyPlasm120\\MyPlasm_CNC_120\\3d\\base_library.zip', 'D:\\Moje Projekty\\MyPlasm120\\MyPlasm_CNC_120\\3d', 'D:\\Moje Projekty\\MyPlasm120\\MyPlasm_CNC_120\\3d\\lib']
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Checking configuration status: 
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | config.toml processed correctly.
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Log's file status: OK - C:\ProgramData\PromaElektronika\MyPlasma3D\logs\log.txt
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Starting the application...
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Crating a window...
+2022-10-14 10:45:23 [INFO    ] myplasma3d       | Showing the window...
+2022-10-14 10:45:24 [INFO    ] OpenGL           | Creating OpenGl...
+2022-10-14 10:45:24 [INFO    ] OpenGL           | OpenGL widget valid: True
+2022-10-14 10:45:24 [INFO    ] OpenGL           | OpenGL context validity:True
+2022-10-14 10:45:24 [INFO    ] OpenGL           | OpenGL context format:<PySide2.QtGui.QSurfaceFormat(version 4.6, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::DoubleBuffer, swapInterval 1, colorSpace QSurfaceFormat::DefaultColorSpace, profile  QSurfaceFormat::CompatibilityProfile)  at 0x07FF9B70>
+2022-10-14 10:45:24 [INFO    ] OpenGL           | GLF.GL_VERSION:4.6.0 - Build 26.20.100.7926
+2022-10-14 10:45:24 [INFO    ] OpenGL           | GLF.GL_VENDOR:Intel
+2022-10-14 10:45:24 [INFO    ] OpenGL           | GLF.GL_RENDERER:Intel(R) UHD Graphics
+2022-10-14 10:45:24 [INFO    ] myplasma3d       | Generating geometry...
+2022-10-14 10:45:24 [INFO    ] input            | Loaded 2238 lines of data
+2022-10-14 10:45:24 [INFO    ] input            | Number of shapes in input data: 4
+2022-10-14 10:45:24 [INFO    ] myplasma3d       | Loading the OpenGL wrapper DLL: D:\Moje Projekty\MyPlasm120\MyPlasm_CNC_120\3d\opengl_cpp_wrapper/opengl_cpp_wrapper_x86.dll
+2022-10-14 10:45:24 [INFO    ] myplasma3d       | OpenGL wrapper DLL successfully loaded.
+2022-10-14 10:45:24 [INFO    ] myplasma3d       | Running...
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 579. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1215. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The path's point (6750, 4225) at line 1417 overlaps the very previous point. Ignoring.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1431. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1444. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1457. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1470. Removing the redundant point from the path.
+2022-10-14 10:45:24 [WARNING ] Shapes           | The last point of the path overlaps the first one. The corrupted path ends at line 1483. Removing the redundant point from the path.
+2022-10-14 10:45:24 [INFO    ] Utils            | Function parse_outers_inners_paths executed in 0.0129s. Total 0.0129s
+2022-10-14 10:45:24 [INFO    ] Utils            | Function parse_outers_inners_paths executed in 0.0000s. Total 0.0129s
+2022-10-14 10:45:24 [INFO    ] Utils            | Function parse_outers_inners_paths executed in 0.0000s. Total 0.0129s
+2022-10-14 10:45:24 [INFO    ] Utils            | Function parse_outers_inners_paths executed in 0.0000s. Total 0.0129s
+2022-10-14 10:45:24 [INFO    ] Utils            | Function divide_surface_for_piping executed in 0.0000s. Total 0.0000s
+2022-10-14 10:45:24 [INFO    ] Profile          | Triangles created: 8232
+2022-10-14 10:45:24 [INFO    ] Utils            | Function divide_surface_for_piping executed in 0.0000s. Total 0.0000s
+2022-10-14 10:45:24 [INFO    ] Profile          | Triangles created: 228
+2022-10-14 10:45:24 [INFO    ] Utils            | Function divide_surface_for_piping executed in 0.0000s. Total 0.0000s
+2022-10-14 10:45:24 [INFO    ] Profile          | Triangles created: 168
+2022-10-14 10:45:24 [INFO    ] Utils            | Function divide_surface_for_piping executed in 0.0000s. Total 0.0000s
+2022-10-14 10:45:24 [INFO    ] Profile          | Triangles created: 128
+2022-10-14 10:45:26 [INFO    ] myplasma3d       | Exiting...

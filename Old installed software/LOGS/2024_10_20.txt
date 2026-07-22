@@ -1,0 +1,757 @@
+|000| 1:52:54 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 1:52:54 PM Run as administrator
+|000| 1:52:54 PM Read advanced file
+|000| 1:52:54 PM Backup create
+|051| 1:52:55 PM Error: Software doesn`t closed previous.
+|051| 1:52:55 PM found : MyPlasm CNC
+|051| 1:52:55 PM FirmwareVer 1.2 1
+|051| 1:52:55 PM Machine not referenced
+|051| 1:52:55 PM Communication OK
+|002| 1:55:47 PM found : MyPlasm CNC
+|002| 1:55:47 PM FirmwareVer 1.2 1
+|002| 1:55:47 PM Communication OK
+|050| 1:55:48 PM Warning: Microsteping X Axis not recomended value
+|050| 1:55:48 PM Warning: Microsteping Y Axis not recomended value
+|050| 1:55:48 PM Warning: Microsteping Z Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping X Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping Y Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping Z Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping X Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping Y Axis not recomended value
+|050| 1:56:29 PM Warning: Microsteping Z Axis not recomended value
+|051| 1:56:36 PM Assign:3610 5175 10160 0
+|051| 1:56:36 PM Z axis referenced
+|002| 1:56:42 PM Assign:3610 5175 10160 0
+|002| 1:56:42 PM Mat:X3610 Y5175
+|002| 1:56:45 PM Assign:0 5175 10160 0
+|002| 1:56:45 PM X axis referenced
+|002| 1:56:45 PM Assign:0 0 10160 0
+|002| 1:56:45 PM Y axis referenced
+|002| 1:56:45 PM Assign:0 0 10160 0
+|002| 1:56:45 PM Mat:X0 Y0
+|002| 1:56:47 PM Assign:0 0 10160 0
+|002| 1:56:47 PM Mat:X0 Y0
+|002| 1:56:48 PM Assign:0 0 10160 0
+|002| 1:56:48 PM Z axis referenced
+|002| 1:56:49 PM Assign:0 0 10160 0
+|002| 1:56:49 PM Z axis referenced
+|002| 1:56:52 PM Assign:0 0 10160 0
+|002| 1:56:52 PM Mat:X0 Y0
+|002| 1:56:54 PM Assign:0 0 10160 0
+|002| 1:56:54 PM Z axis referenced
+|002| 1:57:08 PM Assign:0 0 10160 0
+|002| 1:57:08 PM Mat:X0 Y0
+|002| 1:57:09 PM Assign:0 0 10160 0
+|002| 1:57:09 PM Mat:X0 Y0
+|002| 1:57:54 PM Assign:0 0 10160 0
+|002| 1:57:54 PM Z axis referenced
+|002| 1:57:54 PM Assign:0 0 10160 0
+|002| 1:57:54 PM X axis referenced
+|002| 1:57:54 PM Assign:0 0 10160 0
+|002| 1:57:54 PM Y axis referenced
+|002| 1:57:58 PM Assign:0 0 10160 0
+|002| 1:57:58 PM Mat:X0 Y0
+|010| 2:01:47 PM ---- Work start ----
+|010| 2:01:47 PM Speed:100 / 50
+|011| 2:02:11 PM Work time :00:24
+|011| 2:02:11 PM Working stopped
+|011| 2:02:26 PM Assign:0 3110 10922 0
+|011| 2:02:26 PM X axis referenced
+|011| 2:02:26 PM Assign:0 0 10922 0
+|011| 2:02:26 PM Y axis referenced
+|002| 2:02:27 PM Assign:0 0 10922 0
+|002| 2:02:27 PM Mat:X0 Y0
+|002| 2:02:28 PM Assign:0 0 10922 0
+|002| 2:02:28 PM X axis referenced
+|002| 2:02:29 PM Assign:0 0 10922 0
+|002| 2:02:29 PM Y axis referenced
+|002| 2:02:31 PM Assign:0 0 10922 0
+|002| 2:02:31 PM X axis referenced
+|002| 2:02:32 PM Assign:0 0 10922 0
+|002| 2:02:32 PM Y axis referenced
+|002| 2:02:32 PM Assign:0 0 10922 0
+|002| 2:02:32 PM Mat:X0 Y0
+|002| 2:02:34 PM Assign:0 0 10922 0
+|002| 2:02:34 PM X axis referenced
+|002| 2:02:34 PM Assign:0 0 10922 0
+|002| 2:02:34 PM Y axis referenced
+|002| 2:02:37 PM Assign:0 0 10922 0
+|002| 2:02:37 PM X axis referenced
+|002| 2:02:37 PM Assign:0 0 10922 0
+|002| 2:02:37 PM Assign:0 0 10922 0
+|002| 2:02:37 PM X axis referenced
+|002| 2:02:37 PM Assign:0 0 10922 0
+|002| 2:02:37 PM Y axis referenced
+|002| 2:02:37 PM Y axis referenced
+|002| 2:03:21 PM Assign:0 -2946 10922 0
+|002| 2:03:21 PM X axis referenced
+|002| 2:03:21 PM Assign:0 0 10922 0
+|002| 2:03:21 PM Y axis referenced
+|002| 2:03:24 PM Assign:0 0 10922 0
+|002| 2:03:24 PM Mat:X0 Y0
+|002| 2:03:25 PM Assign:0 0 10922 0
+|002| 2:03:25 PM X axis referenced
+|002| 2:03:25 PM Assign:0 0 10922 0
+|002| 2:03:25 PM Y axis referenced
+|002| 2:03:30 PM Assign:0 0 10922 0
+|002| 2:03:30 PM X axis referenced
+|002| 2:03:30 PM Assign:0 0 10922 0
+|002| 2:03:30 PM Y axis referenced
+|002| 2:03:30 PM Assign:0 0 10922 0
+|002| 2:03:30 PM X axis referenced
+|002| 2:03:31 PM Assign:0 0 10922 0
+|002| 2:03:31 PM Y axis referenced
+|002| 2:03:31 PM Assign:0 0 10922 0
+|002| 2:03:31 PM X axis referenced
+|002| 2:03:31 PM Assign:0 0 10922 0
+|002| 2:03:31 PM Y axis referenced
+|002| 2:03:47 PM Assign:-500 0 10922 0
+|002| 2:03:47 PM X axis referenced
+|002| 2:03:50 PM Assign:0 -500 10922 0
+|002| 2:03:50 PM Y axis referenced
+|010| 2:05:08 PM ---- Work start ----
+|010| 2:05:08 PM Speed:100 / 50
+|002| 2:05:08 PM Z over rang ( Soft Limit )
+|002| 2:05:08 PM Z over rang ( Soft Limit )
+|002| 2:05:08 PM Z over rang ( Soft Limit )
+|002| 2:05:08 PM Z over rang ( Soft Limit )
+|011| 2:05:08 PM Work time :00:00
+|011| 2:05:08 PM Working stopped
+|050| 2:05:32 PM Warning: Microsteping X Axis not recomended value
+|050| 2:05:32 PM Warning: Microsteping Y Axis not recomended value
+|050| 2:05:32 PM Warning: Microsteping Z Axis not recomended value
+|051| 2:07:09 PM TXCorr:2
+|051| 2:08:04 PM found : MyPlasm CNC
+|051| 2:08:04 PM FirmwareVer 1.2 1
+|051| 2:08:04 PM Machine not referenced
+|051| 2:08:04 PM Communication OK
+|002| 2:09:03 PM Assign:633 0 10360 0
+|002| 2:09:03 PM Z axis referenced
+|002| 2:09:18 PM Assign:-500 0 10160 0
+|002| 2:09:18 PM X axis referenced
+|002| 2:09:20 PM Assign:0 -500 10160 0
+|002| 2:09:20 PM Y axis referenced
+|010| 2:09:32 PM ---- Work start ----
+|010| 2:09:32 PM Speed:100 / 50
+|002| 2:09:32 PM Z over rang ( Soft Limit )
+|002| 2:09:33 PM Z over rang ( Soft Limit )
+|002| 2:09:33 PM Z over rang ( Soft Limit )
+|002| 2:09:33 PM Z over rang ( Soft Limit )
+|002| 2:09:33 PM Z over rang ( Soft Limit )
+|011| 2:09:33 PM Work time :00:00
+|011| 2:09:33 PM Working stopped
+|050| 2:09:39 PM Warning: Microsteping X Axis not recomended value
+|050| 2:09:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 2:09:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 2:09:39 PM Warning: Microsteping X Axis not recomended value
+|050| 2:09:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 2:09:39 PM Warning: Microsteping Z Axis not recomended value
+|010| 2:09:45 PM ---- Work start ----
+|010| 2:09:45 PM Speed:100 / 50
+|002| 2:09:45 PM Z over rang ( Soft Limit )
+|002| 2:09:45 PM Z over rang ( Soft Limit )
+|002| 2:09:45 PM Z over rang ( Soft Limit )
+|002| 2:09:45 PM Z over rang ( Soft Limit )
+|002| 2:09:45 PM Z over rang ( Soft Limit )
+|011| 2:09:45 PM Work time :00:00
+|011| 2:09:45 PM Working stopped
+|010| 2:09:49 PM ---- Work start ----
+|010| 2:09:49 PM Speed:100 / 50
+|002| 2:09:50 PM Z over rang ( Soft Limit )
+|002| 2:09:50 PM Z over rang ( Soft Limit )
+|002| 2:09:50 PM Z over rang ( Soft Limit )
+|002| 2:09:50 PM Z over rang ( Soft Limit )
+|002| 2:09:50 PM Z over rang ( Soft Limit )
+|011| 2:09:50 PM Work time :00:00
+|011| 2:09:50 PM Working stopped
+|002| 2:10:45 PM found : MyPlasm CNC
+|002| 2:10:45 PM FirmwareVer 1.2 1
+|002| 2:10:45 PM Machine is referenced OK
+|002| 2:10:45 PM Communication OK
+|002| 2:10:50 PM Assign:0 0 10160 0
+|002| 2:10:50 PM Mat:X0 Y0
+|002| 2:10:52 PM Assign:-500 0 10160 0
+|002| 2:10:52 PM X axis referenced
+|002| 2:10:54 PM Assign:0 -500 10160 0
+|002| 2:10:54 PM Y axis referenced
+|002| 2:11:06 PM Assign:0 0 10360 0
+|002| 2:11:06 PM Z axis referenced
+|002| 2:11:06 PM Assign:0 0 10160 0
+|002| 2:12:28 PM TXCorr:2
+|002| 2:12:42 PM found : MyPlasm CNC
+|002| 2:12:42 PM FirmwareVer 1.2 1
+|002| 2:12:42 PM Machine not referenced
+|002| 2:12:42 PM Communication OK
+|002| 2:12:47 PM Assign:0 0 10160 0
+|002| 2:12:47 PM Mat:X0 Y0
+|002| 2:12:48 PM Assign:-500 0 10160 0
+|002| 2:12:48 PM X axis referenced
+|002| 2:12:50 PM Assign:0 -500 10160 0
+|002| 2:12:50 PM Y axis referenced
+|002| 2:13:05 PM Assign:0 0 10360 0
+|002| 2:13:05 PM Z axis referenced
+|002| 2:13:25 PM Assign:0 0 10360 0
+|002| 2:13:25 PM Z axis referenced
+|010| 2:13:32 PM ---- Work start ----
+|010| 2:13:32 PM Speed:100 / 50
+|002| 2:13:33 PM Z over rang ( Soft Limit )
+|002| 2:13:33 PM Z over rang ( Soft Limit )
+|002| 2:13:33 PM Z over rang ( Soft Limit )
+|002| 2:13:33 PM Z over rang ( Soft Limit )
+|002| 2:13:33 PM Z over rang ( Soft Limit )
+|011| 2:13:33 PM Work time :00:00
+|011| 2:13:33 PM Working stopped
+|010| 2:13:36 PM ---- Work start ----
+|010| 2:13:36 PM Speed:100 / 50
+|002| 2:13:36 PM Z over rang ( Soft Limit )
+|002| 2:13:36 PM Z over rang ( Soft Limit )
+|002| 2:13:36 PM Z over rang ( Soft Limit )
+|002| 2:13:36 PM Z over rang ( Soft Limit )
+|002| 2:13:36 PM Z over rang ( Soft Limit )
+|011| 2:13:36 PM Work time :00:00
+|011| 2:13:36 PM Working stopped
+|011| 2:14:45 PM Z over rang ( Soft Limit )
+|010| 2:15:09 PM ---- Work start ----
+|010| 2:15:09 PM Speed:100 / 50
+|002| 2:15:09 PM Z over rang ( Soft Limit )
+|002| 2:15:09 PM Z over rang ( Soft Limit )
+|002| 2:15:09 PM Z over rang ( Soft Limit )
+|002| 2:15:09 PM Z over rang ( Soft Limit )
+|002| 2:15:09 PM Z over rang ( Soft Limit )
+|011| 2:15:10 PM Work time :00:00
+|011| 2:15:10 PM Working stopped
+|010| 2:15:13 PM ---- Work start ----
+|010| 2:15:13 PM Speed:100 / 50
+|002| 2:15:14 PM Z over rang ( Soft Limit )
+|002| 2:15:14 PM Z over rang ( Soft Limit )
+|002| 2:15:14 PM Z over rang ( Soft Limit )
+|002| 2:15:14 PM Z over rang ( Soft Limit )
+|002| 2:15:14 PM Z over rang ( Soft Limit )
+|011| 2:15:14 PM Work time :00:00
+|011| 2:15:14 PM Working stopped
+|050| 2:15:52 PM Warning: Microsteping X Axis not recomended value
+|050| 2:15:52 PM Warning: Microsteping Y Axis not recomended value
+|050| 2:15:52 PM Warning: Microsteping Z Axis not recomended value
+|051| 2:16:27 PM found : MyPlasm CNC
+|051| 2:16:27 PM FirmwareVer 1.2 1
+|051| 2:16:27 PM Machine is referenced OK
+|051| 2:16:27 PM Communication OK
+|002| 2:16:30 PM Assign:0 0 10160 0
+|002| 2:16:30 PM Mat:X0 Y0
+|002| 2:16:31 PM Assign:0 0 10160 0
+|002| 2:16:31 PM X axis referenced
+|002| 2:16:32 PM Assign:0 0 10160 0
+|002| 2:16:32 PM Y axis referenced
+|010| 2:16:37 PM ---- Work start ----
+|010| 2:16:37 PM Speed:100 / 50
+|011| 2:17:14 PM Work time :00:37
+|011| 2:17:14 PM Finish work OK
+|011| 2:46:51 PM Assign:0 294 11430 0
+|011| 2:46:51 PM X axis referenced
+|011| 2:46:51 PM Assign:0 0 11430 0
+|011| 2:46:51 PM Y axis referenced
+|002| 2:46:52 PM Assign:0 0 11430 0
+|002| 2:46:52 PM Mat:X0 Y0
+|002| 2:46:53 PM Assign:0 0 11430 0
+|002| 2:46:53 PM X axis referenced
+|002| 2:46:53 PM Assign:0 0 11430 0
+|002| 2:46:53 PM Y axis referenced
+|010| 2:47:29 PM ---- Work start ----
+|010| 2:47:29 PM Speed:100 / 50
+|011| 2:48:25 PM Work time :00:56
+|011| 2:48:25 PM Finish work OK
+|011| 2:48:53 PM TXCorr:2
+|011| 3:15:06 PM Assign:0 294 11430 0
+|011| 3:15:06 PM X axis referenced
+|011| 3:15:07 PM Assign:0 0 11430 0
+|011| 3:15:07 PM Y axis referenced
+|002| 3:15:08 PM found : MyPlasm CNC
+|002| 3:15:08 PM FirmwareVer 1.2 1
+|002| 3:15:08 PM Machine not referenced
+|002| 3:15:08 PM Communication OK
+|002| 3:15:19 PM Assign:0 294 11430 0
+|002| 3:15:19 PM X axis referenced
+|002| 3:15:19 PM Assign:0 0 11430 0
+|002| 3:15:19 PM Y axis referenced
+|010| 3:15:47 PM warring: Machine not referenced!
+|010| 3:15:47 PM ---- Work start ----
+|010| 3:15:47 PM Speed:100 / 50
+|011| 3:16:44 PM Work time :00:56
+|011| 3:16:44 PM Finish work OK
+|011| 3:17:06 PM TXCorr:2
+|011| 3:18:35 PM found : MyPlasm CNC
+|011| 3:18:35 PM FirmwareVer 1.2 1
+|011| 3:18:35 PM Machine not referenced
+|011| 3:18:35 PM Communication OK
+|002| 3:18:52 PM Assign:0 294 11430 0
+|002| 3:18:52 PM X axis referenced
+|002| 3:18:52 PM Assign:0 0 11430 0
+|002| 3:18:52 PM Y axis referenced
+|002| 3:18:57 PM Assign:0 0 11430 0
+|002| 3:18:57 PM X axis referenced
+|002| 3:18:57 PM Assign:0 0 11430 0
+|002| 3:18:57 PM Y axis referenced
+|002| 3:18:58 PM Assign:0 0 11430 0
+|002| 3:18:58 PM Mat:X0 Y0
+|002| 3:18:59 PM Assign:0 0 11430 0
+|002| 3:18:59 PM X axis referenced
+|002| 3:18:59 PM Assign:0 0 11430 0
+|002| 3:18:59 PM Y axis referenced
+|002| 3:19:02 PM Assign:0 0 10160 0
+|002| 3:19:02 PM Z axis referenced
+|002| 3:19:05 PM Assign:0 0 10160 0
+|002| 3:19:05 PM Mat:X0 Y0
+|010| 3:19:10 PM ---- Work start ----
+|010| 3:19:10 PM Speed:100 / 50
+|011| 3:20:07 PM Work time :00:56
+|011| 3:20:07 PM Finish work OK
+|011| 3:22:04 PM TXCorr:2
+|011| 4:09:56 PM found : MyPlasm CNC
+|011| 4:09:56 PM FirmwareVer 1.2 1
+|011| 4:09:56 PM Machine not referenced
+|011| 4:09:56 PM Communication OK
+|002| 4:11:07 PM Assign:0 294 8523 0
+|002| 4:11:07 PM X axis referenced
+|002| 4:11:07 PM Assign:0 0 8523 0
+|002| 4:11:07 PM Y axis referenced
+|002| 4:11:08 PM Assign:0 0 8523 0
+|002| 4:11:08 PM Mat:X0 Y0
+|002| 4:11:10 PM Assign:0 0 8523 0
+|002| 4:11:10 PM X axis referenced
+|002| 4:11:10 PM Assign:0 0 8523 0
+|002| 4:11:10 PM Y axis referenced
+|002| 4:11:13 PM Assign:0 0 8523 0
+|002| 4:11:13 PM X axis referenced
+|002| 4:11:13 PM Assign:0 0 8523 0
+|002| 4:11:13 PM Y axis referenced
+|002| 4:11:16 PM Assign:0 0 8523 0
+|002| 4:11:16 PM X axis referenced
+|002| 4:11:16 PM Assign:0 0 8523 0
+|002| 4:11:16 PM Y axis referenced
+|002| 4:11:23 PM Assign:0 0 8523 0
+|002| 4:11:23 PM X axis referenced
+|002| 4:11:23 PM Assign:0 0 8523 0
+|002| 4:11:23 PM Y axis referenced
+|002| 4:11:23 PM Assign:0 0 8523 0
+|002| 4:11:23 PM X axis referenced
+|002| 4:11:24 PM Assign:0 0 8523 0
+|002| 4:11:24 PM Y axis referenced
+|002| 4:11:24 PM Assign:0 0 8523 0
+|002| 4:11:24 PM X axis referenced
+|002| 4:11:24 PM Assign:0 0 8523 0
+|002| 4:11:24 PM X axis referenced
+|002| 4:11:24 PM Assign:0 0 8523 0
+|002| 4:11:24 PM Y axis referenced
+|002| 4:11:28 PM Assign:0 0 8523 0
+|002| 4:11:28 PM X axis referenced
+|002| 4:11:28 PM Assign:0 0 8523 0
+|002| 4:11:28 PM Y axis referenced
+|002| 4:11:31 PM Assign:0 0 8523 0
+|002| 4:11:31 PM X axis referenced
+|002| 4:11:31 PM Assign:0 0 8523 0
+|002| 4:11:31 PM Y axis referenced
+|002| 4:11:31 PM Assign:0 0 8523 0
+|002| 4:11:31 PM Mat:X0 Y0
+|002| 4:11:46 PM Assign:0 0 8523 0
+|002| 4:11:46 PM X axis referenced
+|002| 4:11:46 PM Assign:0 0 8523 0
+|002| 4:11:46 PM Y axis referenced
+|002| 4:11:48 PM Assign:0 0 8523 0
+|002| 4:11:48 PM Mat:X0 Y0
+|002| 4:11:52 PM Assign:0 0 8523 0
+|002| 4:11:52 PM Mat:X0 Y0
+|002| 4:11:53 PM Assign:0 0 8523 0
+|002| 4:11:53 PM Mat:X0 Y0
+|002| 4:11:54 PM Assign:0 0 8523 0
+|002| 4:11:54 PM Mat:X0 Y0
+|050| 4:12:01 PM Warning: Microsteping X Axis not recomended value
+|050| 4:12:01 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:12:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping X Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping X Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:12:05 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:12:08 PM Assign:0 0 8523 0
+|051| 4:12:08 PM X axis referenced
+|051| 4:12:08 PM Assign:0 0 8523 0
+|051| 4:12:08 PM Y axis referenced
+|002| 4:12:11 PM Assign:0 0 8523 0
+|002| 4:12:11 PM X axis referenced
+|002| 4:12:11 PM Assign:0 0 8523 0
+|002| 4:12:11 PM Y axis referenced
+|002| 4:12:13 PM Assign:0 0 8523 0
+|002| 4:12:13 PM X axis referenced
+|002| 4:12:13 PM Assign:0 0 8523 0
+|002| 4:12:13 PM Assign:0 0 8523 0
+|002| 4:12:13 PM X axis referenced
+|002| 4:12:13 PM Assign:0 0 8523 0
+|002| 4:12:13 PM Y axis referenced
+|002| 4:12:13 PM Y axis referenced
+|002| 4:12:16 PM Assign:0 0 8523 0
+|002| 4:12:16 PM X axis referenced
+|002| 4:12:16 PM Assign:0 0 8523 0
+|002| 4:12:16 PM Assign:0 0 8523 0
+|002| 4:12:16 PM X axis referenced
+|002| 4:12:16 PM Assign:0 0 8523 0
+|002| 4:12:16 PM Y axis referenced
+|002| 4:12:17 PM Y axis referenced
+|002| 4:12:17 PM Assign:0 0 8523 0
+|002| 4:12:17 PM X axis referenced
+|002| 4:12:18 PM Assign:0 0 8523 0
+|002| 4:12:18 PM Assign:0 0 8523 0
+|002| 4:12:18 PM X axis referenced
+|002| 4:12:18 PM Assign:0 0 8523 0
+|002| 4:12:18 PM Y axis referenced
+|002| 4:12:18 PM Y axis referenced
+|002| 4:12:26 PM found : MyPlasm CNC
+|002| 4:12:26 PM FirmwareVer 1.2 1
+|002| 4:12:26 PM Communication OK
+|002| 4:12:31 PM Assign:0 0 8523 0
+|002| 4:12:31 PM Mat:X0 Y0
+|002| 4:12:32 PM Assign:0 0 8523 0
+|002| 4:12:32 PM X axis referenced
+|002| 4:12:32 PM Assign:0 0 8523 0
+|002| 4:12:32 PM Y axis referenced
+|002| 4:12:35 PM Assign:0 0 8523 0
+|002| 4:12:35 PM X axis referenced
+|002| 4:12:35 PM Assign:0 0 8523 0
+|002| 4:12:35 PM Y axis referenced
+|002| 4:12:37 PM Assign:0 0 8523 0
+|002| 4:12:37 PM X axis referenced
+|002| 4:12:37 PM Assign:0 0 8523 0
+|002| 4:12:38 PM Assign:0 0 8523 0
+|002| 4:12:38 PM X axis referenced
+|002| 4:12:38 PM Assign:0 0 8523 0
+|002| 4:12:38 PM Y axis referenced
+|002| 4:12:38 PM Y axis referenced
+|002| 4:13:23 PM Assign:0 0 8523 0
+|002| 4:13:23 PM Mat:X0 Y0
+|002| 4:13:24 PM Assign:0 0 8523 0
+|002| 4:13:24 PM X axis referenced
+|002| 4:13:24 PM Assign:0 0 8523 0
+|002| 4:13:24 PM Y axis referenced
+|002| 4:13:27 PM Assign:0 0 8523 0
+|002| 4:13:27 PM Mat:X0 Y0
+|002| 4:13:30 PM Assign:0 0 8523 0
+|002| 4:13:30 PM X axis referenced
+|002| 4:13:30 PM Assign:0 0 8523 0
+|002| 4:13:30 PM Assign:0 0 8523 0
+|002| 4:13:30 PM X axis referenced
+|002| 4:13:30 PM Assign:0 0 8523 0
+|002| 4:13:30 PM Y axis referenced
+|002| 4:13:30 PM Y axis referenced
+|002| 4:13:31 PM Assign:0 0 8523 0
+|002| 4:13:31 PM X axis referenced
+|002| 4:13:31 PM Assign:0 0 8523 0
+|002| 4:13:31 PM Y axis referenced
+|002| 4:13:32 PM Assign:0 0 8523 0
+|002| 4:13:32 PM X axis referenced
+|002| 4:13:32 PM Assign:0 0 8523 0
+|002| 4:13:32 PM Y axis referenced
+|002| 4:13:33 PM Assign:0 0 8523 0
+|002| 4:13:33 PM Mat:X0 Y0
+|002| 4:14:11 PM Assign:0 2739 8523 0
+|002| 4:14:11 PM Mat:X0 Y2739
+|002| 4:14:24 PM Assign:0 19406 8523 0
+|002| 4:14:24 PM X axis referenced
+|002| 4:14:24 PM Assign:0 0 8523 0
+|002| 4:14:24 PM Y axis referenced
+|002| 4:14:27 PM Assign:0 0 8523 0
+|002| 4:14:27 PM X axis referenced
+|002| 4:14:27 PM Assign:0 0 8523 0
+|002| 4:14:27 PM Assign:0 0 8523 0
+|002| 4:14:27 PM X axis referenced
+|002| 4:14:27 PM Assign:0 0 8523 0
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM X axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM X axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM X axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM X axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM Y axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM X axis referenced
+|002| 4:14:28 PM Assign:0 0 8523 0
+|002| 4:14:28 PM Y axis referenced
+|002| 4:14:29 PM Y axis referenced
+|002| 4:14:29 PM Y axis referenced
+|002| 4:14:29 PM Y axis referenced
+|002| 4:14:29 PM Y axis referenced
+|002| 4:15:09 PM Assign:-500 0 8523 0
+|002| 4:15:09 PM X axis referenced
+|002| 4:15:24 PM Assign:0 -500 8523 0
+|002| 4:15:24 PM Y axis referenced
+|002| 4:15:36 PM Assign:0 0 8523 0
+|002| 4:15:36 PM Mat:X0 Y0
+|002| 4:15:40 PM Assign:-500 0 8523 0
+|002| 4:15:40 PM X axis referenced
+|002| 4:15:42 PM Assign:0 -500 8523 0
+|002| 4:15:42 PM Y axis referenced
+|050| 4:17:56 PM Warning: Microsteping X Axis not recomended value
+|050| 4:17:56 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:17:56 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:47:52 PM Warning: Microsteping X Axis not recomended value
+|050| 4:47:52 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:47:52 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:15:50 PM TXCorr:2
+|002| 5:47:06 PM found : MyPlasm CNC
+|002| 5:47:06 PM FirmwareVer 1.2 1
+|002| 5:47:06 PM Machine not referenced
+|002| 5:47:06 PM Communication OK
+|050| 5:47:39 PM Warning: Microsteping X Axis not recomended value
+|050| 5:47:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:47:39 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:48:11 PM Assign:951 109816 10360 0
+|002| 5:48:11 PM Z axis referenced
+|002| 5:48:13 PM Assign:-500 109816 10160 0
+|002| 5:48:13 PM X axis referenced
+|002| 5:49:21 PM Assign:0 -500 10160 0
+|002| 5:49:21 PM Y axis referenced
+|002| 5:51:28 PM Z over rang ( Soft Limit )
+|002| 5:51:30 PM Z over rang ( Soft Limit )
+|002| 5:51:36 PM Z over rang ( Soft Limit )
+|002| 5:52:01 PM Z over rang ( Soft Limit )
+|002| 5:52:01 PM Z over rang ( Soft Limit )
+|002| 5:52:10 PM Z over rang ( Soft Limit )
+|002| 5:52:16 PM Z over rang ( Soft Limit )
+|002| 5:52:23 PM Z over rang ( Soft Limit )
+|002| 6:00:10 PM TXCorr:2
+|002| 4:43:53 PM found : MyPlasm CNC
+|002| 4:43:53 PM FirmwareVer 1.2 1
+|002| 4:43:53 PM Machine not referenced
+|002| 4:43:53 PM Communication OK
+|002| 4:44:01 PM Assign:-500 0 10160 0
+|002| 4:44:01 PM X axis referenced
+|002| 4:44:03 PM Assign:0 -500 10160 0
+|002| 4:44:03 PM Y axis referenced
+|002| 4:49:30 PM Z over rang ( Soft Limit )
+|050| 4:49:36 PM Warning: Microsteping X Axis not recomended value
+|050| 4:49:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:49:36 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:49:50 PM Z over rang ( Soft Limit )
+|002| 4:50:04 PM Z over rang ( Soft Limit )
+|002| 4:50:05 PM Z over rang ( Soft Limit )
+|002| 4:50:33 PM Z over rang ( Soft Limit )
+|050| 4:50:44 PM Warning: Microsteping X Axis not recomended value
+|050| 4:50:44 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:50:44 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:50:58 PM Z over rang ( Soft Limit )
+|002| 4:50:59 PM Z over rang ( Soft Limit )
+|002| 4:51:01 PM Z over rang ( Soft Limit )
+|002| 4:51:01 PM Z over rang ( Soft Limit )
+|002| 4:51:01 PM Z over rang ( Soft Limit )
+|002| 4:51:01 PM Z over rang ( Soft Limit )
+|002| 4:51:01 PM Z over rang ( Soft Limit )
+|050| 4:51:22 PM Warning: Microsteping X Axis not recomended value
+|050| 4:51:22 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:51:23 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:52:42 PM Assign:-500 -58 11722 0
+|002| 4:52:42 PM X axis referenced
+|002| 4:52:44 PM Assign:0 -500 11722 0
+|002| 4:52:44 PM Y axis referenced
+|002| 4:53:01 PM Z over rang ( Soft Limit )
+|002| 4:53:51 PM TXCorr:2
+|002| 4:54:37 PM Assign:0 0 300 0
+|002| 4:54:37 PM Z axis referenced
+|002| 4:54:40 PM Assign:0 0 300 0
+|002| 4:54:40 PM Z axis referenced
+|002| 4:54:40 PM Assign:0 0 100 0
+|002| 4:54:41 PM found : MyPlasm CNC
+|002| 4:54:41 PM FirmwareVer 1.2 1
+|002| 4:54:41 PM Machine not referenced
+|002| 4:54:41 PM Communication OK
+|050| 4:54:51 PM Warning: Microsteping X Axis not recomended value
+|050| 4:54:51 PM Warning: Microsteping Y Axis not recomended value
+|050| 4:54:51 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:58:40 PM Assign:-500 0 10176 0
+|002| 4:58:41 PM X axis referenced
+|002| 4:58:43 PM Assign:0 -500 10176 0
+|002| 4:58:43 PM Y axis referenced
+|050| 5:06:40 PM Warning: Microsteping X Axis not recomended value
+|050| 5:06:40 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:06:40 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:07:18 PM Warning: Microsteping X Axis not recomended value
+|050| 5:07:18 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:07:18 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:07:35 PM Warning: Microsteping X Axis not recomended value
+|050| 5:07:35 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:07:35 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:08:01 PM Assign:0 0 10160 0
+|051| 5:08:01 PM Z axis referenced
+|002| 5:08:02 PM Assign:0 0 10160 0
+|002| 5:08:02 PM Z axis referenced
+|002| 5:09:06 PM Assign:0 0 100 0
+|002| 5:09:06 PM Z axis referenced
+|002| 5:09:10 PM Assign:0 0 100 0
+|002| 5:09:10 PM Z axis referenced
+|002| 5:09:10 PM Assign:0 0 100 0
+|002| 5:10:04 PM Assign:0 0 100 0
+|002| 5:10:04 PM Z axis referenced
+|050| 5:10:07 PM Warning: Microsteping X Axis not recomended value
+|050| 5:10:07 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:10:07 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:10:17 PM Assign:0 0 100 0
+|002| 5:10:18 PM Assign:0 0 100 0
+|002| 5:10:18 PM Z axis referenced
+|002| 5:10:26 PM Assign:0 0 100 0
+|002| 5:10:26 PM Z axis referenced
+|002| 5:10:27 PM Assign:0 0 100 0
+|002| 5:10:27 PM Z axis referenced
+|050| 5:10:39 PM Warning: Microsteping X Axis not recomended value
+|050| 5:10:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:10:39 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:10:46 PM Assign:0 0 100 0
+|051| 5:10:46 PM Z axis referenced
+|002| 5:11:02 PM Assign:0 0 100 0
+|002| 5:11:02 PM Z axis referenced
+|002| 5:11:35 PM Assign:0 0 2540 0
+|050| 5:11:51 PM Warning: Microsteping X Axis not recomended value
+|050| 5:11:51 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:11:51 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:13:06 PM Assign:0 0 100 0
+|051| 5:13:06 PM Z axis referenced
+|002| 5:13:07 PM Assign:0 0 100 0
+|002| 5:13:07 PM Z axis referenced
+|002| 5:13:11 PM Assign:0 0 100 0
+|002| 5:13:11 PM Z axis referenced
+|050| 5:13:52 PM Warning: Microsteping X Axis not recomended value
+|050| 5:13:52 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:13:52 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:13:55 PM Assign:0 0 135 0
+|051| 5:13:55 PM X axis referenced
+|051| 5:13:55 PM Assign:0 0 135 0
+|051| 5:13:55 PM Y axis referenced
+|002| 5:13:57 PM Assign:0 0 135 0
+|002| 5:13:57 PM X axis referenced
+|002| 5:13:57 PM Assign:0 0 135 0
+|002| 5:13:57 PM Y axis referenced
+|002| 5:14:07 PM Assign:-500 0 135 0
+|002| 5:14:07 PM X axis referenced
+|002| 5:14:09 PM Assign:0 -500 135 0
+|002| 5:14:09 PM Y axis referenced
+|050| 5:15:36 PM Warning: Microsteping X Axis not recomended value
+|050| 5:15:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:15:36 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:26:24 PM Assign:-500 0 -1301 0
+|002| 5:26:24 PM X axis referenced
+|002| 5:26:26 PM Assign:0 -500 -1301 0
+|002| 5:26:26 PM Y axis referenced
+|050| 5:30:58 PM Warning: Microsteping X Axis not recomended value
+|050| 5:30:58 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:30:58 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:31:14 PM found : MyPlasm CNC
+|051| 5:31:14 PM FirmwareVer 1.2 1
+|051| 5:31:14 PM Machine is referenced OK
+|051| 5:31:14 PM Communication OK
+|050| 5:32:28 PM Warning: Microsteping X Axis not recomended value
+|050| 5:32:28 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:32:28 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:32:28 PM Warning: Microsteping X Axis not recomended value
+|050| 5:32:28 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:32:28 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:33:24 PM ---- Work start ----
+|010| 5:33:24 PM Speed:100 / 50
+|011| 5:33:27 PM Work time :00:03
+|011| 5:33:27 PM Working stopped
+|002| 5:33:49 PM Assign:0 5175 4937 0
+|002| 5:33:49 PM X axis referenced
+|002| 5:33:50 PM Assign:0 0 4937 0
+|002| 5:33:50 PM Y axis referenced
+|002| 5:33:52 PM Assign:0 0 4937 0
+|002| 5:33:52 PM X axis referenced
+|002| 5:33:52 PM Assign:0 0 4937 0
+|002| 5:33:52 PM Y axis referenced
+|002| 5:33:53 PM Assign:0 0 4937 0
+|002| 5:33:53 PM X axis referenced
+|002| 5:33:53 PM Assign:0 0 4937 0
+|002| 5:33:53 PM X axis referenced
+|002| 5:33:53 PM Assign:0 0 4937 0
+|002| 5:33:53 PM Y axis referenced
+|002| 5:33:57 PM Assign:0 0 4937 0
+|002| 5:33:57 PM X axis referenced
+|002| 5:33:57 PM Assign:0 0 4937 0
+|002| 5:33:57 PM Y axis referenced
+|002| 5:34:00 PM Assign:0 0 4937 0
+|002| 5:34:00 PM Mat:X0 Y0
+|002| 5:34:01 PM Assign:0 0 4937 0
+|002| 5:34:01 PM X axis referenced
+|002| 5:34:01 PM Assign:0 0 4937 0
+|002| 5:34:01 PM Y axis referenced
+|002| 5:34:16 PM Assign:-500 0 4937 0
+|002| 5:34:16 PM X axis referenced
+|002| 5:34:21 PM Assign:0 -500 4937 0
+|002| 5:34:21 PM Y axis referenced
+|010| 5:34:31 PM ---- Work start ----
+|010| 5:34:31 PM Speed:100 / 50
+|011| 5:34:35 PM Work time :00:03
+|011| 5:34:35 PM Working stopped
+|050| 5:40:20 PM Warning: Microsteping X Axis not recomended value
+|050| 5:40:20 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:40:20 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:43:06 PM Warning: Microsteping X Axis not recomended value
+|050| 5:43:06 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:43:06 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:44:38 PM found : MyPlasm CNC
+|002| 5:44:38 PM FirmwareVer 1.2 1
+|002| 5:44:38 PM Machine is referenced OK
+|002| 5:44:38 PM Communication OK
+|050| 5:45:25 PM Warning: Microsteping X Axis not recomended value
+|050| 5:45:25 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:45:25 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:48:55 PM Warning: Microsteping X Axis not recomended value
+|050| 5:48:55 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:48:55 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:51:57 PM TXCorr:2
+|051| 5:54:30 PM found : MyPlasm CNC
+|051| 5:54:30 PM FirmwareVer 1.2 1
+|051| 5:54:30 PM Machine not referenced
+|051| 5:54:30 PM Communication OK
+|050| 5:54:57 PM Warning: Microsteping X Axis not recomended value
+|050| 5:54:57 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:54:57 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:55:03 PM Assign:0 8247 8608 0
+|051| 5:55:03 PM X axis referenced
+|051| 5:55:03 PM Assign:0 0 8608 0
+|051| 5:55:03 PM Y axis referenced
+|002| 5:55:06 PM Assign:0 0 8608 0
+|002| 5:55:06 PM X axis referenced
+|002| 5:55:06 PM Assign:0 0 8608 0
+|002| 5:55:06 PM Y axis referenced
+|002| 5:55:32 PM Assign:-500 0 8608 0
+|002| 5:55:32 PM X axis referenced
+|002| 5:55:39 PM Assign:0 -500 8608 0
+|002| 5:55:39 PM Y axis referenced
+|050| 5:55:46 PM Warning: Microsteping X Axis not recomended value
+|050| 5:55:46 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:55:46 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:56:26 PM Warning: Microsteping X Axis not recomended value
+|050| 5:56:26 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:56:26 PM Warning: Microsteping Z Axis not recomended value
+|050| 5:56:53 PM Warning: Microsteping X Axis not recomended value
+|050| 5:56:53 PM Warning: Microsteping Y Axis not recomended value
+|050| 5:56:53 PM Warning: Microsteping Z Axis not recomended value
+|010| 5:58:31 PM warring: Machine not referenced!
+|010| 5:58:31 PM ---- Work start ----
+|010| 5:58:31 PM Speed:100 / 50
+|011| 5:59:19 PM Work time :00:47
+|011| 5:59:19 PM Working stopped
+|011| 6:01:13 PM TXCorr:2
+|011| 3:48:39 PM found : MyPlasm CNC
+|050| 3:48:39 PM Warning: Microsteping X Axis not recomended value
+|050| 3:48:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 3:48:39 PM Warning: Microsteping Z Axis not recomended value
+|051| 3:48:39 PM FirmWare UpDate...
+|051| 3:48:52 PM MyPlasm CNCFirmware Update OK
+|051| 3:48:53 PM Restart_App
+|002| 3:48:54 PM CloseApp
+|002| 3:48:54 PM found : MyPlasm CNC
+|002| 3:48:54 PM FirmwareVer 1.2 1
+|002| 3:48:54 PM Machine not referenced
+|002| 3:48:54 PM Communication OK

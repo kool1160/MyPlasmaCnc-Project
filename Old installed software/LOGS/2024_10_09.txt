@@ -1,0 +1,6 @@
+|000| 5:07:31 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 5:07:31 PM Run as administrator
+|000| 5:07:31 PM Read advanced file
+|000| 5:07:32 PM Backup create
+|051| 5:07:32 PM Error: Software doesn`t closed previous.
+|051| 5:07:32 PM NoDev found

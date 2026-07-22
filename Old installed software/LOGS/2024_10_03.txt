@@ -1,0 +1,146 @@
+|000| 4:35:12 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 4:35:12 PM Run as administrator
+|000| 4:35:12 PM Read advanced file
+|000| 4:35:12 PM Backup create
+|051| 4:35:14 PM Error: Software doesn`t closed previous.
+|051| 4:35:14 PM found : MyPlasm CNC
+|051| 4:35:14 PM FirmwareVer 1.2 1
+|051| 4:35:14 PM Machine not referenced
+|051| 4:35:14 PM Communication OK
+|002| 4:35:16 PM Game Controller detected OK
+|050| 4:35:56 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:36:08 PM found : MyPlasm CNC
+|051| 4:36:08 PM FirmwareVer 1.2 1
+|051| 4:36:08 PM Communication OK
+|050| 4:36:32 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:36:32 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:36:40 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:36:45 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:36:45 PM Warning: Microsteping Z Axis not recomended value
+|002| 4:37:53 PM Mat:X-10055 Y-15396
+|002| 4:38:38 PM found : MyPlasm CNC
+|002| 4:38:38 PM FirmwareVer 1.2 1
+|002| 4:38:38 PM Communication OK
+|002| 4:39:07 PM TXCorr:2
+|002| 4:39:36 PM CloseApp
+|000| 4:39:40 PM __________________________________
+|000| 4:39:40 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 4:39:40 PM Run as administrator
+|000| 4:39:40 PM Read advanced file
+|051| 4:39:40 PM found : MyPlasm CNC
+|051| 4:39:40 PM TXCorr:2
+|051| 4:39:41 PM Old_TX_err
+|051| 4:39:41 PM Communication Error
+|051| 4:39:43 PM Game Controller detected OK
+|050| 4:39:48 PM Warning: Microsteping Z Axis not recomended value
+|100| 4:40:19 PM Preview: MyPlasmCNC.plt
+|050| 4:40:25 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:40:25 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:43:04 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:43:41 PM Warning: Microsteping Z Axis not recomended value
+|050| 4:43:41 PM Warning: Microsteping Z Axis not recomended value
+|051| 4:46:03 PM found : MyPlasm CNC
+|051| 4:46:03 PM FirmwareVer 1.2 1
+|051| 4:46:03 PM Machine not referenced
+|051| 4:46:03 PM Communication OK
+|002| 4:46:54 PM TXCorr:2
+|002| 4:57:03 PM found : MyPlasm CNC
+|002| 4:57:03 PM FirmwareVer 1.2 1
+|002| 4:57:03 PM Machine not referenced
+|002| 4:57:03 PM Communication OK
+|050| 5:00:05 PM Warning: Microsteping Z Axis not recomended value
+|002| 5:04:32 PM found : MyPlasm CNC
+|002| 5:04:32 PM FirmwareVer 1.2 1
+|002| 5:04:32 PM Communication OK
+|002| 5:06:58 PM TXCorr:2
+|050| 5:11:43 PM Warning: Microsteping Z Axis not recomended value
+|051| 5:12:00 PM found : MyPlasm CNC
+|051| 5:12:00 PM FirmwareVer 1.2 1
+|051| 5:12:00 PM Machine not referenced
+|051| 5:12:00 PM Communication OK
+|002| 5:37:09 PM TXCorr:2
+|050| 6:59:31 PM Warning: Microsteping X Axis not recomended value
+|050| 6:59:31 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:59:31 PM Warning: Microsteping Z Axis not recomended value
+|050| 6:59:49 PM Warning: Microsteping X Axis not recomended value
+|050| 6:59:49 PM Warning: Microsteping Y Axis not recomended value
+|050| 6:59:49 PM Warning: Microsteping Z Axis not recomended value
+|051| 7:01:46 PM found : MyPlasm CNC
+|051| 7:01:46 PM FirmwareVer 1.2 1
+|051| 7:01:46 PM Machine not referenced
+|051| 7:01:46 PM Communication OK
+|050| 7:02:31 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:02:33 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping X Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping X Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:04:39 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:06:44 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:06:56 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:06:58 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:07:01 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:07:12 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:07:12 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:09:45 PM Warning: Microsteping X Axis not recomended value
+|050| 7:09:45 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:09:47 PM Warning: Microsteping X Axis not recomended value
+|050| 7:09:47 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:09:47 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:09:49 PM Warning: Microsteping X Axis not recomended value
+|050| 7:09:49 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:09:49 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping X Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping X Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:09:54 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:10:47 PM Warning: Microsteping X Axis not recomended value
+|050| 7:10:47 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:10:57 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:11:23 PM Warning: Microsteping X Axis not recomended value
+|050| 7:11:23 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:11:26 PM Warning: Microsteping X Axis not recomended value
+|050| 7:11:26 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:11:31 PM Warning: Microsteping X Axis not recomended value
+|050| 7:11:31 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:11:31 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:12:13 PM Warning: Microsteping X Axis not recomended value
+|050| 7:12:13 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:12:13 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:12:16 PM Warning: Microsteping X Axis not recomended value
+|050| 7:12:16 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:12:16 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:21 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:21 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:21 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:26 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:26 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:26 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:29 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:29 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:30 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:32 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:13:35 PM Warning: Microsteping X Axis not recomended value
+|050| 7:13:35 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:13:35 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping X Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping X Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:15:08 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping X Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping Z Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping X Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping Y Axis not recomended value
+|050| 7:15:36 PM Warning: Microsteping Z Axis not recomended value
+|051| 7:15:57 PM TXCorr:2

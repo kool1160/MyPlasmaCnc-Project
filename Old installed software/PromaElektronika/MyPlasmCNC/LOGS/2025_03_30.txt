@@ -1,0 +1,18 @@
+|000| 5:30:20 PM MyPlasm CNC v 1.2.1e  /Plasma
+|000| 5:30:20 PM Run as administrator
+|000| 5:30:20 PM Read advanced file
+|000| 5:30:20 PM Backup create
+|051| 5:30:21 PM Error: Software doesn`t closed previous.
+|051| 5:30:21 PM found : MyPlasm CNC
+|051| 5:30:22 PM FirmwareVer 1.2 1
+|051| 5:30:22 PM Machine not referenced
+|051| 5:30:22 PM Communication OK
+|002| 5:30:49 PM Assign:76509 105467 7063 0
+|002| 5:30:49 PM Mat:X76509 Y105467
+|002| 5:30:51 PM Assign:76509 105467 7063 0
+|002| 5:30:51 PM Mat:X76509 Y105467
+|002| 5:31:03 PM Assign:76509 105467 11431 0
+|002| 5:31:03 PM Mat:X76509 Y105467
+|002| 5:31:19 PM Assign:76509 105467 11431 0
+|002| 5:31:19 PM Mat:X76509 Y105467
+|002| 5:32:10 PM TXCorr:2

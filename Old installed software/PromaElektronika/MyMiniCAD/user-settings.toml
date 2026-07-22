@@ -1,0 +1,13 @@
+[general]
+current_units = 1
+grid_size = 100.0
+skip_backup_warning = false
+
+[snapping]
+master = true
+grid = true
+vertex = true
+middle_edge = false
+middle_polygon = false
+across_layers = false
+tangent = true

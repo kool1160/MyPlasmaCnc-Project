@@ -1,0 +1,558 @@
+0:
+--------------- Main Lang ---------------
+000
+Test EN
+001
+Do you want to replace this file ?
+002
+USB device not found
+003
+USB device error
+004
+Communication error
+005
+Actual controller firmware ver.:
+006
+will UpDate to version         :
+007
+Communication OK
+008
+Working Time : 
+009
+Parameters for the material
+010
+Disconnected
+011
+Connecting....
+012
+Offline / Simulation
+013
+DoubleClick = Resize
+014
+Right Mouse Button = project move
+015
+Tip
+016
+Saved on Desktop
+101
+Move here
+102
+Cut from this path
+103
+Cut path from this point
+104
+Move to [0,0] of project
+105
+Cut line to here
+106
+Cancel
+107
+Authorization
+108
+Password
+109
+Cut line from here
+110
+Your current configuration will be saved as default
+1:
+--------------- Main Window ---------------
+sRev
+Rewind program to first path
+sRev1
+Rewind one path back
+sStop
+STOP
+sStart
+Automatic work START
+sFF
+Rewind program to last path
+sFF1
+Rewind one path forward
+lSpeed1
+[mm/min] Cutting speed
+lSpeed2
+[mm/min] Cutting speed 2
+lCutH
+[mm] Cutting height
+lVthc
+[V] Cutting height ( THC )
+lPiercingH
+[mm] Piercing height
+lPiercingT
+[ms] Piercing time
+lFloatingH
+[mm] Floating height
+lSim
+S I M
+lTime
+Working Time : 00:00
+lLog
+Log!
+Label1
+~00000 mm/min
+lPreHeatTime
+[s] Pre Heat Time
+lPreHeatHeight
+[mm] Pre Heat height
+lMarkerTime
+[ms] Marker delay time
+lMarkerSpeed
+Marker Speed
+lDepth
+Milling depth
+lDepthP
+Partial depth
+lStat
+Status : Check
+lStatR
+Reset
+SpeedButton30
+Exit
+sAnalise
+Analise
+sSave
+Save Project
+SpeedButton32
+Configuration
+SpeedButton33
+About
+sOpen
+Open Project
+sImport
+Import File
+SpeedButton2
+User Guide
+SpeedButton3
+Schematic
+sOut2
+Out 2
+sOut1
+Out 1
+SpeedButtonXA
+MIX X + A ( ROTARY )
+LabelErr
+
+sExport
+G-Codes Eksport
+ConnectText
+Communication error
+Label4
+Click to Reset
+eVoltage
+0 = AUTO THC
+SpeedButton11
+X-  Y+
+LeftButton
+X-
+SpeedButton10
+X-  Y-
+DownButton
+Y-
+SpeedButton12
+ON / OFF [ space ]
+UpButton
+Y+
+SpeedButton8
+X+  Y+
+RightButton
+X+
+SpeedButton9
+X+  Y-
+PgDownButton
+Z-
+PgUpButton
+Z+
+SpeedButton20
+X = 0 ; Y = TOP
+SpeedButton21
+Y = TOP
+SpeedButton22
+X = RIGHT, Y = TOP
+SpeedButton23
+X = RIGHT
+SpeedButton28
+XY = CENTER
+SpeedButton27
+X = 0
+SpeedButton26
+XY = 0
+SpeedButton25
+Y = 0
+SpeedButton24
+X = RIGHT, Y = 0
+Z0Button
+Z = 0
+SpeedButton6
+A+
+SpeedButton7
+A-
+Label9
+X
+Label10
+Y
+Label11
+Z
+lMatPos
+Material / Project position
+Label13
+X
+Label14
+Y
+Label15
+Z
+lTorchPos
+Torch position
+lJogDist
+XY Jog distance
+Label2
+x
+2:
+--------------- Import Window ---------------
+SpeedButton32
+Configuration
+SpeedButton8
+Export ( CTRL + E )
+Label11
+plasma
+Label12
+Grav / Scriber / Marker
+cCalc
+Use MyMiniCAM
+Label1
+2mm
+Label4
+In 4mm  / Out  2mm
+Label14
+0
+cOffsetActive
+Offset
+rOutside
+Outside
+rInside
+Inside
+cLeadIn
+LeadIn
+cLeadOut
+LeadOut
+cLeadOut2
+LeadOut2
+cLeadIn2
+LeadIn2
+Label2
+Sequence
+rSort2
+
+rSort3
+
+rSort1
+
+rSort4
+
+rSort5
+
+rSort0
+Disable
+sSortH
+Handly
+Label10
+Sequence
+lScl
+Import Scale
+lScl1
+HPGL ( *.plt )
+lScl2
+DXF ( *.dxf )
+lScl3
+GCODE ( *.tap )
+Label3
+MyCam Options
+Label5
+LeadIn / LeadOut
+Label6
+material thickness
+Label7
+3D View
+Label8
+Options
+Label9
+Show Area X Y
+eScaleDXF
+0.03937 force [mm]
+cSpaw
+connect paths
+cDXFForceMM
+Force [ mm ]
+xDist
+0 = Auto ( 3 x gap )
+cOpenDetect
+detect inners inside open path
+cUn
+cUn
+cDXFForceINCH
+Force [ inch ]
+cFastCalc
+Fast Processing
+cNumb
+Show Numbers
+lSize
+Current size
+lSclTo
+Scaling to
+lsx
+1234.23
+lsy
+1234.23
+lsxx
+x
+lsxy
+X            Y
+SpeedButton5
+CTRL + Z
+SpeedButton6
+DISABLE
+SpeedButton7
+CTRL+ C ; CTRL + V
+SpeedButton9
+DELETE
+Label13
+Edit
+SpeedButton12
+Right = 3deg ; ctrl = 0.25deg
+SpeedButton13
+Right = 3deg ; ctrl = 0.25deg
+SpeedButton16
+CTRL + Q
+cDateTime
+cDateTime
+3:
+--------------- Configuration Window ---------------
+Label3
+Voltage Divider
+Label1
+Voltage Calibration [%]
+Label8
+PLASMA INTERFACE
+Label11
+Range of Voltage [V]
+Label12
+-
+Label27
+0-100 THC Speed
+Label40
+Current Sensor Cal [%]
+Label10
+Height of transfer max.[mm]
+cInterface
+Enabled
+cArcOk
+Waiting for ARC OK
+Label4
+Microstepping Motor Drivers
+Label5
+X
+Label6
+Y
+Label7
+Z
+Label49
+'
+Label50
+' axis func
+cReversX
+revers
+cReversY
+revers
+cReversZ
+revers
+cReversP
+revers
+Label2
+ 
+Label9
+MyPlasm CNC Controller
+lVer
+1.2.1
+Label79
+RS485 Communication
+Label73
+NEG(NC):
+cNeg1
+
+cNeg2
+
+cNeg3
+
+cNeg4
+
+cNeg5
+
+cNeg6
+
+cNeg7
+
+cNeg8
+
+Label45
+GamePad
+Label28
+
+lJoy4
+
+cType2
+Type 2
+cGamepad
+Active
+Label13
+X Axis move per motor rev [ mm ]
+Label14
+Y Axis move per motor rev [ mm ]
+Label15
+Z Axis move per motor rev [ mm ]
+Label33
+XY moving / gear parameters
+Label34
+Z moving / gear parameters
+Label69
+Rotary Gear
+Label18
+Z maximum speed [mm/min]
+Label19
+Acceleration Z ( RAMP )
+Label21
+Hand Z speed [mm/min]
+Label30
+Z safety speed [mm/min]
+Label32
+Z Axis moving parameters
+Label31
+XY Axis moving parameters
+Label16
+XY maximum speed [mm/min]
+Label20
+Hand XY speed [mm/min]
+Label29
+XY safety speed [mm/min]
+Label17
+Acceleration XY ( RAMP )
+Label70
+A
+Label39
+X                       Y                       Z
+cLimits
+Axis soft limits
+Label41
+Homing
+Label42
+X Speed [mm/min]
+Label43
+Y Speed [mm/min]
+Label44
+Z Speed [mm/min]
+LabelA
+A   offset:
+cHomingY
+Revers
+cHomingX
+Revers
+cHoming
+Home switches active
+cHomingA
+
+cRef
+cRef
+Label22
+Z axis initial height
+Label24
+switch correction [ mm ]
+Label25
+detection height [ mm ]
+Label26
+detection speed
+Label23
+ohmic correction [ mm ]
+cFloating
+Floating head switch
+cOhmic
+Touch ohmic Sensor
+Label35
+Objects
+Label36
+Apply Cutting Speed 2
+Label37
+for ojects smaller that [ mm ]
+Label47
+[ ms / mm ] Pointing
+Label46
+Extra indyvidual functions for clients - Don't change it if you don't know about it !!! 
+Label48
+[ deg ] Critical angle
+Label51
+[mm] Next sense distance
+Label61
+Piercing count
+Label62
+Setup Password
+Label63
+Cutting count time [min]
+Label64
+Out1 Mode
+Label65
+Out2 Mode
+Label66
+In1 Mode
+Label67
+In2 Mode
+Label71
+Laser pointer offset
+Label72
+Offset of X reference
+Label74
+Scriber/Marker offset
+Label75
+Scriber/Marker working height
+Label76
+Backlash Test
+Label78
+Delay before START [ms]
+cSpec1
+Oxygen Mode
+cSpec2
+High Speed THC
+cSpec4
+Shorten rotation
+cSpec5
+OHIMC Auto Blowing out
+cSpec6
+ARC Auto Restarting
+cSpec3
+Smooth
+cSpec1a
+Milling Mode
+cSounds
+Sounds
+Label52
+Park
+Label53
+F1
+Label54
+F2
+Label55
+F3
+Label56
+F4
+Label57
+Finish
+Label58
+X
+Label59
+Y
+Label60
+Z
+Label77
+Start
+Label38
+Language
+cImperial
+Imperial system ( INCHES )
+Label68
+-
