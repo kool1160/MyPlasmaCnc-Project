@@ -41,6 +41,33 @@ Initial live validation must be performed with the 48 V motor supply and plasma 
 
 See GitHub Issue #1: **Project 1: Build read-only MyPlasm Inspector for Windows**.
 
+## Current foundation
+
+The first bounded Issue #1 slice contains:
+
+- `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
+- `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
+- `MyPlasm.Inspector.App` — an initial WPF shell that uses only the fake transport;
+- `MyPlasm.Inspector.Tests` — offline fake-transport and safety-policy tests.
+
+The production allowlist is intentionally empty because no controller request bytes are confirmed yet. The app does not load D2XX and cannot access controller hardware in this slice.
+
+### Build and test
+
+Install a .NET 8 SDK, then run from the repository root:
+
+```powershell
+dotnet restore MyPlasm.Inspector.sln
+dotnet build MyPlasm.Inspector.sln --configuration Release --no-restore
+dotnet test MyPlasm.Inspector.sln --configuration Release --no-build
+```
+
+Launch the fake-only Windows shell with:
+
+```powershell
+dotnet run --project src/MyPlasm.Inspector.App/MyPlasm.Inspector.App.csproj
+```
+
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.

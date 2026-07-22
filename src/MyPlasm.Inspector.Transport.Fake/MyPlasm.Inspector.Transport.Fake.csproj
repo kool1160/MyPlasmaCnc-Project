@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\MyPlasm.Inspector.Core\MyPlasm.Inspector.Core.csproj" />
+  </ItemGroup>
+</Project>

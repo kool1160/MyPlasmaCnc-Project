@@ -15,6 +15,7 @@ This file is the evidence ledger for controller communication.
 
 ## Unknown
 
+- The bundled `ftd2xx.dll` referenced by project planning is not present in the current checkout, so its PE architecture has not been confirmed.
 - Exact D2XX open parameters used by the known-good application.
 - Exact read-only identification handshake.
 - Packet boundaries and checksum behavior.
@@ -34,3 +35,5 @@ For each finding, record:
 - related tests.
 
 Do not place undocumented command bytes into application code before they are classified and reviewed.
+
+The application allowlist is currently empty. Byte values used by automated tests are explicitly synthetic sentinels and are not protocol evidence.
