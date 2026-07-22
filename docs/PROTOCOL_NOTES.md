@@ -5,9 +5,11 @@ This file is the evidence ledger for controller communication.
 ## Confirmed
 
 - The original Windows application uses the FTDI D2XX API.
-- The installed runtime includes `ftd2xx.dll`.
 - The controller is identified by the original software as `MyPlasm CNC`.
 - The original logs report firmware in the form `FirmwareVer 1.2 1`.
+- FTDI documents `FT_CreateDeviceInfoList` followed by `FT_GetDeviceInfoList` as the device-enumeration sequence; it does not require an open device handle.
+- FTDI documents `FT_GetLibraryVersion` as a handle-free metadata operation.
+- FTDI documents `FT_GetDriverVersion` as requiring an open device handle, so this task does not query it.
 
 ## Hypotheses
 
@@ -15,7 +17,7 @@ This file is the evidence ledger for controller communication.
 
 ## Unknown
 
-- The bundled `ftd2xx.dll` referenced by project planning is not present in the current checkout, so its PE architecture has not been confirmed.
+- Project planning states that the installed runtime included `ftd2xx.dll`, but no copy is available in the working tree or reachable Git history; its architecture, file version, and SHA-256 therefore remain unknown.
 - Exact D2XX open parameters used by the known-good application.
 - Exact read-only identification handshake.
 - Packet boundaries and checksum behavior.
@@ -37,3 +39,22 @@ For each finding, record:
 Do not place undocumented command bytes into application code before they are classified and reviewed.
 
 The application allowlist is currently empty. Byte values used by automated tests are explicitly synthetic sentinels and are not protocol evidence.
+
+## Repository evidence audit — 2026-07-22
+
+Classification: `confirmed` for repository state; `unknown` for the reason the original upload omitted the DLL.
+
+- A recursive working-tree search found no `ftd2xx.dll` under `Old installed software/` or elsewhere outside generated build output.
+- `git rev-list --objects --all`, full-history path searches, and the original evidence commit `164e638` contain no `ftd2xx.dll`, `.dll`, or `.exe` runtime file.
+- The evidence commit predates `.gitignore`; it added logs, firmware/configuration/job data, and screenshots, but not the installed executable runtime.
+- Commit `4d73c5c` later added ignore rules for `native/local/` and `ftd2xx.dll`, ensuring locally supplied vendor libraries are not committed.
+- The repository has no Git LFS entry or sparse-checkout rule hiding the DLL.
+- Git history cannot prove why the original evidence upload omitted the runtime binary. It proves only that the DLL was never committed and that later policy intentionally keeps local copies out of Git.
+
+Safety impact: no architecture assumption is made. A local DLL is inspected for PE architecture, file version, SHA-256, and current/selected process compatibility before native loading.
+
+## Vendor references
+
+- FTDI D2XX Programmer's Guide: <https://ftdichip.com/wp-content/uploads/2025/06/D2XX_Programmers_Guide.pdf>
+- FTDI `FT_GetLibraryVersion`: <https://www.ftdichip.com/Support/Knowledgebase/ft_getlibraryversion.htm>
+- FTDI `FT_GetDriverVersion`: <https://www.ftdichip.com/Support/Knowledgebase/ft_getdriverversion.htm>

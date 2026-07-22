@@ -7,9 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Core", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Transport.Fake", "src\MyPlasm.Inspector.Transport.Fake\MyPlasm.Inspector.Transport.Fake.csproj", "{3A795EF8-9A52-4976-9E82-8D50EF7D3647}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Transport.D2xx", "src\MyPlasm.Inspector.Transport.D2xx\MyPlasm.Inspector.Transport.D2xx.csproj", "{C67F9917-C71E-4D35-84A4-60111E7E6315}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.App", "src\MyPlasm.Inspector.App\MyPlasm.Inspector.App.csproj", "{82D85728-B525-4406-906C-2050205547E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Tests", "tests\MyPlasm.Inspector.Tests\MyPlasm.Inspector.Tests.csproj", "{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.PeInspector", "tools\MyPlasm.Inspector.PeInspector\MyPlasm.Inspector.PeInspector.csproj", "{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,10 @@ Global
 		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A795EF8-9A52-4976-9E82-8D50EF7D3647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C67F9917-C71E-4D35-84A4-60111E7E6315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C67F9917-C71E-4D35-84A4-60111E7E6315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C67F9917-C71E-4D35-84A4-60111E7E6315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C67F9917-C71E-4D35-84A4-60111E7E6315}.Release|Any CPU.Build.0 = Release|Any CPU
 		{82D85728-B525-4406-906C-2050205547E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{82D85728-B525-4406-906C-2050205547E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82D85728-B525-4406-906C-2050205547E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,5 +41,9 @@ Global
 		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{462CDFB3-CC60-41BC-97FD-3760A1A0AC66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
