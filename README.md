@@ -88,7 +88,7 @@ With an inspected, legally obtained x86 `ftd2xx.dll` staged at
 `native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It creates:
 
 ```text
-artifacts/MyPlasmInspector-win-x86-diagnostic.zip
+artifacts/MyPlasmInspector-win-x86-passive-capture.zip
 ```
 
 The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the

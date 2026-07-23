@@ -9,7 +9,8 @@ This file is the evidence ledger for controller communication.
 - The original logs report firmware in the form `FirmwareVer 1.2 1`.
 - FTDI documents `FT_CreateDeviceInfoList` followed by `FT_GetDeviceInfoList` as the device-enumeration sequence; it does not require an open device handle.
 - FTDI documents `FT_GetLibraryVersion` as a handle-free metadata operation.
-- FTDI documents `FT_GetDriverVersion` as requiring an open device handle, so this task does not query it.
+- FTDI documents `FT_GetDriverVersion` as requiring an open device handle, so enumeration does not query it.
+- Live target validation confirmed one FTDI device, one exact `MyPlasm CNC` candidate, and enumeration with no open or transmit.
 
 ## Hypotheses
 

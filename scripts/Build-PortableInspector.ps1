@@ -11,8 +11,8 @@ $peInspectorProject = Join-Path $repositoryRoot 'tools\MyPlasm.Inspector.PeInspe
 $localDll = Join-Path $repositoryRoot 'native\local\ftd2xx.dll'
 $packageTemplateDirectory = Join-Path $repositoryRoot 'packaging\portable-win-x86'
 $artifactsDirectory = Join-Path $repositoryRoot 'artifacts'
-$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic'
-$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic.zip'
+$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-passive-capture'
+$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-passive-capture.zip'
 $applicationExecutable = Join-Path $packageDirectory 'MyPlasm Inspector.exe'
 $packagedDll = Join-Path $packageDirectory 'native\ftd2xx.dll'
 

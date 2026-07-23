@@ -39,9 +39,14 @@
                         Padding="16,8"
                         Click="InspectD2xxDevicesButton_Click"
                         Content="Inspect D2XX Devices" />
+                <Button Margin="12,0,0,0" Padding="16,8" Click="OpenExactDeviceButton_Click" Content="Open Exact MyPlasm Device" />
+                <Button Margin="12,0,0,0" Padding="16,8" Click="StartCaptureButton_Click" Content="Start Passive Capture" />
+                <Button Margin="12,0,0,0" Padding="16,8" Click="CloseDeviceButton_Click" Content="Close Device" />
+                <Button Margin="12,0,0,0" Padding="16,8" Click="ExportDiagnosticPackageButton_Click" Content="Export Diagnostic Package" />
             </StackPanel>
 
             <TextBlock x:Name="InspectionStatusText" Margin="0,18,0,0" Text="No transport has been created." />
+            <TextBlock Text="PASSIVE RECEIVE ONLY — ZERO TRANSMITS" FontWeight="Bold" Foreground="DarkRed" Margin="0,8,0,0" />
             <ListBox x:Name="EventLog" Margin="0,10,0,0" Height="170" />
         </StackPanel>
     </ScrollViewer>

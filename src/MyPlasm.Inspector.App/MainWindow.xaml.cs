@@ -11,6 +11,7 @@ public partial class MainWindow : Window
 {
     private readonly StartupLog _startupLog;
     private readonly ManualInspectionController _inspectionController;
+    private PassiveCaptureResult? _lastCapture;
 
     internal MainWindow(StartupLog startupLog, bool softwareRenderingActive)
     {
@@ -52,6 +53,50 @@ public partial class MainWindow : Window
             "D2XX inspection",
             _inspectionController.InspectD2xxDevicesAsync,
             true);
+    }
+
+    private async void OpenExactDeviceButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_inspectionController.CurrentTransport is not D2xxInspectionTransport d2xx)
+        {
+            AddEvent("Inspect D2XX Devices before opening."); return;
+        }
+        MessageBoxResult confirmation = MessageBox.Show("Close the original MyPlasm software. Keep 48 V motor power and plasma power off; disconnect torch start. This performs no writes but temporarily holds the FTDI device open.", "Passive receive safety confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+        if (confirmation != MessageBoxResult.OK) return;
+        try
+        {
+            await d2xx.OpenExactPassiveSessionAsync(() => System.Diagnostics.Process.GetProcessesByName("MyPlasmCNC").Length > 0);
+            InspectionStatusText.Text = $"Exact device open; driver {d2xx.DriverVersion ?? "unavailable"}; transmit count: 0";
+            AddEvent("Exact MyPlasm device opened by enumerated serial only; zero transmits.");
+        }
+        catch (Exception exception) { _startupLog.Exception("Open exact device", exception); AddEvent(exception.Message); }
+    }
+
+    private async void StartCaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_inspectionController.CurrentTransport is not D2xxInspectionTransport d2xx || !d2xx.HasOpenPassiveSession) { AddEvent("Open the exact device first."); return; }
+        try
+        {
+            PassiveCaptureResult capture = await d2xx.CapturePassiveReceiveAsync(TimeSpan.FromSeconds(30));
+            _lastCapture = capture;
+            InspectionStatusText.Text = $"Passive capture stopped: {capture.TotalBytes} bytes; {capture.Chunks.Count} chunks; transmit count: 0";
+            AddEvent("Passive receive capture completed; zero transmits.");
+        }
+        catch (Exception exception) { _startupLog.Exception("Passive capture", exception); AddEvent(exception.Message); }
+    }
+
+    private async void CloseDeviceButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_inspectionController.CurrentTransport is D2xxInspectionTransport d2xx) await d2xx.ClosePassiveSessionAsync();
+        InspectionStatusText.Text = "Device closed; transmit count: 0";
+        AddEvent("Passive device session closed.");
+    }
+
+    private void ExportDiagnosticPackageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_lastCapture is null) { AddEvent("Run a passive capture before export."); return; }
+        try { AddEvent($"Capture ZIP exported: {CaptureExporter.Export(_lastCapture, _startupLog)}"); }
+        catch (Exception exception) { _startupLog.Exception("Capture export", exception); AddEvent(exception.Message); }
     }
 
     private async Task RunEnumerationAsync(
