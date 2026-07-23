@@ -82,6 +82,22 @@ dotnet run --project tools/MyPlasm.Inspector.PeInspector -- native/local/ftd2xx.
 
 Use `--architecture x86` or `--architecture x64` to check a chosen application architecture. See `native/README.md` for the complete local-only setup.
 
+### Portable Windows package
+
+With an inspected, legally obtained x86 `ftd2xx.dll` staged at
+`native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It creates:
+
+```text
+artifacts/MyPlasmInspector-win-x86.zip
+```
+
+The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
+plasma-table PC, extract the complete archive, and double-click
+`Launch MyPlasm Inspector.bat`. No .NET SDK or runtime is required on that target
+PC. The FTDI driver is still required by Windows and may need administrator rights
+to install; launching the package does not. See `native/README.md` and the packaged
+`README-FIRST.txt` for the safety setup and full instructions.
+
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.

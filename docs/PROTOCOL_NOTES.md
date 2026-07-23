@@ -53,6 +53,24 @@ Classification: `confirmed` for repository state; `unknown` for the reason the o
 
 Safety impact: no architecture assumption is made. A local DLL is inspected for PE architecture, file version, SHA-256, and current/selected process compatibility before native loading.
 
+## Local runtime evidence audit - 2026-07-23
+
+Classification: `confirmed` for the inspected local runtime file; this does not
+change any controller-protocol classification.
+
+- A legally obtained `ftd2xx.dll` was located in the locally installed MyPlasmCNC
+  runtime, outside the Git working tree.
+- PE inspection reported `x86`, file version `3.01.19`, and SHA-256
+  `381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`.
+- The PE inspection utility confirmed compatibility with the selected `win-x86`
+  application architecture.
+- The DLL is copied only to ignored local staging and generated portable-package
+  output; it is not committed to Git.
+
+Safety impact: the vendor DLL makes D2XX metadata enumeration available in the
+portable package. It does not authorize device opening or any controller protocol
+operation. The production command allowlist remains empty.
+
 ## Vendor references
 
 - FTDI D2XX Programmer's Guide: <https://ftdichip.com/wp-content/uploads/2025/06/D2XX_Programmers_Guide.pdf>

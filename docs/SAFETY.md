@@ -73,3 +73,15 @@ The application fails closed:
 - Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
 - Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
 - The production command allowlist remains empty.
+
+## Portable package safety status
+
+- The self-contained `win-x86` package includes an inspected local FTDI DLL but
+  remains subject to the same empty production command allowlist.
+- Its D2XX inspection mode is device enumeration only: it has no controller-open,
+  read, write, EEPROM, baud-rate, or bit-mode path.
+- The launcher only verifies package files and starts the application; it does not
+  request elevation or communicate with a controller.
+- The packaged `README-FIRST.txt` repeats the required first-live-validation power
+  isolation: 24 V controller power only, with motor power, plasma source, and
+  torch-start circuit disabled.
