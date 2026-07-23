@@ -71,6 +71,24 @@ Safety impact: the vendor DLL makes D2XX metadata enumeration available in the
 portable package. It does not authorize device opening or any controller protocol
 operation. The production command allowlist remains empty.
 
+## Portable startup diagnostic - 2026-07-23
+
+Classification: `confirmed` for the previous application's eager startup design;
+`unknown` for the exact target-PC crash mechanism until its new startup log is
+collected.
+
+- The prior WPF window automatically ran fake transport enumeration in
+  `Window_Loaded`, before the operator could interact with the window.
+- The prior package did not force WPF software rendering before window creation and
+  did not write an application startup log before `MainWindow` construction.
+- The diagnostic package forces software rendering by default, logs environment and
+  startup stages before `MainWindow` exists, and defers every transport action until
+  an explicit button click.
+
+Safety impact: no controller operation is attempted during startup. The exact root
+cause of the target PC's renderer/startup crash remains unknown pending its startup
+log; this change removes automatic transport work and provides reproducible evidence.
+
 ## Vendor references
 
 - FTDI D2XX Programmer's Guide: <https://ftdichip.com/wp-content/uploads/2025/06/D2XX_Programmers_Guide.pdf>

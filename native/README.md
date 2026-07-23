@@ -36,7 +36,7 @@ The corresponding .NET 8 desktop runtime architecture must be installed. An arch
 
 For a portable, self-contained Windows x86 package, place the inspected local DLL
 at `native/local/ftd2xx.dll` and double-click `Build Portable Inspector.bat` in the
-repository root. The build creates `artifacts/MyPlasmInspector-win-x86.zip` without
+repository root. The build creates `artifacts/MyPlasmInspector-win-x86-diagnostic.zip` without
 committing the DLL or generated package. The target computer needs neither the .NET
 SDK nor the .NET runtime.
 
