@@ -9,7 +9,13 @@ This file is the evidence ledger for controller communication.
 - The original logs report firmware in the form `FirmwareVer 1.2 1`.
 - FTDI documents `FT_CreateDeviceInfoList` followed by `FT_GetDeviceInfoList` as the device-enumeration sequence; it does not require an open device handle.
 - FTDI documents `FT_GetLibraryVersion` as a handle-free metadata operation.
-- FTDI documents `FT_GetDriverVersion` as requiring an open device handle, so this task does not query it.
+- FTDI documents `FT_GetDriverVersion` as requiring an open device handle, so enumeration does not query it.
+- Live target validation confirmed one FTDI device, one exact `MyPlasm CNC` candidate, and enumeration with no open or transmit.
+- The passive-receive implementation can open only the exact unique serial from a
+  completed enumeration, query driver metadata, poll receive queue depth, and read
+  already-queued bytes. It has no controller transmit or FTDI configuration API.
+- This implementation has been validated only with injectable offline native
+  doubles during hardening; no real controller was opened for this correction.
 
 ## Hypotheses
 
@@ -88,6 +94,27 @@ collected.
 Safety impact: no controller operation is attempted during startup. The exact root
 cause of the target PC's renderer/startup crash remains unknown pending its startup
 log; this change removes automatic transport work and provides reproducible evidence.
+
+## Passive receive hardening — 2026-07-23
+
+Classification: `confirmed` for code structure and offline automated behavior;
+`unknown` for live controller receive behavior because no hardware test was run.
+
+- Enumeration, passive handle ownership, capture lifecycle, and evidence export
+  are separate components.
+- Automated tests cover exact-device rejection, exact-serial open, process
+  exclusion, handle state, close failures, queue polling, zero-depth evidence,
+  byte ordering, malformed native counts, cancellation, concurrent-capture
+  rejection, close-during-capture ordering, zero-byte export, ZIP hashes, and
+  the empty transmit surface.
+- Each capture event records UTC time, operation, queue depth, requested and
+  returned counts, D2XX status, elapsed session time, and an error message when
+  applicable.
+- No protocol decoder, request packet, controller command, configuration change,
+  or transmit allowlist entry was added.
+
+Safety impact: passive receive can be exercised without inventing or sending a
+controller request. The production command allowlist remains empty.
 
 ## Vendor references
 

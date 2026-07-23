@@ -1,7 +1,7 @@
 MYPLASM INSPECTOR - PORTABLE WINDOWS PACKAGE
 =============================================
 
-1. Copy MyPlasmInspector-win-x86-diagnostic.zip to the plasma-table computer.
+1. Copy MyPlasmInspector-win-x86-passive-capture.zip to the plasma-table computer.
 2. Extract the ENTIRE ZIP to a normal writable folder, for example Desktop\MyPlasmInspector.
 3. Double-click "Launch MyPlasm Inspector.bat".
 
@@ -24,9 +24,10 @@ administrator account; starting this package normally does not.
 
 SAFETY
 ------
-This build is DEVICE ENUMERATION ONLY — NO CONTROLLER COMMANDS.
+This build is PASSIVE RECEIVE ONLY — NO CONTROLLER COMMANDS OR TRANSMITS.
 It can list FTDI metadata and identify a device whose description exactly
-matches "MyPlasm CNC". It cannot open a controller, read controller traffic,
+matches "MyPlasm CNC". After explicit operator confirmation it can open only
+the exact enumerated serial and record bytes already queued by D2XX. It cannot
 send controller bytes, move axes, change outputs, alter EEPROM, change baud
 rate or bit mode, or update firmware.
 
@@ -36,6 +37,12 @@ Use "Run Fake Enumeration" for an offline demonstration or "Inspect D2XX
 Devices" to explicitly start metadata-only D2XX inspection. Software rendering
 is the safe default. The optional --hardware-rendering command-line argument is
 only for comparison during troubleshooting.
+
+For passive receive, inspect devices, confirm there is exactly one exact
+"MyPlasm CNC" candidate, then choose "Open Exact MyPlasm Device". Use "Start
+Passive Capture" and "Stop Capture"; closing the device or window also stops
+and waits for capture before closing. Captures can be exported after the device
+is closed. A zero-byte capture is valid evidence.
 
 Startup logs are written to:
 %LOCALAPPDATA%\MyPlasm Inspector\Logs\

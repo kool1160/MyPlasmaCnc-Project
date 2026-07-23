@@ -155,7 +155,7 @@ public sealed class D2xxInspectionTransportTests
             .ToArray();
 
         Assert.Equal(
-            ["CreateDeviceInfoList", "GetDeviceInfoList", "GetLibraryVersion"],
+            ["Close", "CreateDeviceInfoList", "GetDeviceInfoList", "GetDriverVersion", "GetLibraryVersion", "GetQueueStatus", "OpenExBySerialNumber", "Read"],
             methodNames);
     }
 
@@ -209,5 +209,11 @@ public sealed class D2xxInspectionTransportTests
             deviceCount = checked((uint)count);
             return D2xxStatus.Ok;
         }
+
+        public D2xxStatus OpenExBySerialNumber(string serialNumber, out nint handle) { handle = 1; return D2xxStatus.Ok; }
+        public D2xxStatus Close(nint handle) => D2xxStatus.Ok;
+        public D2xxStatus GetDriverVersion(nint handle, out uint version) { version = 0x00030102; return D2xxStatus.Ok; }
+        public D2xxStatus GetQueueStatus(nint handle, out uint bytesAvailable) { bytesAvailable = 0; return D2xxStatus.Ok; }
+        public D2xxStatus Read(nint handle, byte[] buffer, uint requestedCount, out uint returnedCount) { returnedCount = 0; return D2xxStatus.Ok; }
     }
 }

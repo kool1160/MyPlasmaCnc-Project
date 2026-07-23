@@ -47,12 +47,12 @@ The completed Issue #1 foundation slices contain:
 
 - `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
 - `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
-- `MyPlasm.Inspector.Transport.D2xx` — enumeration-only production D2XX interop;
+- `MyPlasm.Inspector.Transport.D2xx` — enumeration plus operator-confirmed, passive-receive-only D2XX interop;
 - `MyPlasm.Inspector.App` — a WPF shell with explicit fake and D2XX inspection modes;
 - `MyPlasm.Inspector.Tests` — offline fake-transport and safety-policy tests.
 - `MyPlasm.Inspector.PeInspector` — local vendor-DLL architecture, version, and hash inspection.
 
-The production command allowlist remains empty because no controller request bytes are confirmed. D2XX mode can list device metadata but cannot open, read, configure, or write a device. Driver version is deliberately not queried because FTDI documents that operation as requiring an open device handle.
+The production command allowlist remains empty because no controller request bytes are confirmed. D2XX enumeration does not open devices. After exactly one `MyPlasm CNC` device is enumerated, the operator can explicitly open its exact serial number and capture only bytes already waiting in the D2XX receive queue. The production native surface has no transmit or configuration-changing function.
 
 ### Build and test
 
@@ -88,7 +88,7 @@ With an inspected, legally obtained x86 `ftd2xx.dll` staged at
 `native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It creates:
 
 ```text
-artifacts/MyPlasmInspector-win-x86-diagnostic.zip
+artifacts/MyPlasmInspector-win-x86-passive-capture.zip
 ```
 
 The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
@@ -101,6 +101,21 @@ exits unexpectedly, use `Launch MyPlasm Inspector Diagnostic.bat`; it writes
 `launcher.log` beside the app and opens `%LOCALAPPDATA%\MyPlasm Inspector\Logs`.
 See `native/README.md` and the packaged `README-FIRST.txt` for the safety setup and
 full instructions.
+
+### Passive receive capture
+
+Passive receive is a separate, operator-confirmed action after D2XX enumeration.
+The application rejects unrelated, missing, duplicate, ambiguous, or already-open
+devices and refuses to open while the original MyPlasm application is running.
+`Start Passive Capture` runs off the WPF thread; `Stop Capture`, `Close Device`,
+and window close cancel and await an active capture before attempting native
+close. The default duration is 30 seconds and the hard maximum is 5 minutes.
+
+Completed zero-byte and nonzero captures can be exported beneath
+`%LOCALAPPDATA%\MyPlasm Inspector\Captures\`. Each retained capture directory and
+ZIP contains `session.json`, `events.jsonl`, `rx.bin`, `rx-hex.txt`, `report.txt`,
+`hashes.sha256`, and `startup.log`. Transmit count and production allowlist count
+are fixed at zero.
 
 ## Ground rule
 

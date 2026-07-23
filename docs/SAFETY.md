@@ -67,19 +67,24 @@ The application fails closed:
 
 ## D2XX enumeration implementation status
 
-- `D2xxInspectionTransport` exposes enumeration through only `FT_CreateDeviceInfoList`, `FT_GetDeviceInfoList`, and `FT_GetLibraryVersion`.
-- Its injectable native API has no open, read, write, configuration, bit-mode, baud-rate, or EEPROM functions.
-- The D2XX transport's application-facing open, read, and write methods are non-functional and throw `NotSupportedException`.
-- Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
-- Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
+- `D2xxInspectionTransport` performs DLL inspection, enumeration, library
+  metadata, and exact-candidate discovery without opening a device.
+- Its application-facing `IControllerTransport` open, read, and write methods
+  remain non-functional. Operator-confirmed passive work uses the separate
+  `PassiveD2xxSession`.
+- Driver version is queried only after a successful explicit session open.
+- Missing DLL, PE architecture mismatch, load failure, driver/device absence,
+  and duplicate identifiers produce diagnostics without opening a device.
 - The production command allowlist remains empty.
 
 ## Portable package safety status
 
 - The self-contained `win-x86` package includes an inspected local FTDI DLL but
   remains subject to the same empty production command allowlist.
-- Its D2XX inspection mode is device enumeration only: it has no controller-open,
-  read, write, EEPROM, baud-rate, or bit-mode path.
+- Its D2XX inspection mode does not open automatically. A separate confirmed
+  passive session can open the unique exact serial and read queued receive
+  bytes, but cannot transmit, alter EEPROM, change communication configuration,
+  reset, purge, or update firmware.
 - The launcher only verifies package files and starts the application; it does not
   request elevation or communicate with a controller.
 - The packaged `README-FIRST.txt` repeats the required first-live-validation power
@@ -96,3 +101,26 @@ The application fails closed:
   button click. D2XX native loading cannot begin before that click.
 - Startup exceptions are written with stack traces to
   `%LOCALAPPDATA%\MyPlasm Inspector\Logs\`.
+
+## Passive receive implementation status
+
+- D2XX enumeration remains handle-free and cannot automatically open a device.
+- Opening requires a separate operator confirmation, exactly one exact
+  `MyPlasm CNC` description match, a nonempty unique serial number, a unique
+  location, a not-already-open enumeration result, and confirmation that the
+  original MyPlasm process is not running.
+- The exact serial returned by enumeration is the only value passed to native
+  open. The application exposes no arbitrary serial input.
+- A dedicated safe handle records native close status. A failed close remains
+  visible as a failure and is not reported as successfully closed.
+- Passive capture uses only queue-status polling and receive reads. Every queue
+  poll, including zero depth, and every open, metadata, read, cancellation,
+  disconnect, error, and close operation is timestamped in the session evidence.
+- Capture work runs outside the WPF thread. Stop, device close, and window close
+  cancel and await active capture work before native close.
+- Receive counts are validated against both the request and buffer before bytes
+  are copied. Invalid counts stop safely and preserve earlier bytes.
+- Zero-byte captures are valid and exportable.
+- CI scans production source for prohibited native transmit, EEPROM,
+  communication-configuration, reset, purge, and firmware entry points.
+- The production command allowlist and transmit count remain fixed at zero.
