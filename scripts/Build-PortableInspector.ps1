@@ -11,8 +11,8 @@ $peInspectorProject = Join-Path $repositoryRoot 'tools\MyPlasm.Inspector.PeInspe
 $localDll = Join-Path $repositoryRoot 'native\local\ftd2xx.dll'
 $packageTemplateDirectory = Join-Path $repositoryRoot 'packaging\portable-win-x86'
 $artifactsDirectory = Join-Path $repositoryRoot 'artifacts'
-$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86'
-$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86.zip'
+$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic'
+$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic.zip'
 $applicationExecutable = Join-Path $packageDirectory 'MyPlasm Inspector.exe'
 $packagedDll = Join-Path $packageDirectory 'native\ftd2xx.dll'
 
@@ -24,7 +24,7 @@ if (-not (Test-Path -LiteralPath $localDll -PathType Leaf)) {
     throw "The required vendor DLL is missing: $localDll`nCopy a legally obtained x86 ftd2xx.dll there. The directory is intentionally ignored by Git."
 }
 
-foreach ($template in @('Launch MyPlasm Inspector.bat', 'README-FIRST.txt')) {
+foreach ($template in @('Launch MyPlasm Inspector.bat', 'Launch MyPlasm Inspector Diagnostic.bat', 'README-FIRST.txt')) {
     if (-not (Test-Path -LiteralPath (Join-Path $packageTemplateDirectory $template) -PathType Leaf)) {
         throw "Package template is missing: $template"
     }
@@ -50,9 +50,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Copy-Item -LiteralPath (Join-Path $packageTemplateDirectory 'Launch MyPlasm Inspector.bat') -Destination (Join-Path $packageDirectory 'Launch MyPlasm Inspector.bat')
+Copy-Item -LiteralPath (Join-Path $packageTemplateDirectory 'Launch MyPlasm Inspector Diagnostic.bat') -Destination (Join-Path $packageDirectory 'Launch MyPlasm Inspector Diagnostic.bat')
 Copy-Item -LiteralPath (Join-Path $packageTemplateDirectory 'README-FIRST.txt') -Destination (Join-Path $packageDirectory 'README-FIRST.txt')
 
-foreach ($requiredFile in @($applicationExecutable, $packagedDll, (Join-Path $packageDirectory 'Launch MyPlasm Inspector.bat'), (Join-Path $packageDirectory 'README-FIRST.txt'))) {
+foreach ($requiredFile in @($applicationExecutable, $packagedDll, (Join-Path $packageDirectory 'Launch MyPlasm Inspector.bat'), (Join-Path $packageDirectory 'Launch MyPlasm Inspector Diagnostic.bat'), (Join-Path $packageDirectory 'README-FIRST.txt'))) {
     if (-not (Test-Path -LiteralPath $requiredFile -PathType Leaf)) {
         throw "Portable package is missing required file: $requiredFile"
     }

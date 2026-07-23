@@ -88,15 +88,19 @@ With an inspected, legally obtained x86 `ftd2xx.dll` staged at
 `native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It creates:
 
 ```text
-artifacts/MyPlasmInspector-win-x86.zip
+artifacts/MyPlasmInspector-win-x86-diagnostic.zip
 ```
 
 The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
 plasma-table PC, extract the complete archive, and double-click
 `Launch MyPlasm Inspector.bat`. No .NET SDK or runtime is required on that target
 PC. The FTDI driver is still required by Windows and may need administrator rights
-to install; launching the package does not. See `native/README.md` and the packaged
-`README-FIRST.txt` for the safety setup and full instructions.
+to install; launching the package does not. The first window uses software rendering
+and creates no transport until an operator clicks a manual enumeration button. If it
+exits unexpectedly, use `Launch MyPlasm Inspector Diagnostic.bat`; it writes
+`launcher.log` beside the app and opens `%LOCALAPPDATA%\MyPlasm Inspector\Logs`.
+See `native/README.md` and the packaged `README-FIRST.txt` for the safety setup and
+full instructions.
 
 ## Ground rule
 

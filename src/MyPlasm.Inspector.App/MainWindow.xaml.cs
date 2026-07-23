@@ -1,6 +1,6 @@
-using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
+using MyPlasm.Inspector.Core.Safety;
 using MyPlasm.Inspector.Core.Transport;
 using MyPlasm.Inspector.Transport.D2xx;
 using MyPlasm.Inspector.Transport.Fake;
@@ -9,151 +9,105 @@ namespace MyPlasm.Inspector.App;
 
 public partial class MainWindow : Window
 {
-    private readonly ObservableCollection<FtdiDeviceInfo> _devices = [];
-    private IControllerTransport _transport = new FakeFtdiTransport();
+    private readonly StartupLog _startupLog;
+    private readonly ManualInspectionController _inspectionController;
 
-    public MainWindow()
+    internal MainWindow(StartupLog startupLog, bool softwareRenderingActive)
     {
+        _startupLog = startupLog ?? throw new ArgumentNullException(nameof(startupLog));
+        _startupLog.Stage("MainWindow constructor entered before InitializeComponent.");
         InitializeComponent();
-        DevicesGrid.ItemsSource = _devices;
+        _startupLog.Stage("MainWindow InitializeComponent completed.");
+
+        _inspectionController = new ManualInspectionController(
+            static () => new FakeFtdiTransport(),
+            static () => D2xxInspectionTransport.CreateDefault());
+
+        RenderingStatusText.Text = softwareRenderingActive
+            ? "Software rendering active (safe default)."
+            : "Hardware rendering enabled by --hardware-rendering.";
+        ArchitectureStatusText.Text = $"Process architecture: {RuntimeInformation.ProcessArchitecture}";
+        AllowlistStatusText.Text = $"Production command allowlist: {new DenyByDefaultCommandSafetyPolicy().AllowedCommandCount} entries (empty)";
+        LogFileLocationText.Text = _startupLog.FilePath;
+        AddEvent("Startup-safe window initialized. No transport has been created or enumerated.");
     }
 
-    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        await RefreshDevicesAsync();
-        AddEvent("Enumeration-only shell started in fake-transport mode.");
+        _startupLog.Stage("MainWindow Loaded event completed without transport activity.");
+        AddEvent("Choose a manual action to create an inspection transport.");
     }
 
-    private async void TransportSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void RunFakeEnumerationButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!IsLoaded || TransportSelector.SelectedItem is not ComboBoxItem selected)
-        {
-            return;
-        }
-
-        await _transport.DisposeAsync();
-        bool useD2xx = string.Equals(selected.Tag?.ToString(), "D2xx", StringComparison.Ordinal);
-        _transport = useD2xx
-            ? D2xxInspectionTransport.CreateDefault()
-            : new FakeFtdiTransport();
-
-        ConnectButton.IsEnabled = !useD2xx;
-        DisconnectButton.IsEnabled = !useD2xx;
-        DeviceListHeading.Text = useD2xx ? "FTDI devices (D2XX)" : "FTDI devices (simulated)";
-        ConnectionStatusText.Text = "Enumeration idle";
-        LibraryStatusText.Text = useD2xx ? "Waiting for D2XX inspection" : "Not loaded in fake mode";
-        _devices.Clear();
-
-        AddEvent(useD2xx
-            ? "D2XX inspection mode selected. Device open/read/write operations are unavailable."
-            : "Fake transport selected.");
-        await RefreshDevicesAsync();
+        await RunEnumerationAsync(
+            "Fake enumeration",
+            _inspectionController.RunFakeEnumerationAsync,
+            false);
     }
 
-    private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+    private async void InspectD2xxDevicesButton_Click(object sender, RoutedEventArgs e)
     {
-        await RefreshDevicesAsync();
+        await RunEnumerationAsync(
+            "D2XX inspection",
+            _inspectionController.InspectD2xxDevicesAsync,
+            true);
     }
 
-    private async void ConnectButton_Click(object sender, RoutedEventArgs e)
+    private async Task RunEnumerationAsync(
+        string actionName,
+        Func<CancellationToken, ValueTask<IReadOnlyList<FtdiDeviceInfo>>> action,
+        bool d2xxInspection)
     {
-        if (_transport is not FakeFtdiTransport)
-        {
-            AddEvent("Open refused: D2XX mode is device-enumeration-only.");
-            return;
-        }
-
-        if (DevicesGrid.SelectedItem is not FtdiDeviceInfo selected)
-        {
-            AddEvent("Select the simulated MyPlasm device first.");
-            return;
-        }
-
-        if (!selected.IsMyPlasmController)
-        {
-            AddEvent("Connection refused: unrelated FTDI devices are never opened automatically.");
-            return;
-        }
+        RunFakeEnumerationButton.IsEnabled = false;
+        InspectD2xxDevicesButton.IsEnabled = false;
+        InspectionStatusText.Text = $"{actionName} running...";
+        _startupLog.Stage($"Operator requested {actionName}.");
 
         try
         {
-            await _transport.OpenAsync(selected.SerialNumber);
-            ConnectionStatusText.Text = $"Connected to fake {selected.SerialNumber}";
-            AddEvent($"Opened simulated target {selected.SerialNumber}; no bytes transmitted.");
-            await RefreshDevicesAsync();
-        }
-        catch (InvalidOperationException exception)
-        {
-            AddEvent(exception.Message);
-        }
-    }
+            IReadOnlyList<FtdiDeviceInfo> devices = await action(CancellationToken.None);
+            int candidates = devices.Count(device => device.IsMyPlasmController);
+            InspectionStatusText.Text = $"{actionName}: {devices.Count} device(s); {candidates} exact MyPlasm candidate(s).";
+            AddEvent($"{actionName} completed without opening a device or transmitting bytes.");
 
-    private async void DisconnectButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _transport.CloseAsync();
-        ConnectionStatusText.Text = "Disconnected";
-        AddEvent("Simulated target closed; no bytes transmitted.");
-        await RefreshDevicesAsync();
-    }
-
-    private async Task RefreshDevicesAsync()
-    {
-        try
-        {
-            IReadOnlyList<FtdiDeviceInfo> devices = await _transport.EnumerateDevicesAsync();
-            _devices.Clear();
-
-            foreach (FtdiDeviceInfo device in devices)
+            if (d2xxInspection && _inspectionController.CurrentTransport is D2xxInspectionTransport d2xx)
             {
-                _devices.Add(device);
-            }
-
-            DevicesGrid.SelectedItem = _devices.FirstOrDefault(device => device.IsMyPlasmController);
-            int candidates = _devices.Count(device => device.IsMyPlasmController);
-            ConnectionStatusText.Text = $"{_devices.Count} device(s); {candidates} exact candidate(s)";
-
-            if (_transport is D2xxInspectionTransport d2xx)
-            {
-                LibraryStatusText.Text = BuildLibraryStatus(d2xx);
                 foreach (D2xxDiagnostic diagnostic in d2xx.Diagnostics)
                 {
                     AddEvent($"{diagnostic.Severity}: {diagnostic.Message}");
                 }
-
-                AddEvent("D2XX enumeration completed without opening a device or transmitting bytes.");
-            }
-            else
-            {
-                AddEvent("Simulated FTDI enumeration completed without opening a device.");
             }
         }
-        catch (Exception exception) when (exception is InvalidOperationException or NotSupportedException)
+        catch (Exception exception)
         {
-            ConnectionStatusText.Text = "Enumeration failed";
-            AddEvent($"Enumeration error: {exception.Message}");
+            InspectionStatusText.Text = $"{actionName} failed. See startup log.";
+            _startupLog.Exception(actionName, exception);
+            AddEvent($"{actionName} error: {exception.Message}");
         }
-    }
-
-    private static string BuildLibraryStatus(D2xxInspectionTransport transport)
-    {
-        if (transport.LibraryInspection is PeInspectionResult inspection)
+        finally
         {
-            string version = transport.LibraryVersion ?? inspection.FileVersion ?? "version unavailable";
-            return $"{inspection.DllArchitecture}; {version}; SHA-256 {inspection.Sha256[..12]}…";
+            RunFakeEnumerationButton.IsEnabled = true;
+            InspectD2xxDevicesButton.IsEnabled = true;
         }
-
-        return transport.LibraryVersion is null
-            ? "D2XX unavailable — see diagnostics"
-            : $"D2XX {transport.LibraryVersion}";
     }
 
     private void AddEvent(string message)
     {
         EventLog.Items.Insert(0, $"{DateTimeOffset.Now:T}  {message}");
+        _startupLog.Stage($"UI: {message}");
     }
 
     private async void Window_Closed(object? sender, EventArgs e)
     {
-        await _transport.DisposeAsync();
+        try
+        {
+            _startupLog.Stage("MainWindow closing; disposing any manually created transport.");
+            await _inspectionController.DisposeAsync();
+        }
+        catch (Exception exception)
+        {
+            _startupLog.Exception("MainWindow closed", exception);
+        }
     }
 }

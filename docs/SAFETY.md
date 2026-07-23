@@ -85,3 +85,14 @@ The application fails closed:
 - The packaged `README-FIRST.txt` repeats the required first-live-validation power
   isolation: 24 V controller power only, with motor power, plasma source, and
   torch-start circuit disabled.
+
+## Startup-safe diagnostic package
+
+- WPF software rendering is forced before `MainWindow` construction unless the
+  operator explicitly passes `--hardware-rendering` for comparison.
+- The first window creates no fake or D2XX transport, inspects no DLL, enumerates
+  no devices, and cannot reach a controller open, read, or write operation.
+- Fake enumeration and D2XX metadata inspection each require a separate manual
+  button click. D2XX native loading cannot begin before that click.
+- Startup exceptions are written with stack traces to
+  `%LOCALAPPDATA%\MyPlasm Inspector\Logs\`.
