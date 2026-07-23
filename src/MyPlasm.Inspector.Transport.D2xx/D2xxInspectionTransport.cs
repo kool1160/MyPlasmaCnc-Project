@@ -16,7 +16,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     private bool _ownsNativeApi;
     private IReadOnlyList<FtdiDeviceInfo> _lastDevices = [];
     private bool _enumerationSucceeded;
-    private nint _deviceHandle;
+    private PassiveD2xxSession? _activeSession;
 
     public D2xxInspectionTransport(ID2xxNativeApi nativeApi)
     {
@@ -35,7 +35,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         _applicationArchitecture = applicationArchitecture;
     }
 
-    public bool IsOpen => false;
+    public bool IsOpen => _activeSession?.IsOpen == true;
 
     public string? LibraryVersion { get; private set; }
 
@@ -43,9 +43,23 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
     public IReadOnlyList<D2xxDiagnostic> Diagnostics => _diagnostics.ToArray();
 
-    public bool HasOpenPassiveSession => _deviceHandle != 0;
+    public IReadOnlyList<FtdiDeviceInfo> LastDevices => _lastDevices;
 
-    public string? DriverVersion { get; private set; }
+    public bool CanCreatePassiveSession
+    {
+        get
+        {
+            try
+            {
+                _ = SelectExactCandidate();
+                return !IsOpen;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
+        }
+    }
 
     public static D2xxInspectionTransport CreateDefault() =>
         new(Path.Combine(AppContext.BaseDirectory, DefaultRelativeLibraryPath));
@@ -54,6 +68,11 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (IsOpen)
+        {
+            throw new InvalidOperationException("Enumeration cannot replace device state while a passive session is open.");
+        }
+
         _diagnostics.Clear();
         _enumerationSucceeded = false;
         _lastDevices = [];
@@ -125,54 +144,19 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>(devices);
     }
 
-    public ValueTask OpenExactPassiveSessionAsync(Func<bool> originalApplicationRunning, CancellationToken cancellationToken = default)
+    public PassiveD2xxSession CreatePassiveSession(
+        IOriginalMyPlasmProcessDetector processDetector,
+        IPassiveCaptureClock? clock = null)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        ArgumentNullException.ThrowIfNull(originalApplicationRunning);
-        if (_deviceHandle != 0) throw new InvalidOperationException("An Inspector passive session is already open.");
-        if (!_enumerationSucceeded) throw new InvalidOperationException("Enumerate devices successfully before opening.");
-        if (originalApplicationRunning()) throw new InvalidOperationException("Close the original MyPlasm software before opening the device.");
-        FtdiDeviceInfo[] candidates = _lastDevices.Where(device => device.IsMyPlasmController).ToArray();
-        if (candidates.Length != 1) throw new InvalidOperationException("Exactly one MyPlasm CNC candidate is required.");
-        FtdiDeviceInfo candidate = candidates[0];
-        if (string.IsNullOrWhiteSpace(candidate.SerialNumber)) throw new InvalidOperationException("The exact candidate has no serial number.");
-        if (candidate.IsOpen) throw new InvalidOperationException("The exact candidate is already open.");
-        if (_lastDevices.GroupBy(device => device.SerialNumber, StringComparer.Ordinal).Any(group => !string.IsNullOrWhiteSpace(group.Key) && group.Count() > 1) ||
-            _lastDevices.Where(device => device.LocationId.HasValue).GroupBy(device => device.LocationId).Any(group => group.Count() > 1))
-            throw new InvalidOperationException("Duplicate serial number or location ambiguity prevents opening.");
-        D2xxStatus status = _nativeApi!.OpenExBySerialNumber(candidate.SerialNumber, out _deviceHandle);
-        if (status != D2xxStatus.Ok) { _deviceHandle = 0; throw new InvalidOperationException($"FT_OpenEx failed: {status}."); }
-        status = _nativeApi.GetDriverVersion(_deviceHandle, out uint version);
-        DriverVersion = status == D2xxStatus.Ok ? D2xxVersion.Format(version) : null;
-        if (status != D2xxStatus.Ok) _diagnostics.Add(new D2xxDiagnostic("DRIVER_VERSION_FAILED", D2xxDiagnosticSeverity.Warning, $"FT_GetDriverVersion returned {status}."));
-        return ValueTask.CompletedTask;
-    }
-
-    public async ValueTask<PassiveCaptureResult> CapturePassiveReceiveAsync(TimeSpan duration, CancellationToken cancellationToken = default)
-    {
-        if (_deviceHandle == 0) throw new InvalidOperationException("Open an exact passive session before capture.");
-        if (duration <= TimeSpan.Zero || duration > TimeSpan.FromMinutes(5)) throw new ArgumentOutOfRangeException(nameof(duration));
-        DateTimeOffset started = DateTimeOffset.UtcNow;
-        List<PassiveCaptureChunk> chunks = [];
-        byte[] buffer = new byte[4096];
-        while (DateTimeOffset.UtcNow - started < duration && !cancellationToken.IsCancellationRequested)
+        ArgumentNullException.ThrowIfNull(processDetector);
+        if (_activeSession?.IsOpen == true)
         {
-            D2xxStatus queueStatus = _nativeApi!.GetQueueStatus(_deviceHandle, out uint depth);
-            if (queueStatus != D2xxStatus.Ok) { _diagnostics.Add(new D2xxDiagnostic("QUEUE_STATUS_FAILED", D2xxDiagnosticSeverity.Error, $"FT_GetQueueStatus returned {queueStatus}.")); break; }
-            if (depth == 0) { await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken); continue; }
-            uint request = Math.Min(depth, (uint)buffer.Length);
-            D2xxStatus readStatus = _nativeApi.Read(_deviceHandle, buffer, request, out uint returned);
-            byte[] bytes = readStatus == D2xxStatus.Ok ? buffer.AsSpan(0, checked((int)returned)).ToArray() : [];
-            chunks.Add(new PassiveCaptureChunk(DateTimeOffset.UtcNow, depth, request, returned, readStatus, bytes));
-            if (readStatus != D2xxStatus.Ok) { _diagnostics.Add(new D2xxDiagnostic("READ_FAILED", D2xxDiagnosticSeverity.Error, $"FT_Read returned {readStatus}.")); break; }
+            throw new InvalidOperationException("A passive D2XX session is already open.");
         }
-        return new PassiveCaptureResult(started, DateTimeOffset.UtcNow, chunks, Diagnostics);
-    }
 
-    public ValueTask ClosePassiveSessionAsync()
-    {
-        if (_deviceHandle != 0) { _nativeApi!.Close(_deviceHandle); _deviceHandle = 0; }
-        return ValueTask.CompletedTask;
+        FtdiDeviceInfo candidate = SelectExactCandidate();
+        _activeSession = new PassiveD2xxSession(_nativeApi!, candidate, processDetector, clock);
+        return _activeSession;
     }
 
     public ValueTask OpenAsync(string serialNumber, CancellationToken cancellationToken = default) =>
@@ -191,9 +175,14 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         CancellationToken cancellationToken = default) =>
         throw EnumerationOnlyException();
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        ClosePassiveSessionAsync();
+        if (_activeSession is not null)
+        {
+            await _activeSession.DisposeAsync();
+            _activeSession = null;
+        }
+
         if (_ownsNativeApi && _nativeApi is IDisposable disposable)
         {
             disposable.Dispose();
@@ -201,7 +190,46 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
         _nativeApi = null;
         _ownsNativeApi = false;
-        return ValueTask.CompletedTask;
+    }
+
+    private FtdiDeviceInfo SelectExactCandidate()
+    {
+        if (!_enumerationSucceeded || _nativeApi is null)
+        {
+            throw new InvalidOperationException("Enumerate devices successfully before creating a passive session.");
+        }
+
+        FtdiDeviceInfo[] candidates = _lastDevices.Where(device => device.IsMyPlasmController).ToArray();
+        if (candidates.Length != 1)
+        {
+            throw new InvalidOperationException("Exactly one MyPlasm CNC candidate is required.");
+        }
+
+        FtdiDeviceInfo candidate = candidates[0];
+        if (string.IsNullOrWhiteSpace(candidate.SerialNumber))
+        {
+            throw new InvalidOperationException("The exact candidate has no serial number.");
+        }
+
+        if (candidate.IsOpen)
+        {
+            throw new InvalidOperationException("The exact candidate is already open.");
+        }
+
+        bool duplicateSerial = _lastDevices
+            .Where(device => !string.IsNullOrWhiteSpace(device.SerialNumber))
+            .GroupBy(device => device.SerialNumber, StringComparer.Ordinal)
+            .Any(group => group.Count() > 1);
+        bool duplicateLocation = _lastDevices
+            .Where(device => device.LocationId.HasValue)
+            .GroupBy(device => device.LocationId)
+            .Any(group => group.Count() > 1);
+        if (duplicateSerial || duplicateLocation)
+        {
+            throw new InvalidOperationException("Duplicate serial number or location ambiguity prevents opening.");
+        }
+
+        return candidate;
     }
 
     private bool TryEnsureNativeApi()
@@ -324,7 +352,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
             "DRIVER_VERSION_NOT_QUERIED",
             D2xxDiagnosticSeverity.Information,
             "Driver version was not queried because FT_GetDriverVersion requires an open device handle; " +
-            "this task never opens a device."));
+            "enumeration never opens a device. A later operator-confirmed passive session may query it."));
     }
 
     private void AddDuplicateDiagnostics(IReadOnlyList<FtdiDeviceInfo> devices)
@@ -359,5 +387,5 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     }
 
     private static NotSupportedException EnumerationOnlyException() =>
-        new("The D2XX inspection transport supports device enumeration only and cannot open, read, or write.");
+        new("The D2XX inspection transport exposes enumeration only through IControllerTransport. Passive opening and reads require the dedicated session layer.");
 }

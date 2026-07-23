@@ -30,5 +30,9 @@ jobs:
       - name: Run tests
         run: dotnet test MyPlasm.Inspector.sln -c Release --no-build
 
+      - name: Audit production native symbols
+        shell: pwsh
+        run: ./scripts/Test-ProductionNativeSafety.ps1
+
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore

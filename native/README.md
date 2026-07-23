@@ -36,11 +36,13 @@ The corresponding .NET 8 desktop runtime architecture must be installed. An arch
 
 For a portable, self-contained Windows x86 package, place the inspected local DLL
 at `native/local/ftd2xx.dll` and double-click `Build Portable Inspector.bat` in the
-repository root. The build creates `artifacts/MyPlasmInspector-win-x86-diagnostic.zip` without
+repository root. The build creates `artifacts/MyPlasmInspector-win-x86-passive-capture.zip` without
 committing the DLL or generated package. The target computer needs neither the .NET
 SDK nor the .NET runtime.
 
 The package launcher checks for both `MyPlasm Inspector.exe` and
 `native/ftd2xx.dll` before starting. It does not require elevation; installing a
 missing FTDI driver may require it. The portable application remains device
-enumeration only and does not open a controller or transmit controller bytes.
+enumeration-only until the operator explicitly confirms exact-device passive
+receive. It can then open only the unique enumerated `MyPlasm CNC` serial and
+read queued bytes. It has no transmit or device-configuration native function.
