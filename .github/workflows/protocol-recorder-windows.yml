@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   build-and-test-x86:
-    runs-on: windows-latest
+    # Keep the runner aligned with the explicitly selected VS 2022 generator.
+    runs-on: windows-2022
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
