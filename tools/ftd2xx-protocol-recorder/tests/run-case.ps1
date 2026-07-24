@@ -9,6 +9,8 @@ param(
         'failed_initialization',
         'reentrant',
         'concurrent',
+        'stress',
+        'flush_time',
         'logging_failure',
         'mock_error',
         'empty_read',
@@ -248,6 +250,25 @@ elseif ($CaseName -eq 'concurrent') {
         throw "Expected 800 concurrent queue records, found $($queueRecords.Count)."
     }
 }
+elseif ($CaseName -eq 'stress') {
+    $queueRecords = @($records | Where-Object function -eq 'FT_GetQueueStatus')
+    $readRecords = @($records | Where-Object function -eq 'FT_Read')
+    $writeRecords = @($records | Where-Object function -eq 'FT_Write')
+    if ($queueRecords.Count -ne 900 -or
+        $readRecords.Count -ne 900 -or
+        $writeRecords.Count -ne 900) {
+        throw "Stress record counts were queue=$($queueRecords.Count), read=$($readRecords.Count), write=$($writeRecords.Count)."
+    }
+    if (@($records | Where-Object flush_trigger -eq 'byte_threshold').Count -eq 0) {
+        throw 'Stress traffic never exercised the byte-threshold flush policy.'
+    }
+}
+elseif ($CaseName -eq 'flush_time') {
+    $queue = $records | Where-Object function -eq 'FT_GetQueueStatus'
+    if ($queue.flush_trigger -ne 'time_threshold') {
+        throw "Expected the delayed queue record to trigger a time flush, got '$($queue.flush_trigger)'."
+    }
+}
 elseif ($CaseName -eq 'reentrant') {
     if (($records.function -join ',') -ne 'FT_OpenEx,FT_GetQueueStatus,FT_Read,FT_Close') {
         throw "Unexpected re-entrant record order: $($records.function -join ',')"
@@ -280,12 +301,27 @@ elseif ($CaseName -eq 'large_payload') {
         $write.write_hex.Length -ne 2097152) {
         throw 'Large payload was truncated in the log.'
     }
+    if ($write.flush_trigger -ne 'byte_threshold') {
+        throw "Large write did not trigger the byte-threshold flush policy."
+    }
 }
 elseif ($CaseName -in @('missing_real', 'missing_export', 'failed_initialization')) {
     $record = $records | Select-Object -First 1
     if ($record.status -ne 18 -or $record.function -ne 'FT_ListDevices') {
         throw 'Initialization failure did not produce an unambiguous safe-failure record.'
     }
+}
+
+$closeRecords = @($records | Where-Object function -eq 'FT_Close')
+if ($closeRecords.Count -gt 0 -and
+    @($closeRecords | Where-Object flush_trigger -ne 'close').Count -gt 0) {
+    throw 'An FT_Close record did not trigger an immediate post-record flush.'
+}
+
+$nonCloseRecords = @($records | Where-Object function -ne 'FT_Close')
+if ($CaseName -in @('normal', 'default_location') -and
+    @($nonCloseRecords | Where-Object flush_trigger -ne 'none').Count -ne 0) {
+    throw 'Low-volume normal traffic flushed before FT_Close.'
 }
 
 Write-Host "PASS: $CaseName produced $($records.Count) valid JSONL record(s)."

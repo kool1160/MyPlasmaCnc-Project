@@ -211,6 +211,81 @@ void RunConcurrent(const ProxyApi& proxy)
     Require(proxy.close(handle) == FT_OK, "concurrent test close failed");
 }
 
+void RunStress(const ProxyApi& proxy)
+{
+    const FT_HANDLE handle = Open(proxy);
+    const MockApi mock = LoadMockApi();
+    mock.reset();
+    constexpr int ThreadCount = 6;
+    constexpr int CallsPerThread = 150;
+    std::vector<std::thread> threads;
+    for (int thread = 0; thread < ThreadCount; ++thread)
+    {
+        threads.emplace_back([&proxy, handle, thread, CallsPerThread]() {
+            const std::array<unsigned char, 8> payload{
+                static_cast<unsigned char>(thread),
+                0x10,
+                0x20,
+                0x30,
+                0x40,
+                0x50,
+                0x60,
+                0x70};
+            for (int call = 0; call < CallsPerThread; ++call)
+            {
+                DWORD queue = 0;
+                Require(
+                    proxy.getQueueStatus(handle, &queue) == FT_OK && queue == 4,
+                    "stress queue forwarding changed behavior");
+
+                std::array<unsigned char, 8> readBuffer{};
+                DWORD read = 0;
+                Require(
+                    proxy.read(
+                        handle,
+                        readBuffer.data(),
+                        static_cast<DWORD>(readBuffer.size()),
+                        &read) == FT_OK &&
+                        read == 4,
+                    "stress read forwarding changed behavior");
+
+                DWORD written = 0;
+                Require(
+                    proxy.write(
+                        handle,
+                        const_cast<unsigned char*>(payload.data()),
+                        static_cast<DWORD>(payload.size()),
+                        &written) == FT_OK &&
+                        written == payload.size(),
+                    "stress write forwarding changed behavior");
+            }
+        });
+    }
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    const ULONG expected = ThreadCount * CallsPerThread;
+    Require(
+        mock.getCallCount(MockGetQueueStatus) == expected &&
+            mock.getCallCount(MockRead) == expected &&
+            mock.getCallCount(MockWrite) == expected,
+        "stress calls were not forwarded exactly once");
+    Require(proxy.close(handle) == FT_OK, "stress test close failed");
+}
+
+void RunFlushTime(const ProxyApi& proxy)
+{
+    const FT_HANDLE handle = Open(proxy);
+    Sleep(1100);
+    DWORD queue = 0;
+    Require(
+        proxy.getQueueStatus(handle, &queue) == FT_OK && queue == 4,
+        "time-threshold queue forwarding changed behavior");
+    Require(proxy.close(handle) == FT_OK, "time-threshold close failed");
+}
+
 void RunReentrant(const ProxyApi& proxy)
 {
     const FT_HANDLE handle = Open(proxy);
@@ -312,6 +387,14 @@ int wmain(const int argumentCount, wchar_t* arguments[])
     else if (mode == L"concurrent")
     {
         RunConcurrent(proxy);
+    }
+    else if (mode == L"stress")
+    {
+        RunStress(proxy);
+    }
+    else if (mode == L"flush_time")
+    {
+        RunFlushTime(proxy);
     }
     else if (mode == L"reentrant")
     {

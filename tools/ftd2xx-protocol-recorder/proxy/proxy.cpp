@@ -44,9 +44,14 @@ std::wstring g_logPath;
 std::string g_sessionId = "uninitialized";
 LARGE_INTEGER g_startCounter{};
 LARGE_INTEGER g_counterFrequency{};
+ULONGLONG g_lastFlushTick = 0;
+unsigned long long g_bufferedBytes = 0;
 SRWLOCK g_logLock = SRWLOCK_INIT;
 std::atomic<unsigned long long> g_sequence{0};
 thread_local bool g_insideLogger = false;
+
+constexpr unsigned long long LogFlushByteThreshold = 64ULL * 1024ULL;
+constexpr ULONGLONG LogFlushIntervalMilliseconds = 1000;
 
 SRWLOCK g_handleLock = SRWLOCK_INIT;
 std::unordered_map<FT_HANDLE, unsigned long long> g_handleIds;
@@ -245,6 +250,7 @@ BOOL CALLBACK InitializeLogger(PINIT_ONCE, PVOID, PVOID*)
         g_sessionId = GuidString();
         QueryPerformanceCounter(&g_startCounter);
         QueryPerformanceFrequency(&g_counterFrequency);
+        g_lastFlushTick = GetTickCount64();
 
         std::wstring captureDirectory;
         const DWORD overrideLength = GetEnvironmentVariableW(L"MYPLASM_PROXY_LOG_DIR", nullptr, 0);
@@ -504,8 +510,8 @@ void LogRecord(
 
         const ExclusiveLockGuard guard(g_logLock);
         const unsigned long long sequence = g_sequence.fetch_add(1) + 1;
-        std::ostringstream record;
-        record
+        std::ostringstream recordPrefix;
+        recordPrefix
             << "{\"schema_version\":1"
             << ",\"session_id\":\"" << JsonEscape(g_sessionId) << "\""
             << ",\"utc_timestamp\":\"" << UtcTimestamp() << "\""
@@ -516,17 +522,54 @@ void LogRecord(
             << ",\"sequence\":" << sequence
             << ",\"handle_id\":" << handleId
             << ",\"status\":" << status
-            << applicableFields
-            << "}\r\n";
-        const std::string line = record.str();
-        DWORD written = 0;
-        WriteFile(
-            g_logFile,
-            line.data(),
-            static_cast<DWORD>(line.size()),
-            &written,
-            nullptr);
-        FlushFileBuffers(g_logFile);
+            << applicableFields;
+
+        const ULONGLONG now = GetTickCount64();
+        const auto projectedBytes =
+            g_bufferedBytes + static_cast<unsigned long long>(recordPrefix.tellp()) + 64ULL;
+        const char* flushTrigger = "none";
+        if (std::strcmp(functionName, "FT_Close") == 0)
+        {
+            flushTrigger = "close";
+        }
+        else if (projectedBytes >= LogFlushByteThreshold)
+        {
+            flushTrigger = "byte_threshold";
+        }
+        else if (now - g_lastFlushTick >= LogFlushIntervalMilliseconds)
+        {
+            flushTrigger = "time_threshold";
+        }
+
+        recordPrefix << ",\"flush_trigger\":\"" << flushTrigger << "\"}\r\n";
+        const std::string line = recordPrefix.str();
+        size_t offset = 0;
+        while (offset < line.size())
+        {
+            const size_t remaining = line.size() - offset;
+            const DWORD request = static_cast<DWORD>(
+                std::min<size_t>(remaining, static_cast<size_t>(MAXDWORD)));
+            DWORD written = 0;
+            if (!WriteFile(
+                    g_logFile,
+                    line.data() + offset,
+                    request,
+                    &written,
+                    nullptr) ||
+                written == 0)
+            {
+                break;
+            }
+            offset += written;
+        }
+        g_bufferedBytes += static_cast<unsigned long long>(offset);
+
+        if (std::strcmp(flushTrigger, "none") != 0 &&
+            FlushFileBuffers(g_logFile) != FALSE)
+        {
+            g_bufferedBytes = 0;
+            g_lastFlushTick = GetTickCount64();
+        }
     }
     catch (...)
     {

@@ -69,6 +69,8 @@ if(BUILD_TESTING)
         failed_initialization
         reentrant
         concurrent
+        stress
+        flush_time
         logging_failure
         mock_error
         empty_read

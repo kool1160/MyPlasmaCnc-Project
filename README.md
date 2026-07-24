@@ -101,6 +101,11 @@ ctest --test-dir build/protocol-recorder -C Release --output-on-failure
 ```
 
 No vendor executable, DLL, driver, firmware, controller, or plasma table is
-needed for these tests. See [docs/protocol-recorder.md](docs/protocol-recorder.md)
-for the architecture, log schema, hash-aware installation and restoration, and
-the required first live capture procedure.
+needed for these tests. Capture writes are serialized and physically flushed
+only at a 64 KiB threshold, a one-second threshold, or after `FT_Close`; an
+abnormal termination can therefore lose the final buffered records. Installer
+and restoration rollback use verified transaction copies and preserve
+unexpected files under unique quarantine names. See
+[docs/protocol-recorder.md](docs/protocol-recorder.md) for the architecture,
+log schema, transactional installation and restoration, and the required first
+live capture procedure.

@@ -104,6 +104,7 @@ Each line is one complete JSON object. Common fields are:
 | `handle_id` | Stable recorder-assigned handle identifier; zero when absent |
 | `status` | Unmodified FT status returned by the real DLL |
 | `arguments` | Applicable input arguments |
+| `flush_trigger` | `none`, `byte_threshold`, `time_threshold`, or `close` |
 
 Function-specific records include:
 
@@ -117,9 +118,20 @@ Function-specific records include:
 - word length, stop bits, and parity;
 - device-list count and open selector metadata.
 
-Payloads are not truncated. Concurrent writes are serialized so JSON objects
-cannot interleave. A disk or logging failure can result in missing evidence, but
-must not alter successful controller communication.
+Payloads are not truncated. Concurrent writes are serialized under one lock so
+JSON objects cannot interleave. The recorder uses cached file writes and calls
+`FlushFileBuffers` only after at least 64 KiB has accumulated, after at least
+one second has elapsed since the previous successful flush, or immediately
+after writing an `FT_Close` record. It does not physically flush after every
+FTDI API call. The threshold check and physical flush remain inside the same
+log lock as the associated record.
+
+Logging and flushing are best effort. A disk or logging failure cannot alter
+the real D2XX status, output buffer, byte count, or successful forwarding
+behavior. Abnormal process or operating-system termination can lose the final
+records that were written to the operating-system cache but had not reached a
+threshold. A normal `FT_Close` minimizes this exposure by forcing all records
+through the close record to stable storage.
 
 ## Build and test
 
@@ -154,15 +166,19 @@ The tests use only the repository's synthetic mock:
 - missing required export;
 - corrupt real DLL/failed initialization;
 - concurrent calls and sequence uniqueness;
+- high-volume mixed queue/read/write stress without deadlock or malformed JSON;
+- 64 KiB, one-second, and `FT_Close` flush triggers;
 - re-entrant calls without recursion or deadlock;
 - unavailable logging directory;
 - mock FTDI error status;
 - empty read;
 - zero-byte write;
 - untruncated 1 MiB payload;
-- hash/state-aware installation and restoration.
+- hash/state-aware installation and restoration;
+- injected post-move, post-copy, post-verification, and manifest-write
+  transaction failures with exact file/hash/state assertions.
 
-CI performs the same Win32 build and tests on `windows-latest`. It does not
+CI performs the same Win32 build and tests on `windows-2022`. It does not
 download, execute, or upload vendor software and requires no hardware.
 
 ## Hash-aware installation
@@ -184,11 +200,20 @@ The script defaults to the verified hashes:
   `381117c743766e3a696609bb29ca075772aa603cff196e16c3854c06ee1ab254`
 
 It prints all relevant hashes, checks directory writability, rejects ambiguous
-or partial states, refuses to overwrite `ftd2xx_real.dll`, verifies copies after
-moving, and writes `myplasm-proxy-install.json`. Running it again against the
-same verified installed state reports that the proxy is already installed.
-Administrator rights are unnecessary when the application directory is
-user-writable.
+or partial states, and refuses to overwrite `ftd2xx_real.dll`. Before moving
+the original it creates and verifies a uniquely named transaction backup. It
+then verifies every moved/copied DLL before publishing
+`myplasm-proxy-install.json`.
+
+If any post-copy or post-move step fails, the script restores the verified
+original as `ftd2xx.dll` whenever possible. Copied, unexpected, temporary, and
+failed-verification files are moved to uniquely named sibling paths containing
+`.quarantine-`; they are never overwritten or silently deleted during failed
+rollback. The script prints every resulting standard and quarantine path,
+SHA-256, and whether the final DLL arrangement is a verified runnable state.
+Running it again after a completed install or a successfully rolled-back
+failure is idempotent. Administrator rights are unnecessary when the
+application directory is user-writable.
 
 Do not use the test-only expected-hash override parameters for a live
 installation unless separately reviewed evidence establishes different trusted
@@ -214,10 +239,19 @@ The restoration script:
 2. verifies `ftd2xx_real.dll` against both the recorded and expected original
    hashes;
 3. verifies the application hash has not changed;
-4. removes only the proven proxy;
-5. restores the proven original DLL;
-6. verifies the restored hash;
-7. leaves all capture directories untouched.
+4. creates verified transaction backups of both DLLs before either move;
+5. moves the proven proxy aside and restores the proven original DLL;
+6. verifies both post-move hashes;
+7. atomically changes the manifest to state `restored`;
+8. removes only verified redundant transaction copies;
+9. leaves all capture directories untouched.
+
+If a move, hash verification, or manifest update fails, the script reconstructs
+the prior verified proxy-plus-original arrangement from the verified files or
+transaction backups. Unknown or failed-verification files are preserved under
+unique `.quarantine-` names. It never makes an unknown DLL active or reports a
+safe restoration unless the active arrangement's hashes prove it is runnable.
+The complete resulting paths and hashes are printed even after rollback.
 
 Running restoration again reports that the original DLL is already active.
 Unknown, missing-manifest, hash-mismatched, or partial states are refused rather
