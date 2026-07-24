@@ -1,0 +1,25 @@
+#pragma once
+
+#include <Windows.h>
+
+using FT_HANDLE = PVOID;
+using FT_STATUS = ULONG;
+
+constexpr FT_STATUS FT_OK = 0;
+constexpr FT_STATUS FT_IO_ERROR = 4;
+constexpr FT_STATUS FT_OTHER_ERROR = 18;
+
+constexpr DWORD FT_OPEN_BY_SERIAL_NUMBER = 1;
+constexpr DWORD FT_LIST_NUMBER_ONLY = 0x80000000UL;
+
+using FT_ListDevices_t = FT_STATUS(WINAPI*)(PVOID, PVOID, DWORD);
+using FT_OpenEx_t = FT_STATUS(WINAPI*)(PVOID, DWORD, FT_HANDLE*);
+using FT_Close_t = FT_STATUS(WINAPI*)(FT_HANDLE);
+using FT_Read_t = FT_STATUS(WINAPI*)(FT_HANDLE, LPVOID, DWORD, LPDWORD);
+using FT_Write_t = FT_STATUS(WINAPI*)(FT_HANDLE, LPVOID, DWORD, LPDWORD);
+using FT_SetBaudRate_t = FT_STATUS(WINAPI*)(FT_HANDLE, ULONG);
+using FT_SetDataCharacteristics_t = FT_STATUS(WINAPI*)(FT_HANDLE, UCHAR, UCHAR, UCHAR);
+using FT_SetFlowControl_t = FT_STATUS(WINAPI*)(FT_HANDLE, USHORT, UCHAR, UCHAR);
+using FT_GetQueueStatus_t = FT_STATUS(WINAPI*)(FT_HANDLE, LPDWORD);
+using FT_SetLatencyTimer_t = FT_STATUS(WINAPI*)(FT_HANDLE, UCHAR);
+using FT_SetBitMode_t = FT_STATUS(WINAPI*)(FT_HANDLE, UCHAR, UCHAR);

@@ -1,0 +1,16 @@
+LIBRARY ftd2xx_real_missing_export
+EXPORTS
+    FT_ListDevices=_FT_ListDevices@12
+    FT_OpenEx=_FT_OpenEx@12
+    FT_Close=_FT_Close@4
+    FT_Read=_FT_Read@16
+    FT_Write=_FT_Write@16
+    FT_SetBaudRate=_FT_SetBaudRate@8
+    FT_SetDataCharacteristics=_FT_SetDataCharacteristics@16
+    FT_SetFlowControl=_FT_SetFlowControl@16
+    FT_GetQueueStatus=_FT_GetQueueStatus@8
+    FT_SetLatencyTimer=_FT_SetLatencyTimer@8
+    MOCK_Reset
+    MOCK_GetCallCount
+    MOCK_GetLastWriteSize
+    MOCK_CopyLastWrite
