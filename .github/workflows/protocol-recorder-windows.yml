@@ -36,3 +36,80 @@ jobs:
         run: >
           ./tools/ftd2xx-protocol-recorder/tests/verify-exports.ps1
           -DllPath build/protocol-recorder/Release/ftd2xx.dll
+
+      - name: Stage verified startup-capture package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sourceDll = 'build/protocol-recorder/Release/ftd2xx.dll'
+          $packageDirectory = 'artifacts/protocol-recorder-win32'
+          $stagedDll = Join-Path $packageDirectory 'ftd2xx.dll'
+
+          if (-not (Test-Path -LiteralPath $sourceDll -PathType Leaf)) {
+              throw "Verified Release proxy was not found: $sourceDll"
+          }
+
+          New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
+          Copy-Item -LiteralPath $sourceDll -Destination $stagedDll -Force
+          Copy-Item -LiteralPath 'tools/install-proxy.ps1' -Destination $packageDirectory -Force
+          Copy-Item -LiteralPath 'tools/restore-original.ps1' -Destination $packageDirectory -Force
+          Copy-Item -LiteralPath 'docs/protocol-recorder.md' -Destination $packageDirectory -Force
+
+          $sourceHash = (Get-FileHash -LiteralPath $sourceDll -Algorithm SHA256).Hash.ToUpperInvariant()
+          $stagedHash = (Get-FileHash -LiteralPath $stagedDll -Algorithm SHA256).Hash.ToUpperInvariant()
+          if ($sourceHash -ne $stagedHash) {
+              throw 'Staged proxy SHA-256 does not match the verified Release build.'
+          }
+
+          $dllInfo = Get-Item -LiteralPath $stagedDll
+          "$stagedHash *ftd2xx.dll" |
+              Set-Content -LiteralPath (Join-Path $packageDirectory 'SHA256SUMS.txt') -Encoding ascii
+
+          $manifest = [ordered]@{
+              schemaVersion = 1
+              product = 'Laser X Design (LXD SOFTWARE)'
+              component = 'MyPlasm FTD2XX Protocol Recorder'
+              sourceCommit = '${{ github.sha }}'
+              workflowRunId = '${{ github.run_id }}'
+              workflowRunAttempt = '${{ github.run_attempt }}'
+              buildConfiguration = 'Release'
+              architecture = 'Win32/x86'
+              fileName = 'ftd2xx.dll'
+              sizeBytes = $dllInfo.Length
+              sha256 = $stagedHash
+              retentionDays = 7
+              safetyScope = 'Startup-only protocol capture. The proxy forwards only vendor-application D2XX calls and does not originate controller commands.'
+          }
+          $manifest |
+              ConvertTo-Json -Depth 4 |
+              Set-Content -LiteralPath (Join-Path $packageDirectory 'build-manifest.json') -Encoding utf8
+
+          @'
+          LASER X DESIGN (LXD SOFTWARE)
+          MYPLASM FTD2XX PROTOCOL RECORDER
+
+          This package is for the documented startup-only protocol capture.
+
+          Before use:
+          1. Turn the plasma source OFF.
+          2. Physically disable or unplug torch start.
+          3. Turn the 48 V motor supply OFF.
+          4. Leave only the MyPlasm 24 V controller supply ON.
+          5. Read protocol-recorder.md completely.
+          6. Verify ftd2xx.dll against SHA256SUMS.txt and build-manifest.json.
+          7. Use install-proxy.ps1 and restore-original.ps1; do not rename DLLs manually.
+
+          Do not jog, home, probe, activate plasma, or execute a toolpath during the first capture.
+          '@ | Set-Content -LiteralPath (Join-Path $packageDirectory 'README-FIRST.txt') -Encoding ascii
+
+          Get-ChildItem -LiteralPath $packageDirectory | Format-Table Name, Length
+          Write-Host "Verified package proxy SHA-256: $stagedHash"
+
+      - name: Upload verified recorder package
+        uses: actions/upload-artifact@v4
+        with:
+          name: myplasm-protocol-recorder-win32-${{ github.sha }}
+          path: artifacts/protocol-recorder-win32/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
