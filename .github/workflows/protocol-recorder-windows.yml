@@ -13,6 +13,9 @@ jobs:
   build-and-test-x86:
     # Keep the runner aligned with the explicitly selected VS 2022 generator.
     runs-on: windows-2022
+    env:
+      SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+      SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -48,6 +51,9 @@ jobs:
           if (-not (Test-Path -LiteralPath $sourceDll -PathType Leaf)) {
               throw "Verified Release proxy was not found: $sourceDll"
           }
+          if ([string]::IsNullOrWhiteSpace($env:SOURCE_COMMIT) -or $env:SOURCE_COMMIT.Length -ne 40) {
+              throw 'SOURCE_COMMIT did not resolve to an exact 40-character Git commit SHA.'
+          }
 
           New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
           Copy-Item -LiteralPath $sourceDll -Destination $stagedDll -Force
@@ -69,7 +75,8 @@ jobs:
               schemaVersion = 1
               product = 'Laser X Design (LXD SOFTWARE)'
               component = 'MyPlasm FTD2XX Protocol Recorder'
-              sourceCommit = '${{ github.sha }}'
+              sourceCommit = $env:SOURCE_COMMIT
+              sourceBranch = $env:SOURCE_BRANCH
               workflowRunId = '${{ github.run_id }}'
               workflowRunAttempt = '${{ github.run_attempt }}'
               buildConfiguration = 'Release'
@@ -104,11 +111,12 @@ jobs:
 
           Get-ChildItem -LiteralPath $packageDirectory | Format-Table Name, Length
           Write-Host "Verified package proxy SHA-256: $stagedHash"
+          Write-Host "Artifact source commit: $env:SOURCE_COMMIT"
 
       - name: Upload verified recorder package
         uses: actions/upload-artifact@v4
         with:
-          name: myplasm-protocol-recorder-win32-${{ github.sha }}
+          name: myplasm-protocol-recorder-win32-${{ env.SOURCE_COMMIT }}
           path: artifacts/protocol-recorder-win32/
           if-no-files-found: error
           retention-days: 7
