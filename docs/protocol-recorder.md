@@ -71,8 +71,10 @@ No EEPROM, purge, reset, firmware, or other D2XX API is exported or resolved.
 - Stable numeric handle IDs avoid treating raw process handles as cross-session
   identifiers.
 
-The recorder does not claim live compatibility until a startup-only capture is
-completed and reviewed.
+A first bench-isolated startup/reconnect capture completed successfully and is
+documented below. That evidence validates transparent forwarding and recording
+for the tested startup-only setup. It does not establish packet meaning, command
+safety, motion safety, or general compatibility with other versions or workflows.
 
 ## JSON Lines capture
 
@@ -288,6 +290,52 @@ After restoration:
 
 Do not deviate from this sequence for the initial capture.
 
+## First live validation evidence
+
+The first startup-only validation was completed on a bench-isolated controller
+with motor drives, torch-start, plasma interface, and machine outputs
+disconnected. Only the controller's required 24 V supply and USB were connected.
+No motion, homing, probing, plasma operation, firmware handling, protocol replay,
+or independent command generation occurred.
+
+Provenance and integrity:
+
+- recorder source commit:
+  `f86a6ab93c5fe2deaf9b74abf91ab7a0423448bc`;
+- workflow run: `30090285786`;
+- recorder artifact ZIP SHA-256:
+  `710BDBE544DB03F18C4BC3AA20ABE346355D849FB23C03316AF57C0459E1204E`;
+- recorder proxy SHA-256:
+  `08D5D54CE6BFB6388C57F8D439B8BB96F2935686C4A5BF2A2F7B099EF26DA32F`;
+- raw private `traffic.jsonl` SHA-256:
+  `9BE39C4A186B92A3B7D4F8C7479205A5D19AF45FA385BE86CCA812AF29A8CE3A`.
+
+Structural validation results:
+
+- 106,759 JSONL records and zero malformed lines;
+- sequence numbers 1 through 106,759 were unique, contiguous, and monotonic;
+- one consistent schema version, recorder session, process, and thread;
+- four successful `FT_OpenEx` calls;
+- 3,472 writes and 3,456 reads;
+- 3,456 deterministically matched write/read exchanges;
+- reconnect was visible as close, enumeration, reopen, and communication
+  reconfiguration;
+- one redundant `FT_Close` returned status 1 after the handle had already closed
+  successfully;
+- the final reopened handle had no explicit `FT_Close` before process
+  termination.
+
+The original FTDI DLL was restored to SHA-256
+`381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`,
+`ftd2xx_real.dll` was removed, capture evidence was preserved, and a second
+restoration run confirmed idempotence. The raw capture remains private and is
+not part of Git history.
+
+These findings confirm the recorder's startup-only forwarding and evidence
+capture behavior for this exact tested setup. They do not identify packet
+semantics, prove any request is read-only, approve captured traffic for replay,
+or validate production machine control.
+
 ## Successful-capture indicators
 
 A successful capture has:
@@ -322,12 +370,13 @@ or protocol captures that may contain private machine data.
 
 ## Known limitations
 
-- Live-controller compatibility is unconfirmed until a capture is completed and
-  reviewed.
+- Startup/reconnect compatibility has been demonstrated once on the exact
+  bench-isolated controller and recorder artifact documented above; broader
+  application, controller-version, and workflow compatibility remains unverified.
 - The recorder observes only these 11 imported D2XX functions.
 - It cannot see USB traffic below D2XX or calls made through other libraries.
-- Synchronous durable logging adds latency and consumes disk space, especially
-  for large payloads.
+- Recorder logging adds latency and consumes disk space, especially for large
+  payloads; the timing impact has not been fully characterized.
 - Logging is best effort; forwarding continues if evidence storage fails.
 - Protocol meaning, framing, checksums, and command safety are intentionally not
   decoded in this task.
