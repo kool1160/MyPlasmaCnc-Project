@@ -109,3 +109,27 @@ unexpected files under unique quarantine names. See
 [docs/protocol-recorder.md](docs/protocol-recorder.md) for the architecture,
 log schema, transactional installation and restoration, and the required first
 live capture procedure.
+
+## Offline protocol analyzer
+
+The .NET 8 analyzer validates and structurally summarizes recorder
+`traffic.jsonl` files without loading D2XX, accessing hardware, replaying
+packets, or assigning packet meaning:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- analyze `
+  --input "C:\PrivateEvidence\traffic.jsonl" `
+  --output "C:\PrivateEvidence\analysis" `
+  --expected-sha256 "<64-character capture SHA-256>"
+```
+
+It streams large captures, fails closed on malformed or inconsistent evidence,
+uses a documented FIFO write/read pairing rule per open handle, and produces
+deterministic JSON, Markdown, CSV, variability, and SHA-256 reports. Default
+reports exclude raw payloads, pointer values, controller selectors, recorder
+session identifiers, and local directory paths.
+
+Raw captures and generated private evidence must remain outside Git. Structural
+fingerprints and timing do not establish packet meaning or command safety. See
+[docs/protocol-analysis.md](docs/protocol-analysis.md) for validation rules,
+outputs, privacy handling, exit codes, and limitations.
