@@ -71,3 +71,41 @@ dotnet run --project src/MyPlasm.Inspector.App/MyPlasm.Inspector.App.csproj
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.
+
+## FTD2XX protocol recorder
+
+The repository also contains a bounded native reverse-engineering tool: a
+32-bit forwarding `ftd2xx.dll` that records calls made by the original
+32-bit MyPlasm application while forwarding them to a same-directory
+`ftd2xx_real.dll`.
+
+This recorder is not part of the replacement Inspector transport and does not
+generate, decode, filter, approve, or rewrite controller commands. It forwards
+only calls initiated by the original application. Because those vendor-originated
+calls may include motion or output commands, the first live startup-only capture
+requires the motor supply, plasma source, and torch-start connection to be
+disabled as documented.
+
+Supported build environment:
+
+- Windows with Visual Studio 2019 or 2022 C++ Build Tools;
+- CMake 3.21 or newer;
+- the Win32/x86 MSVC toolchain.
+
+Configure, build, and test:
+
+```powershell
+cmake -S tools/ftd2xx-protocol-recorder -B build/protocol-recorder -G "Visual Studio 17 2022" -A Win32
+cmake --build build/protocol-recorder --config Release
+ctest --test-dir build/protocol-recorder -C Release --output-on-failure
+```
+
+No vendor executable, DLL, driver, firmware, controller, or plasma table is
+needed for these tests. Capture writes are serialized and physically flushed
+only at a 64 KiB threshold, a one-second threshold, or after `FT_Close`; an
+abnormal termination can therefore lose the final buffered records. Installer
+and restoration rollback use verified transaction copies and preserve
+unexpected files under unique quarantine names. See
+[docs/protocol-recorder.md](docs/protocol-recorder.md) for the architecture,
+log schema, transactional installation and restoration, and the required first
+live capture procedure.
