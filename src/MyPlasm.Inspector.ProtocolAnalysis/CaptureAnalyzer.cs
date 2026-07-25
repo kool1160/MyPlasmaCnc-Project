@@ -6,7 +6,7 @@ namespace MyPlasm.Inspector.ProtocolAnalysis;
 
 public sealed class CaptureAnalyzer
 {
-    public const string ToolVersion = "1.0.0";
+    public const string ToolVersion = "1.0.1";
 
     public async Task<AnalysisResult> AnalyzeAsync(
         AnalysisRequest request,
@@ -29,6 +29,9 @@ public sealed class CaptureAnalyzer
         {
             throw new FileNotFoundException("The input capture does not exist.", inputPath);
         }
+
+        string outputDirectory = Path.GetFullPath(request.OutputDirectory);
+        OutputPathSafety.EnsureInputIsNotAnOutput(inputPath, outputDirectory);
 
         string inputSha256 = await CalculateSha256Async(inputPath, cancellationToken)
             .ConfigureAwait(false);
@@ -61,7 +64,8 @@ public sealed class CaptureAnalyzer
         ReportBundle reports = accumulator.Complete();
         IReadOnlyDictionary<string, string> outputHashes =
             await ReportWriter.WriteAsync(
-                    Path.GetFullPath(request.OutputDirectory),
+                    inputPath,
+                    outputDirectory,
                     request.Overwrite,
                     reports,
                     cancellationToken)

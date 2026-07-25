@@ -38,7 +38,22 @@ When supplied, the hash is checked before schema analysis or output creation.
 
 A nonempty output directory is refused by default. `--overwrite` explicitly
 allows replacement of the six known analyzer report files. Unrelated files are
-not deleted.
+not deleted. It never permits one of those report paths to be the input path.
+
+### Input-evidence collision protection
+
+Before hashing or parsing the capture, the analyzer compares the input against
+all six report destinations. The comparison uses absolute normalized paths, is
+conservatively case-insensitive, and resolves existing symbolic-link or
+junction components. A collision fails with exit code `5` before the output
+directory or any report is created. This protection applies with and without
+`--overwrite`; the option cannot authorize replacing input evidence.
+
+Report staging also uses a new, uniquely named file opened with exclusive
+creation for each write. Existing predictable `.tmp` files are never opened,
+truncated, or reused. The collision check is repeated immediately before each
+staged report is committed to its final path. Staging files created by the
+analyzer are removed after success or a handled write failure.
 
 The tool prints a progress line every 25,000 validated records and a final
 summary. It never prints payload bytes.
@@ -193,7 +208,10 @@ They cover normal startup/configuration/exchange/close, probe-like unmatched
 writes, reconnects, redundant closes, unclosed and multiple handles, failed
 calls, unexpected reads, queue polling, sequence gaps and duplicates, malformed
 JSON, invalid UTF-8, schema/type/hex/count failures, unknown extension fields,
-empty input, and a generated 120,002-record streaming capture.
+empty input, all six input/report filename collisions with both overwrite
+settings, relative and directory-link aliases, legacy temporary filenames, and
+a generated 120,002-record streaming capture. Collision tests verify input
+bytes and timestamps remain unchanged and that no output is written.
 
 CI builds with warnings as errors, runs all tests, verifies formatting, runs the
 CLI against the invented fixture twice, compares every output byte, and checks

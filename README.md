@@ -127,7 +127,9 @@ It streams large captures, fails closed on malformed or inconsistent evidence,
 uses a documented FIFO write/read pairing rule per open handle, and produces
 deterministic JSON, Markdown, CSV, variability, and SHA-256 reports. Default
 reports exclude raw payloads, pointer values, controller selectors, recorder
-session identifiers, and local directory paths.
+session identifiers, and local directory paths. Before reading the capture, it
+rejects any normalized or link-resolved collision between the input evidence
+and a report destination. `--overwrite` never permits replacing the input.
 
 Raw captures and generated private evidence must remain outside Git. Structural
 fingerprints and timing do not establish packet meaning or command safety. See

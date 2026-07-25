@@ -7,13 +7,14 @@ namespace MyPlasm.Inspector.ProtocolAnalysis;
 
 internal static class ReportWriter
 {
-    private static readonly string[] ReportFileNames =
+    internal static readonly string[] ReportFileNames =
     [
         "capture-summary.json",
         "capture-report.md",
         "phase-timeline.csv",
         "transaction-classes.csv",
-        "payload-variability.json"
+        "payload-variability.json",
+        "hashes.sha256"
     ];
 
     private static readonly UTF8Encoding Utf8WithoutBom =
@@ -27,6 +28,7 @@ internal static class ReportWriter
     };
 
     public static async Task<IReadOnlyDictionary<string, string>> WriteAsync(
+        string inputPath,
         string outputDirectory,
         bool overwrite,
         ReportBundle reports,
@@ -34,6 +36,7 @@ internal static class ReportWriter
     {
         try
         {
+            OutputPathSafety.EnsureInputIsNotAnOutput(inputPath, outputDirectory);
             if (Directory.Exists(outputDirectory))
             {
                 if (!overwrite && Directory.EnumerateFileSystemEntries(outputDirectory).Any())
@@ -60,6 +63,8 @@ internal static class ReportWriter
             foreach ((string fileName, string fileContent) in content)
             {
                 await WriteAtomicAsync(
+                        inputPath,
+                        outputDirectory,
                         Path.Combine(outputDirectory, fileName),
                         fileContent,
                         cancellationToken)
@@ -67,7 +72,9 @@ internal static class ReportWriter
             }
 
             SortedDictionary<string, string> hashes = new(StringComparer.Ordinal);
-            foreach (string fileName in ReportFileNames.Order(StringComparer.Ordinal))
+            foreach (string fileName in ReportFileNames
+                         .Where(fileName => fileName != "hashes.sha256")
+                         .Order(StringComparer.Ordinal))
             {
                 hashes[fileName] = await CaptureAnalyzer.CalculateSha256Async(
                         Path.Combine(outputDirectory, fileName),
@@ -78,6 +85,8 @@ internal static class ReportWriter
             string manifest = string.Concat(
                 hashes.Select(pair => $"{pair.Value}  {pair.Key}\n"));
             await WriteAtomicAsync(
+                    inputPath,
+                    outputDirectory,
                     Path.Combine(outputDirectory, "hashes.sha256"),
                     manifest,
                     cancellationToken)
@@ -101,14 +110,40 @@ internal static class ReportWriter
         JsonSerializer.Serialize(value, JsonOptions) + "\n";
 
     private static async Task WriteAtomicAsync(
+        string inputPath,
+        string outputDirectory,
         string destination,
         string content,
         CancellationToken cancellationToken)
     {
-        string temporary = destination + ".tmp";
-        await File.WriteAllTextAsync(temporary, content, Utf8WithoutBom, cancellationToken)
-            .ConfigureAwait(false);
-        File.Move(temporary, destination, overwrite: true);
+        string temporary = Path.Combine(
+            outputDirectory,
+            $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
+        try
+        {
+            byte[] bytes = Utf8WithoutBom.GetBytes(content);
+            await using (FileStream stream = new(
+                             temporary,
+                             FileMode.CreateNew,
+                             FileAccess.Write,
+                             FileShare.None,
+                             bufferSize: 64 * 1024,
+                             FileOptions.Asynchronous))
+            {
+                await stream.WriteAsync(bytes, cancellationToken).ConfigureAwait(false);
+                await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            OutputPathSafety.EnsureInputIsNotAnOutput(inputPath, outputDirectory);
+            File.Move(temporary, destination, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporary))
+            {
+                File.Delete(temporary);
+            }
+        }
     }
 
     private static string BuildMarkdown(ReportBundle reports)

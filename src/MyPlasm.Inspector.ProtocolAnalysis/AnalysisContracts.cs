@@ -39,7 +39,7 @@ public sealed class InputHashMismatchException : Exception
     public string Actual { get; }
 }
 
-public sealed class AnalysisOutputException : Exception
+public class AnalysisOutputException : Exception
 {
     public AnalysisOutputException(string message)
         : base(message)
@@ -50,4 +50,17 @@ public sealed class AnalysisOutputException : Exception
         : base(message, innerException)
     {
     }
+}
+
+public sealed class InputOutputPathCollisionException : AnalysisOutputException
+{
+    public InputOutputPathCollisionException(string reportFileName)
+        : base(
+            $"The input evidence path collides with analyzer output '{reportFileName}'. " +
+            "Choose a different output directory; --overwrite never permits replacing input evidence.")
+    {
+        ReportFileName = reportFileName;
+    }
+
+    public string ReportFileName { get; }
 }
