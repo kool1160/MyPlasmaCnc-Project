@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.PeInspector", "tools\MyPlasm.Inspector.PeInspector\MyPlasm.Inspector.PeInspector.csproj", "{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.ProtocolAnalysis", "src\MyPlasm.Inspector.ProtocolAnalysis\MyPlasm.Inspector.ProtocolAnalysis.csproj", "{C73B235B-1AE2-45F0-9823-2DE06B60BB5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.ProtocolAnalyzer", "tools\MyPlasm.ProtocolAnalyzer\MyPlasm.ProtocolAnalyzer.csproj", "{1F6C6540-BD7C-4590-AD40-22C72958A12A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPlasm.Inspector.ProtocolAnalysis.Tests", "tests\MyPlasm.Inspector.ProtocolAnalysis.Tests\MyPlasm.Inspector.ProtocolAnalysis.Tests.csproj", "{BA287F31-DB0E-4E2A-BCF0-A94C17F49A53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,5 +51,17 @@ Global
 		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6A40F96-3FD7-481A-ABCE-5BC1C7D86D55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C73B235B-1AE2-45F0-9823-2DE06B60BB5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C73B235B-1AE2-45F0-9823-2DE06B60BB5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C73B235B-1AE2-45F0-9823-2DE06B60BB5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C73B235B-1AE2-45F0-9823-2DE06B60BB5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6C6540-BD7C-4590-AD40-22C72958A12A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6C6540-BD7C-4590-AD40-22C72958A12A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6C6540-BD7C-4590-AD40-22C72958A12A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6C6540-BD7C-4590-AD40-22C72958A12A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA287F31-DB0E-4E2A-BCF0-A94C17F49A53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA287F31-DB0E-4E2A-BCF0-A94C17F49A53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA287F31-DB0E-4E2A-BCF0-A94C17F49A53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA287F31-DB0E-4E2A-BCF0-A94C17F49A53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

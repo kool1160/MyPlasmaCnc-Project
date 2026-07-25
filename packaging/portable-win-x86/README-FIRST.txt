@@ -30,7 +30,6 @@ matches "MyPlasm CNC". It cannot open a controller, read controller traffic,
 send controller bytes, move axes, change outputs, alter EEPROM, change baud
 rate or bit mode, or update firmware.
 
-In the app, choose "D2XX inspection transport" and then enumerate devices.
 The first window deliberately creates no transport and performs no enumeration.
 Use "Run Fake Enumeration" for an offline demonstration or "Inspect D2XX
 Devices" to explicitly start metadata-only D2XX inspection. Software rendering

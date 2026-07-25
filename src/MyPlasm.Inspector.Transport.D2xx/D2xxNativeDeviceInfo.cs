@@ -5,5 +5,5 @@ public sealed record D2xxNativeDeviceInfo(
     uint Type,
     uint DeviceId,
     uint LocationId,
-    string SerialNumber,
-    string Description);
+    string? SerialNumber,
+    string? Description);

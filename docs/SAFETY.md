@@ -72,26 +72,32 @@ The application fails closed:
 - The D2XX transport's application-facing open, read, and write methods are non-functional and throw `NotSupportedException`.
 - Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
 - Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
+- The production native loader centralizes exactly three required export names;
+  automated tests reject any compiled `FT_Open`, `FT_Read`, `FT_Write`,
+  configuration, bit-mode, baud-rate, or EEPROM export reference.
+- Inconsistent native device counts fail closed without returning a partial
+  device list, and a disposed inspection transport cannot reload or enumerate.
 - The production command allowlist remains empty.
 
 ## Portable package safety status
 
-- The self-contained `win-x86` package includes an inspected local FTDI DLL but
-  remains subject to the same empty production command allowlist.
-- Its D2XX inspection mode is device enumeration only: it has no controller-open,
-  read, write, EEPROM, baud-rate, or bit-mode path.
-- The launcher only verifies package files and starts the application; it does not
-  request elevation or communicate with a controller.
-- The packaged `README-FIRST.txt` repeats the required first-live-validation power
-  isolation: 24 V controller power only, with motor power, plasma source, and
-  torch-start circuit disabled.
+- The self-contained `win-x86` package includes an inspected local FTDI DLL
+  but remains subject to the same empty production command allowlist.
+- Its D2XX inspection mode is device enumeration only: it has no
+  controller-open, read, write, EEPROM, baud-rate, or bit-mode path.
+- The launcher only verifies package files and starts the application; it does
+  not request elevation or communicate with a controller.
+- The packaged `README-FIRST.txt` repeats the required first-live-validation
+  power isolation: 24 V controller power only, with motor power, plasma source,
+  and torch-start circuit disabled.
 
 ## Startup-safe diagnostic package
 
 - WPF software rendering is forced before `MainWindow` construction unless the
   operator explicitly passes `--hardware-rendering` for comparison.
-- The first window creates no fake or D2XX transport, inspects no DLL, enumerates
-  no devices, and cannot reach a controller open, read, or write operation.
+- The first window creates no fake or D2XX transport, inspects no DLL,
+  enumerates no devices, and cannot reach a controller open, read, or write
+  operation.
 - Fake enumeration and D2XX metadata inspection each require a separate manual
   button click. D2XX native loading cannot begin before that click.
 - Startup exceptions are written with stack traces to

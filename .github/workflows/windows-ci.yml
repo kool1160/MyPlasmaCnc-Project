@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-test-format:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -25,10 +25,10 @@ jobs:
         run: dotnet restore MyPlasm.Inspector.sln
 
       - name: Build Release
-        run: dotnet build MyPlasm.Inspector.sln -c Release --no-restore
+        run: dotnet build MyPlasm.Inspector.sln -c Release --no-restore -warnaserror
 
       - name: Run tests
-        run: dotnet test MyPlasm.Inspector.sln -c Release --no-build
+        run: dotnet test MyPlasm.Inspector.sln -c Release --no-build --logger "console;verbosity=normal"
 
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore

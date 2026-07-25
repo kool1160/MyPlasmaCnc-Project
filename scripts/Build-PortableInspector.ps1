@@ -16,6 +16,59 @@ $packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic
 $applicationExecutable = Join-Path $packageDirectory 'MyPlasm Inspector.exe'
 $packagedDll = Join-Path $packageDirectory 'native\ftd2xx.dll'
 
+function Assert-WinX86Executable {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    $stream = [System.IO.File]::Open(
+        $Path,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read)
+    $reader = [System.IO.BinaryReader]::new($stream)
+
+    try {
+        if ($reader.ReadUInt16() -ne 0x5A4D) {
+            throw "The packaged application does not have a valid DOS/PE signature: $Path"
+        }
+
+        $stream.Position = 0x3C
+        $peHeaderOffset = $reader.ReadInt32()
+        if ($peHeaderOffset -lt 0x40 -or $peHeaderOffset -gt ($stream.Length - 26)) {
+            throw "The packaged application has an invalid PE header offset: $Path"
+        }
+
+        $stream.Position = $peHeaderOffset
+        if ($reader.ReadUInt32() -ne 0x00004550) {
+            throw "The packaged application does not have a valid PE signature: $Path"
+        }
+
+        $machine = $reader.ReadUInt16()
+        $stream.Position = $peHeaderOffset + 22
+        $characteristics = $reader.ReadUInt16()
+        $stream.Position = $peHeaderOffset + 24
+        $optionalHeaderMagic = $reader.ReadUInt16()
+
+        $isExecutable = ($characteristics -band 0x0002) -ne 0
+        $isDll = ($characteristics -band 0x2000) -ne 0
+        if ($machine -ne 0x014C -or
+            $optionalHeaderMagic -ne 0x010B -or
+            -not $isExecutable -or
+            $isDll) {
+            throw "The packaged application is not an x86 PE32 executable: $Path"
+        }
+    }
+    finally {
+        $reader.Dispose()
+        $stream.Dispose()
+    }
+
+    Write-Host "Packaged executable: $Path"
+    Write-Host 'Architecture: X86 (PE32 executable)'
+}
+
 if (-not (Get-Command $DotnetCommand -ErrorAction SilentlyContinue)) {
     throw 'A .NET 8 SDK was not found. Install the .NET 8 SDK, then run this file again.'
 }
@@ -64,10 +117,7 @@ if ($LASTEXITCODE -ne 0) {
     throw 'The packaged ftd2xx.dll did not pass the x86 compatibility check.'
 }
 
-& $DotnetCommand run --project $peInspectorProject --configuration Release -- $applicationExecutable --architecture x86
-if ($LASTEXITCODE -ne 0) {
-    throw 'The packaged application executable is not an x86 PE file.'
-}
+Assert-WinX86Executable -Path $applicationExecutable
 
 Compress-Archive -LiteralPath (Get-ChildItem -LiteralPath $packageDirectory | Select-Object -ExpandProperty FullName) -DestinationPath $packageZip -Force
 

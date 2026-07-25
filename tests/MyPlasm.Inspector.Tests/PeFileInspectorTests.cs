@@ -15,6 +15,18 @@ public sealed class PeFileInspectorTests
     }
 
     [Fact]
+    public void ExecutablePeIsRejectedAsNotBeingADll()
+    {
+        string executablePath = Environment.ProcessPath
+            ?? throw new InvalidOperationException("The test host executable path is unavailable.");
+
+        BadImageFormatException exception = Assert.Throws<BadImageFormatException>(
+            () => new PeFileInspector().Inspect(executablePath));
+
+        Assert.Contains("not marked as a DLL", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void InspectionReportsArchitectureVersionHashAndCompatibility()
     {
         string path = typeof(PeFileInspector).Assembly.Location;
