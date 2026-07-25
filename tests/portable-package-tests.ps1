@@ -332,7 +332,7 @@ try {
             Assert-True `
                 -Condition ($preservedReplacement.Count -gt 0) `
                 -Message 'Failed replacement evidence was not preserved.'
-        }.GetNewClosure()
+        }
     }
 
     Invoke-Test 'validator failure rolls back both published outputs' {
