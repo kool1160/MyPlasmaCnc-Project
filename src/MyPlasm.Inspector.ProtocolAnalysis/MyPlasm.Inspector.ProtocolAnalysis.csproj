@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Offline-only streaming analysis for MyPlasm recorder captures.</Description>
+  </PropertyGroup>
+</Project>

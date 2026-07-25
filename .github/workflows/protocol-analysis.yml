@@ -1,0 +1,73 @@
+name: Offline Protocol Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-and-verify:
+    runs-on: windows-2022
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore MyPlasm.Inspector.sln
+
+      - name: Build Release with warnings as errors
+        run: dotnet build MyPlasm.Inspector.sln --configuration Release --no-restore -warnaserror
+
+      - name: Run hardware-free tests
+        run: dotnet test MyPlasm.Inspector.sln --configuration Release --no-build --logger "console;verbosity=normal"
+
+      - name: Verify formatting
+        run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore
+
+      - name: Run analyzer twice against invented fixture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $input = 'tests/MyPlasm.Inspector.ProtocolAnalysis.Tests/Fixtures/normal-startup.jsonl'
+          $expected = (Get-FileHash -LiteralPath $input -Algorithm SHA256).Hash
+
+          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+            analyze --input $input --output artifacts/analysis-first --expected-sha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "First analyzer run failed with $LASTEXITCODE." }
+
+          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+            analyze --input $input --output artifacts/analysis-second --expected-sha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "Second analyzer run failed with $LASTEXITCODE." }
+
+          $names = @(
+            'capture-summary.json',
+            'capture-report.md',
+            'phase-timeline.csv',
+            'transaction-classes.csv',
+            'payload-variability.json',
+            'hashes.sha256'
+          )
+          foreach ($name in $names) {
+            $first = (Get-FileHash -LiteralPath "artifacts/analysis-first/$name" -Algorithm SHA256).Hash
+            $second = (Get-FileHash -LiteralPath "artifacts/analysis-second/$name" -Algorithm SHA256).Hash
+            if ($first -ne $second) {
+              throw "Deterministic output mismatch for $name."
+            }
+          }
+
+          $leaks = Get-ChildItem -LiteralPath artifacts/analysis-first -File |
+            Select-String -Pattern 'FACEB00C|C001D00D|SYNTHETIC-DEVICE|0x00002000'
+          if ($leaks) {
+            throw 'A sanitized report contains raw synthetic evidence.'
+          }
+
+          Get-Content -LiteralPath artifacts/analysis-first/hashes.sha256
