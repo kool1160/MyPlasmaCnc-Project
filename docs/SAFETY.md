@@ -64,3 +64,17 @@ The application fails closed:
 - Transport writes accept only a validated command object whose constructor is internal to the core assembly.
 - The initial Windows shell uses `FakeFtdiTransport`; it contains no native D2XX binding and no command-send UI.
 - Automated tests use synthetic sentinel bytes, not inferred controller commands, to prove motion, homing/probing, output, plasma, configuration, firmware, EEPROM, unknown, and unverified read-only intents are blocked before transport.
+
+## D2XX enumeration implementation status
+
+- `D2xxInspectionTransport` exposes enumeration through only `FT_CreateDeviceInfoList`, `FT_GetDeviceInfoList`, and `FT_GetLibraryVersion`.
+- Its injectable native API has no open, read, write, configuration, bit-mode, baud-rate, or EEPROM functions.
+- The D2XX transport's application-facing open, read, and write methods are non-functional and throw `NotSupportedException`.
+- Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
+- Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
+- The production native loader centralizes exactly three required export names;
+  automated tests reject any compiled `FT_Open`, `FT_Read`, `FT_Write`,
+  configuration, bit-mode, baud-rate, or EEPROM export reference.
+- Inconsistent native device counts fail closed without returning a partial
+  device list, and a disposed inspection transport cannot reload or enumerate.
+- The production command allowlist remains empty.

@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\MyPlasm.Inspector.Core\MyPlasm.Inspector.Core.csproj" />
+    <ProjectReference Include="..\..\src\MyPlasm.Inspector.Transport.D2xx\MyPlasm.Inspector.Transport.D2xx.csproj" />
     <ProjectReference Include="..\..\src\MyPlasm.Inspector.Transport.Fake\MyPlasm.Inspector.Transport.Fake.csproj" />
   </ItemGroup>
 </Project>
