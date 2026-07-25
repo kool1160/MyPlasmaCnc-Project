@@ -33,8 +33,13 @@ popd
 echo Application exit code: %APPLICATION_EXIT_CODE%
 if not "%APPLICATION_EXIT_CODE%"=="0" (
     echo The application exited unexpectedly.
-    echo Opening startup logs: "%LOCALAPPDATA%\MyPlasm Inspector\Logs"
-    start "" explorer.exe "%LOCALAPPDATA%\MyPlasm Inspector\Logs"
+    if exist "%LOCALAPPDATA%\MyPlasm Inspector\Logs" (
+        echo Opening startup logs: "%LOCALAPPDATA%\MyPlasm Inspector\Logs"
+        start "" explorer.exe "%LOCALAPPDATA%\MyPlasm Inspector\Logs"
+    ) else (
+        echo No startup-log folder is available. File logging may have been unavailable.
+        >> "%LAUNCHER_LOG%" echo No startup-log folder was available.
+    )
 )
 
 echo Press any key to close this diagnostic launcher.

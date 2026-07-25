@@ -30,5 +30,9 @@ jobs:
       - name: Run tests
         run: dotnet test MyPlasm.Inspector.sln -c Release --no-build --logger "console;verbosity=normal"
 
+      - name: Run portable package transaction tests
+        shell: pwsh
+        run: ./tests/portable-package-tests.ps1
+
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore

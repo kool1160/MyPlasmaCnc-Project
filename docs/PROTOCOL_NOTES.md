@@ -99,11 +99,18 @@ log is collected.
 - The diagnostic package forces software rendering by default, logs environment
   and startup stages before `MainWindow` exists, and defers every transport
   action until an explicit button click.
+- Startup logging failures are isolated from application startup. Persistent
+  file logging falls back once to a bounded in-memory/Trace diagnostic path and
+  does not retry a failed file sink.
+- Portable packaging accepts only the confirmed D2XX DLL architecture,
+  version, size, and SHA-256 above. A package manifest binds generated
+  application and DLL evidence to an exact clean source commit.
 
 Safety impact: no controller operation is attempted during startup. The exact
 root cause of the target PC's renderer/startup crash remains unknown pending
-its startup log; this change removes automatic transport work and provides
-reproducible evidence.
+its diagnostic evidence; this change removes automatic transport work,
+prevents logging failures from becoming startup failures, and provides
+reproducible package evidence.
 
 ## Vendor references
 

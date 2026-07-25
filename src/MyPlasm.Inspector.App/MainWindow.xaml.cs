@@ -28,7 +28,7 @@ public partial class MainWindow : Window
             : "Hardware rendering enabled by --hardware-rendering.";
         ArchitectureStatusText.Text = $"Process architecture: {RuntimeInformation.ProcessArchitecture}";
         AllowlistStatusText.Text = $"Production command allowlist: {new DenyByDefaultCommandSafetyPolicy().AllowedCommandCount} entries (empty)";
-        LogFileLocationText.Text = _startupLog.FilePath;
+        LogFileLocationText.Text = _startupLog.DiagnosticLocation;
         AddEvent("Startup-safe window initialized. No transport has been created or enumerated.");
     }
 
@@ -81,7 +81,7 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            InspectionStatusText.Text = $"{actionName} failed. See startup log.";
+            InspectionStatusText.Text = $"{actionName} failed. See startup diagnostics.";
             _startupLog.Exception(actionName, exception);
             AddEvent($"{actionName} error: {exception.Message}");
         }

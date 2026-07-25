@@ -47,6 +47,14 @@ DLL at `native/local/ftd2xx.dll` and double-click
 or generated package. The target computer needs neither the .NET SDK nor the
 .NET runtime.
 
+The portable builder refuses any DLL that differs from the confirmed identity:
+x86, file version `3.01.19`, size `206144` bytes, and SHA-256
+`381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`.
+It also requires a clean Git worktree so `package-manifest.json` can bind the
+package to one exact source commit. Build and ZIP validation happen in staging;
+the prior validated package is retained unless the replacement passes all
+checks.
+
 The package launcher checks for both `MyPlasm Inspector.exe` and
 `native/ftd2xx.dll` before starting. It does not require elevation; installing
 a missing FTDI driver may require it. The portable application remains device
