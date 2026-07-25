@@ -1,6 +1,7 @@
 using MyPlasm.Inspector.Core.Transport;
 using MyPlasm.Inspector.Transport.D2xx;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace MyPlasm.Inspector.Tests;
 
@@ -159,6 +160,96 @@ public sealed class D2xxInspectionTransportTests
             methodNames);
     }
 
+    [Fact]
+    public void ProductionNativeLibraryResolvesOnlyThreeReadOnlyEnumerationExports()
+    {
+        Assert.Equal(
+            [
+                "FT_CreateDeviceInfoList",
+                "FT_GetDeviceInfoList",
+                "FT_GetLibraryVersion"
+            ],
+            D2xxNativeLibrary.RequiredExports);
+
+        string assemblyMetadata = Encoding.UTF8.GetString(
+            File.ReadAllBytes(typeof(D2xxInspectionTransport).Assembly.Location));
+        string[] prohibitedExports =
+        [
+            "FT_Open",
+            "FT_OpenEx",
+            "FT_Read",
+            "FT_Write",
+            "FT_SetBaudRate",
+            "FT_SetBitMode",
+            "FT_SetDataCharacteristics",
+            "FT_SetFlowControl",
+            "FT_SetLatencyTimer",
+            "FT_EraseEE",
+            "FT_EE_Write",
+            "FT_EE_Program"
+        ];
+
+        Assert.All(
+            prohibitedExports,
+            export => Assert.DoesNotContain(export, assemblyMetadata, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task EnumerationAfterDisposeFailsBeforeCallingNativeApi()
+    {
+        StubNativeApi nativeApi = new(0x00030102, []);
+        D2xxInspectionTransport transport = new(nativeApi);
+        await transport.DisposeAsync();
+        await transport.DisposeAsync();
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(
+            () => transport.EnumerateDevicesAsync().AsTask());
+
+        Assert.Equal(0, nativeApi.GetLibraryVersionCalls);
+        Assert.Equal(0, nativeApi.CreateDeviceInfoListCalls);
+        Assert.Equal(0, nativeApi.GetDeviceInfoListCalls);
+    }
+
+    [Fact]
+    public async Task IncreasedReturnedDeviceCountFailsClosedWithoutPartialResults()
+    {
+        StubNativeApi nativeApi = new(
+            0x00030102,
+            [new(0, 5, 0x04036001, 0x00001000, "MY001", "MyPlasm CNC")])
+        {
+            ReturnedCountOverride = 2
+        };
+        await using D2xxInspectionTransport transport = new(nativeApi);
+
+        IReadOnlyList<FtdiDeviceInfo> devices = await transport.EnumerateDevicesAsync();
+
+        Assert.Empty(devices);
+        Assert.Contains(
+            transport.Diagnostics,
+            diagnostic => diagnostic.Code == "DEVICE_COUNT_INCREASED" &&
+                diagnostic.Severity == D2xxDiagnosticSeverity.Error);
+    }
+
+    [Fact]
+    public async Task NativeEnumerationExceptionFailsClosedWithDiagnostic()
+    {
+        StubNativeApi nativeApi = new(0x00030102, [])
+        {
+            EnumerationException = new DllNotFoundException("synthetic native failure")
+        };
+        await using D2xxInspectionTransport transport = new(nativeApi);
+
+        IReadOnlyList<FtdiDeviceInfo> devices = await transport.EnumerateDevicesAsync();
+
+        Assert.Empty(devices);
+        Assert.Contains(
+            transport.Diagnostics,
+            diagnostic => diagnostic.Code == "NATIVE_ENUMERATION_FAILED" &&
+                diagnostic.Severity == D2xxDiagnosticSeverity.Error);
+        Assert.Equal(0, nativeApi.CreateDeviceInfoListCalls);
+        Assert.Equal(0, nativeApi.GetDeviceInfoListCalls);
+    }
+
     private sealed class StubNativeApi : ID2xxNativeApi
     {
         private readonly D2xxNativeDeviceInfo[] _devices;
@@ -176,6 +267,10 @@ public sealed class D2xxInspectionTransportTests
 
         public D2xxStatus VersionStatus { get; init; } = D2xxStatus.Ok;
 
+        public uint? ReturnedCountOverride { get; init; }
+
+        public Exception? EnumerationException { get; init; }
+
         public int GetLibraryVersionCalls { get; private set; }
 
         public int CreateDeviceInfoListCalls { get; private set; }
@@ -185,6 +280,11 @@ public sealed class D2xxInspectionTransportTests
         public D2xxStatus GetLibraryVersion(out uint version)
         {
             GetLibraryVersionCalls++;
+            if (EnumerationException is not null)
+            {
+                throw EnumerationException;
+            }
+
             version = _libraryVersion;
             return VersionStatus;
         }
@@ -206,7 +306,7 @@ public sealed class D2xxInspectionTransportTests
 
             int count = Math.Min(devices.Length, _devices.Length);
             Array.Copy(_devices, devices, count);
-            deviceCount = checked((uint)count);
+            deviceCount = ReturnedCountOverride ?? checked((uint)count);
             return D2xxStatus.Ok;
         }
     }

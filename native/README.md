@@ -2,6 +2,10 @@
 
 Vendor binaries are intentionally excluded from Git.
 
+The locally verified original DLL is x86, file version `3.01.19`, SHA-256
+`381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`.
+It remains a local dependency and must not be committed or redistributed.
+
 Place a legally obtained `ftd2xx.dll` at:
 
 ```text

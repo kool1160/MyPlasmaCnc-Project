@@ -72,4 +72,9 @@ The application fails closed:
 - The D2XX transport's application-facing open, read, and write methods are non-functional and throw `NotSupportedException`.
 - Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
 - Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
+- The production native loader centralizes exactly three required export names;
+  automated tests reject any compiled `FT_Open`, `FT_Read`, `FT_Write`,
+  configuration, bit-mode, baud-rate, or EEPROM export reference.
+- Inconsistent native device counts fail closed without returning a partial
+  device list, and a disposed inspection transport cannot reload or enumerate.
 - The production command allowlist remains empty.

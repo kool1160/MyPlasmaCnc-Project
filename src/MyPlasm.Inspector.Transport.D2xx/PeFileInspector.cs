@@ -22,24 +22,31 @@ public sealed class PeFileInspector
         Architecture selectedArchitecture = applicationArchitecture ?? RuntimeInformation.ProcessArchitecture;
 
         PeArchitecture dllArchitecture;
-        using (FileStream stream = File.OpenRead(fullPath))
+        string sha256;
+        string? fileVersion;
+        using (FileStream stream = new(
+                   fullPath,
+                   FileMode.Open,
+                   FileAccess.Read,
+                   FileShare.Read))
         using (PEReader reader = new(stream, PEStreamOptions.LeaveOpen))
         {
-            if (!reader.HasMetadata && reader.PEHeaders.PEHeader is null)
+            if (reader.PEHeaders.PEHeader is null)
             {
                 throw new BadImageFormatException("The file does not contain a valid PE header.", fullPath);
             }
 
+            if (!reader.PEHeaders.CoffHeader.Characteristics.HasFlag(
+                    System.Reflection.PortableExecutable.Characteristics.Dll))
+            {
+                throw new BadImageFormatException("The PE file is not marked as a DLL.", fullPath);
+            }
+
             dllArchitecture = MapArchitecture(reader.PEHeaders.CoffHeader.Machine);
-        }
-
-        string sha256;
-        using (FileStream stream = File.OpenRead(fullPath))
-        {
+            stream.Position = 0;
             sha256 = Convert.ToHexString(SHA256.HashData(stream));
+            fileVersion = FileVersionInfo.GetVersionInfo(fullPath).FileVersion;
         }
-
-        string? fileVersion = FileVersionInfo.GetVersionInfo(fullPath).FileVersion;
 
         return new PeInspectionResult(
             fullPath,

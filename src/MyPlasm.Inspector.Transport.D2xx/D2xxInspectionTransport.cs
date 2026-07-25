@@ -13,6 +13,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     private readonly PeFileInspector _peInspector;
     private readonly string? _libraryPath;
     private ID2xxNativeApi? _nativeApi;
+    private bool _disposed;
     private bool _ownsNativeApi;
 
     public D2xxInspectionTransport(ID2xxNativeApi nativeApi)
@@ -46,72 +47,109 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     public ValueTask<IReadOnlyList<FtdiDeviceInfo>> EnumerateDevicesAsync(
         CancellationToken cancellationToken = default)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         cancellationToken.ThrowIfCancellationRequested();
         _diagnostics.Clear();
         LibraryVersion = null;
 
-        if (!TryEnsureNativeApi())
+        try
         {
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
+            if (!TryEnsureNativeApi())
+            {
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
 
-        D2xxStatus versionStatus = _nativeApi!.GetLibraryVersion(out uint rawLibraryVersion);
-        if (versionStatus == D2xxStatus.Ok)
-        {
-            LibraryVersion = D2xxVersion.Format(rawLibraryVersion);
-        }
-        else
-        {
-            AddStatusError("LIBRARY_VERSION_FAILED", "FT_GetLibraryVersion", versionStatus);
-        }
+            D2xxStatus versionStatus = _nativeApi!.GetLibraryVersion(out uint rawLibraryVersion);
+            if (versionStatus == D2xxStatus.Ok)
+            {
+                LibraryVersion = D2xxVersion.Format(rawLibraryVersion);
+            }
+            else
+            {
+                AddStatusError("LIBRARY_VERSION_FAILED", "FT_GetLibraryVersion", versionStatus);
+            }
 
-        D2xxStatus countStatus = _nativeApi.CreateDeviceInfoList(out uint deviceCount);
-        if (countStatus != D2xxStatus.Ok)
-        {
-            AddStatusError("DEVICE_LIST_CREATE_FAILED", "FT_CreateDeviceInfoList", countStatus);
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
+            D2xxStatus countStatus = _nativeApi.CreateDeviceInfoList(out uint deviceCount);
+            if (countStatus != D2xxStatus.Ok)
+            {
+                AddStatusError("DEVICE_LIST_CREATE_FAILED", "FT_CreateDeviceInfoList", countStatus);
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
 
-        if (deviceCount == 0)
-        {
-            _diagnostics.Add(new D2xxDiagnostic(
-                "NO_DEVICES",
-                D2xxDiagnosticSeverity.Warning,
-                "D2XX reported no devices. The driver may be absent, or no supported FTDI device is connected."));
+            if (deviceCount == 0)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "NO_DEVICES",
+                    D2xxDiagnosticSeverity.Warning,
+                    "D2XX reported no devices. The driver may be absent, or no supported FTDI device is connected."));
+                AddDriverVersionDiagnostic();
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (deviceCount > MaximumDeviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_INVALID",
+                    D2xxDiagnosticSeverity.Error,
+                    $"D2XX reported {deviceCount} devices, above the safety limit of {MaximumDeviceCount}."));
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            D2xxNativeDeviceInfo[] nativeDevices =
+                new D2xxNativeDeviceInfo[checked((int)deviceCount)];
+            uint returnedCount = deviceCount;
+            D2xxStatus listStatus = _nativeApi.GetDeviceInfoList(nativeDevices, ref returnedCount);
+            if (listStatus != D2xxStatus.Ok)
+            {
+                AddStatusError("DEVICE_LIST_READ_FAILED", "FT_GetDeviceInfoList", listStatus);
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (returnedCount > deviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_INCREASED",
+                    D2xxDiagnosticSeverity.Error,
+                    $"D2XX returned {returnedCount} entries after allocating for {deviceCount}; " +
+                    "the inconsistent result was discarded."));
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (returnedCount != deviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_CHANGED",
+                    D2xxDiagnosticSeverity.Warning,
+                    $"D2XX device count changed from {deviceCount} to {returnedCount} during enumeration."));
+            }
+
+            int mappedCount = checked((int)returnedCount);
+            List<FtdiDeviceInfo> devices = new(mappedCount);
+            for (int index = 0; index < mappedCount; index++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                D2xxNativeDeviceInfo native = nativeDevices[index];
+                devices.Add(MapDevice(checked((uint)index), native));
+            }
+
+            AddDuplicateDiagnostics(devices);
             AddDriverVersionDiagnostic();
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>(devices);
         }
-
-        if (deviceCount > MaximumDeviceCount)
+        catch (Exception exception) when (
+            exception is DllNotFoundException or
+            EntryPointNotFoundException or
+            BadImageFormatException or
+            FileLoadException or
+            MarshalDirectiveException or
+            SEHException)
         {
             _diagnostics.Add(new D2xxDiagnostic(
-                "DEVICE_COUNT_INVALID",
+                "NATIVE_ENUMERATION_FAILED",
                 D2xxDiagnosticSeverity.Error,
-                $"D2XX reported {deviceCount} devices, above the safety limit of {MaximumDeviceCount}."));
+                $"D2XX enumeration failed safely without opening a device: {exception.Message}"));
             return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
         }
-
-        D2xxNativeDeviceInfo[] nativeDevices = new D2xxNativeDeviceInfo[checked((int)deviceCount)];
-        uint returnedCount = deviceCount;
-        D2xxStatus listStatus = _nativeApi.GetDeviceInfoList(nativeDevices, ref returnedCount);
-        if (listStatus != D2xxStatus.Ok)
-        {
-            AddStatusError("DEVICE_LIST_READ_FAILED", "FT_GetDeviceInfoList", listStatus);
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
-
-        int mappedCount = Math.Min(nativeDevices.Length, checked((int)returnedCount));
-        List<FtdiDeviceInfo> devices = new(mappedCount);
-        for (int index = 0; index < mappedCount; index++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            D2xxNativeDeviceInfo native = nativeDevices[index];
-            devices.Add(MapDevice(checked((uint)index), native));
-        }
-
-        AddDuplicateDiagnostics(devices);
-        AddDriverVersionDiagnostic();
-        return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>(devices);
     }
 
     public ValueTask OpenAsync(string serialNumber, CancellationToken cancellationToken = default) =>
@@ -132,6 +170,11 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
     public ValueTask DisposeAsync()
     {
+        if (_disposed)
+        {
+            return ValueTask.CompletedTask;
+        }
+
         if (_ownsNativeApi && _nativeApi is IDisposable disposable)
         {
             disposable.Dispose();
@@ -139,6 +182,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
         _nativeApi = null;
         _ownsNativeApi = false;
+        _disposed = true;
         return ValueTask.CompletedTask;
     }
 
@@ -222,8 +266,8 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
         return new FtdiDeviceInfo(
             index,
-            native.Description,
-            native.SerialNumber,
+            native.Description ?? string.Empty,
+            native.SerialNumber ?? string.Empty,
             FormatDeviceType(native.Type),
             vendorId,
             productId,

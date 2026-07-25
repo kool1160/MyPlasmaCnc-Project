@@ -43,13 +43,14 @@ See GitHub Issue #1: **Project 1: Build read-only MyPlasm Inspector for Windows*
 
 ## Current foundation
 
-The completed Issue #1 foundation slices contain:
+The current bounded Issue #1 slices contain:
 
 - `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
 - `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
 - `MyPlasm.Inspector.Transport.D2xx` — enumeration-only production D2XX interop;
 - `MyPlasm.Inspector.App` — a WPF shell with explicit fake and D2XX inspection modes;
-- `MyPlasm.Inspector.Tests` — offline fake-transport and safety-policy tests.
+- `MyPlasm.Inspector.Tests` — offline fake-transport, D2XX-enumeration, and
+  safety-policy tests;
 - `MyPlasm.Inspector.PeInspector` — local vendor-DLL architecture, version, and hash inspection.
 
 The production command allowlist remains empty because no controller request bytes are confirmed. D2XX mode can list device metadata but cannot open, read, configure, or write a device. Driver version is deliberately not queried because FTDI documents that operation as requiring an open device handle.
@@ -85,3 +86,67 @@ Use `--architecture x86` or `--architecture x64` to check a chosen application a
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.
+
+## FTD2XX protocol recorder
+
+The repository also contains a bounded native reverse-engineering tool: a
+32-bit forwarding `ftd2xx.dll` that records calls made by the original
+32-bit MyPlasm application while forwarding them to a same-directory
+`ftd2xx_real.dll`.
+
+This recorder is not part of the replacement Inspector transport and does not
+generate, decode, filter, approve, or rewrite controller commands. It forwards
+only calls initiated by the original application. Because those vendor-originated
+calls may include motion or output commands, the first live startup-only capture
+requires the motor supply, plasma source, and torch-start connection to be
+disabled as documented.
+
+Supported build environment:
+
+- Windows with Visual Studio 2019 or 2022 C++ Build Tools;
+- CMake 3.21 or newer;
+- the Win32/x86 MSVC toolchain.
+
+Configure, build, and test:
+
+```powershell
+cmake -S tools/ftd2xx-protocol-recorder -B build/protocol-recorder -G "Visual Studio 17 2022" -A Win32
+cmake --build build/protocol-recorder --config Release
+ctest --test-dir build/protocol-recorder -C Release --output-on-failure
+```
+
+No vendor executable, DLL, driver, firmware, controller, or plasma table is
+needed for these tests. Capture writes are serialized and physically flushed
+only at a 64 KiB threshold, a one-second threshold, or after `FT_Close`; an
+abnormal termination can therefore lose the final buffered records. Installer
+and restoration rollback use verified transaction copies and preserve
+unexpected files under unique quarantine names. See
+[docs/protocol-recorder.md](docs/protocol-recorder.md) for the architecture,
+log schema, transactional installation and restoration, and the required first
+live capture procedure.
+
+## Offline protocol analyzer
+
+The .NET 8 analyzer validates and structurally summarizes recorder
+`traffic.jsonl` files without loading D2XX, accessing hardware, replaying
+packets, or assigning packet meaning:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- analyze `
+  --input "C:\PrivateEvidence\traffic.jsonl" `
+  --output "C:\PrivateEvidence\analysis" `
+  --expected-sha256 "<64-character capture SHA-256>"
+```
+
+It streams large captures, fails closed on malformed or inconsistent evidence,
+uses a documented FIFO write/read pairing rule per open handle, and produces
+deterministic JSON, Markdown, CSV, variability, and SHA-256 reports. Default
+reports exclude raw payloads, pointer values, controller selectors, recorder
+session identifiers, and local directory paths. Before reading the capture, it
+rejects any normalized or link-resolved collision between the input evidence
+and a report destination. `--overwrite` never permits replacing the input.
+
+Raw captures and generated private evidence must remain outside Git. Structural
+fingerprints and timing do not establish packet meaning or command safety. See
+[docs/protocol-analysis.md](docs/protocol-analysis.md) for validation rules,
+outputs, privacy handling, exit codes, and limitations.

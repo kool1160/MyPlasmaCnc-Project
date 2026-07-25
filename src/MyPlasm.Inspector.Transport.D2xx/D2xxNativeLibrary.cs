@@ -4,6 +4,14 @@ namespace MyPlasm.Inspector.Transport.D2xx;
 
 internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
 {
+    internal static readonly IReadOnlyList<string> RequiredExports =
+        Array.AsReadOnly(
+        [
+            "FT_CreateDeviceInfoList",
+            "FT_GetDeviceInfoList",
+            "FT_GetLibraryVersion"
+        ]);
+
     private readonly nint _libraryHandle;
     private readonly CreateDeviceInfoListDelegate _createDeviceInfoList;
     private readonly GetDeviceInfoListDelegate _getDeviceInfoList;
@@ -13,9 +21,12 @@ internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
     private D2xxNativeLibrary(nint libraryHandle)
     {
         _libraryHandle = libraryHandle;
-        _createDeviceInfoList = GetExport<CreateDeviceInfoListDelegate>("FT_CreateDeviceInfoList");
-        _getDeviceInfoList = GetExport<GetDeviceInfoListDelegate>("FT_GetDeviceInfoList");
-        _getLibraryVersion = GetExport<GetLibraryVersionDelegate>("FT_GetLibraryVersion");
+        _createDeviceInfoList =
+            GetExport<CreateDeviceInfoListDelegate>(RequiredExports[0]);
+        _getDeviceInfoList =
+            GetExport<GetDeviceInfoListDelegate>(RequiredExports[1]);
+        _getLibraryVersion =
+            GetExport<GetLibraryVersionDelegate>(RequiredExports[2]);
     }
 
     public static D2xxNativeLibrary Load(string fullPath)
