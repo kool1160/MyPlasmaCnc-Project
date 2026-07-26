@@ -11,6 +11,7 @@ TestResults/
 .idea/
 
 # Build and package output
+build/
 publish/
 releases/
 *.msi
@@ -20,15 +21,23 @@ releases/
 # Local native/runtime dependencies
 native/local/
 ftd2xx.dll
+ftd2xx_real.dll
+ftd2xx_proxy_restore_pending.dll
+MyPlasmCNC.exe
+myplasm-proxy-install.json
 
 # Captures and diagnostic exports
 captures/
 diagnostics/
 exports/
+traffic.jsonl
 *.pcap
 *.pcapng
 *.binlog
 *.dmp
+*.pdb
+*.lib
+*.exp
 
 # Large archives and local evidence
 *.zip

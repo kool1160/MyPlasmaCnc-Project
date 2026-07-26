@@ -4,6 +4,19 @@ namespace MyPlasm.Inspector.Transport.D2xx;
 
 internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
 {
+    internal static readonly IReadOnlyList<string> RequiredExports =
+        Array.AsReadOnly(
+        [
+            "FT_CreateDeviceInfoList",
+            "FT_GetDeviceInfoList",
+            "FT_GetLibraryVersion",
+            "FT_OpenEx",
+            "FT_Close",
+            "FT_GetDriverVersion",
+            "FT_GetQueueStatus",
+            "FT_Read"
+        ]);
+
     private readonly nint _libraryHandle;
     private readonly CreateDeviceInfoListDelegate _createDeviceInfoList;
     private readonly GetDeviceInfoListDelegate _getDeviceInfoList;
@@ -18,14 +31,19 @@ internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
     private D2xxNativeLibrary(nint libraryHandle)
     {
         _libraryHandle = libraryHandle;
-        _createDeviceInfoList = GetExport<CreateDeviceInfoListDelegate>("FT_CreateDeviceInfoList");
-        _getDeviceInfoList = GetExport<GetDeviceInfoListDelegate>("FT_GetDeviceInfoList");
-        _getLibraryVersion = GetExport<GetLibraryVersionDelegate>("FT_GetLibraryVersion");
-        _openEx = GetExport<OpenExDelegate>("FT_OpenEx");
-        _close = GetExport<CloseDelegate>("FT_Close");
-        _getDriverVersion = GetExport<GetDriverVersionDelegate>("FT_GetDriverVersion");
-        _getQueueStatus = GetExport<GetQueueStatusDelegate>("FT_GetQueueStatus");
-        _read = GetExport<ReadDelegate>("FT_Read");
+        _createDeviceInfoList =
+            GetExport<CreateDeviceInfoListDelegate>(RequiredExports[0]);
+        _getDeviceInfoList =
+            GetExport<GetDeviceInfoListDelegate>(RequiredExports[1]);
+        _getLibraryVersion =
+            GetExport<GetLibraryVersionDelegate>(RequiredExports[2]);
+        _openEx = GetExport<OpenExDelegate>(RequiredExports[3]);
+        _close = GetExport<CloseDelegate>(RequiredExports[4]);
+        _getDriverVersion =
+            GetExport<GetDriverVersionDelegate>(RequiredExports[5]);
+        _getQueueStatus =
+            GetExport<GetQueueStatusDelegate>(RequiredExports[6]);
+        _read = GetExport<ReadDelegate>(RequiredExports[7]);
     }
 
     public static D2xxNativeLibrary Load(string fullPath)
@@ -49,11 +67,17 @@ internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
 
     public D2xxStatus Close(nint handle) => _close(handle);
 
-    public D2xxStatus GetDriverVersion(nint handle, out uint version) => _getDriverVersion(handle, out version);
+    public D2xxStatus GetDriverVersion(nint handle, out uint version) =>
+        _getDriverVersion(handle, out version);
 
-    public D2xxStatus GetQueueStatus(nint handle, out uint bytesAvailable) => _getQueueStatus(handle, out bytesAvailable);
+    public D2xxStatus GetQueueStatus(nint handle, out uint bytesAvailable) =>
+        _getQueueStatus(handle, out bytesAvailable);
 
-    public D2xxStatus Read(nint handle, byte[] buffer, uint requestedCount, out uint returnedCount) =>
+    public D2xxStatus Read(
+        nint handle,
+        byte[] buffer,
+        uint requestedCount,
+        out uint returnedCount) =>
         _read(handle, buffer, requestedCount, out returnedCount);
 
     public D2xxStatus CreateDeviceInfoList(out uint deviceCount) =>
@@ -116,19 +140,30 @@ internal sealed class D2xxNativeLibrary : ID2xxNativeApi, IDisposable
     private delegate D2xxStatus GetLibraryVersionDelegate(out uint version);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Ansi)]
-    private delegate D2xxStatus OpenExDelegate(string serialNumber, uint flags, out nint handle);
+    private delegate D2xxStatus OpenExDelegate(
+        string serialNumber,
+        uint flags,
+        out nint handle);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     private delegate D2xxStatus CloseDelegate(nint handle);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    private delegate D2xxStatus GetDriverVersionDelegate(nint handle, out uint version);
+    private delegate D2xxStatus GetDriverVersionDelegate(
+        nint handle,
+        out uint version);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    private delegate D2xxStatus GetQueueStatusDelegate(nint handle, out uint bytesAvailable);
+    private delegate D2xxStatus GetQueueStatusDelegate(
+        nint handle,
+        out uint bytesAvailable);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    private delegate D2xxStatus ReadDelegate(nint handle, [Out] byte[] buffer, uint requestedCount, out uint returnedCount);
+    private delegate D2xxStatus ReadDelegate(
+        nint handle,
+        [Out] byte[] buffer,
+        uint requestedCount,
+        out uint returnedCount);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     private struct NativeDeviceInfoNode

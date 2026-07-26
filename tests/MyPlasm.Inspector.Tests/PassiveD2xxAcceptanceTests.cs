@@ -420,6 +420,7 @@ public sealed class PassiveD2xxAcceptanceTests
 
         Assert.Equal(D2xxStatus.IoError, status);
         Assert.True(session.IsOpen);
+        Assert.True(session.HasUnresolvedCloseFailure);
         Assert.Null(session.ClosedUtc);
         Assert.Contains(session.Events, item =>
             item.Operation == PassiveOperations.Close && item.Status == D2xxStatus.IoError);
@@ -525,13 +526,14 @@ public sealed class PassiveD2xxAcceptanceTests
         string[] metadata =
         [
             "applicationName", "applicationVersion", "processArchitecture", "osVersion",
-            "runtimeVersion", "renderingMode", "d2xxDllPath", "dllPeArchitecture",
+            "runtimeVersion", "renderingMode", "d2xxDllRelativePath", "dllPeArchitecture",
             "dllFileVersion", "dllSha256", "d2xxLibraryVersion", "ftdiDriverVersion",
             "selectedDevice", "serialNumber", "description", "deviceType", "vendorId",
             "productId", "locationId", "openTimestampUtc", "captureStartTimestampUtc",
             "captureStopTimestampUtc", "closeTimestampUtc", "stopReason", "duration",
-            "totalBytes", "readChunkCount", "queuePollCount", "d2xxErrors",
-            "transmitCount", "productionAllowlistCount"
+            "totalBytes", "readChunkCount", "queuePollCount", "captureByteLimit",
+            "captureEventLimit", "d2xxErrors", "closeFailure", "transmitCount",
+            "productionAllowlistCount"
         ];
         Assert.All(metadata, name => Assert.True(session.RootElement.TryGetProperty(name, out _), name));
         Assert.Equal(0, new FileInfo(Path.Combine(result.CaptureDirectory, "rx.bin")).Length);
@@ -549,7 +551,7 @@ public sealed class PassiveD2xxAcceptanceTests
         ZipArchiveEntry manifestEntry = Assert.Single(archive.Entries, item => item.FullName == "hashes.sha256");
         using StreamReader reader = new(manifestEntry.Open());
         string[] lines = (await reader.ReadToEndAsync())
-            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         foreach (string line in lines)
         {
@@ -580,6 +582,256 @@ public sealed class PassiveD2xxAcceptanceTests
             await File.ReadAllBytesAsync(Path.Combine(captureDirectory, "rx.bin")));
     }
 
+    [Fact]
+    public async Task ByteSafetyLimitStopsAtExactBoundWithoutOverRead()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.QueueResults.Enqueue((D2xxStatus.Ok, 10));
+        native.ReadResults.Enqueue(
+            (D2xxStatus.Ok, new byte[] { 1, 2, 3, 4, 5, 6 }, 5));
+        AdvancingClock clock = new();
+        await using PassiveD2xxSession session = Session(native, clock);
+        await session.OpenAsync();
+        await using PassiveCaptureService service = new(
+            session,
+            clock,
+            maximumCaptureBytes: 5,
+            maximumCaptureEvents: 20,
+            receiveBufferSize: 8);
+
+        PassiveCaptureResult result =
+            await service.StartAsync(TimeSpan.FromSeconds(1));
+
+        Assert.Equal("byte safety limit reached", result.StopReason);
+        Assert.Equal(5, result.TotalBytes);
+        Assert.Equal([5U], native.ReadRequestedCounts);
+        Assert.Contains(
+            result.Events,
+            item => item.Operation == PassiveOperations.Limit);
+    }
+
+    [Fact]
+    public async Task EventSafetyLimitStopsPollingDeterministically()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        AdvancingClock clock = new();
+        await using PassiveD2xxSession session = Session(native, clock);
+        await session.OpenAsync();
+        await using PassiveCaptureService service = new(
+            session,
+            clock,
+            maximumCaptureBytes: 1024,
+            maximumCaptureEvents: 6,
+            receiveBufferSize: 8);
+
+        PassiveCaptureResult result =
+            await service.StartAsync(TimeSpan.FromMinutes(1));
+
+        Assert.Equal("event safety limit reached", result.StopReason);
+        Assert.InRange(native.QueueCalls, 1, 6);
+        Assert.Contains(
+            result.Events,
+            item => item.Operation == PassiveOperations.Limit);
+    }
+
+    [Fact]
+    public async Task NativeQueueExceptionStopsSafelyWithEvidence()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.QueueException = new InvalidOperationException(
+            "synthetic native queue failure");
+        AdvancingClock clock = new();
+        await using PassiveD2xxSession session = Session(native, clock);
+        await session.OpenAsync();
+        await using PassiveCaptureService service = new(session, clock);
+
+        PassiveCaptureResult result =
+            await service.StartAsync(TimeSpan.FromSeconds(1));
+
+        Assert.Equal("queue-status error", result.StopReason);
+        Assert.Contains(
+            result.Events,
+            item =>
+                item.Operation == PassiveOperations.QueuePoll &&
+                item.Status == D2xxStatus.OtherError);
+    }
+
+    [Fact]
+    public async Task ConcurrentCloseAttemptsReachNativeCloseExactlyOnce()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        await using PassiveD2xxSession session = Session(native);
+        await session.OpenAsync();
+
+        await Task.WhenAll(
+            Enumerable.Range(0, 8)
+                .Select(_ => session.CloseAsync().AsTask()));
+
+        Assert.Equal(1, native.CloseCalls);
+        Assert.Equal(D2xxStatus.Ok, session.CloseStatus);
+    }
+
+    [Fact]
+    public async Task CancelledTokenCannotSuppressSafetyClose()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        await using PassiveD2xxSession session = Session(native);
+        await session.OpenAsync();
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        D2xxStatus? status =
+            await session.CloseAsync(cancellation.Token);
+
+        Assert.Equal(D2xxStatus.Ok, status);
+        Assert.Equal(1, native.CloseCalls);
+    }
+
+    [Fact]
+    public async Task UnresolvedCloseFailureBlocksReenumerationAndReopen()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.CloseStatus = D2xxStatus.IoError;
+        await using D2xxInspectionTransport transport = new(native);
+        await transport.EnumerateDevicesAsync();
+        PassiveD2xxSession session =
+            transport.CreatePassiveSession(new FixedProcessDetector(false));
+        await session.OpenAsync();
+        await session.CloseAsync();
+
+        Assert.True(session.HasUnresolvedCloseFailure);
+        Assert.True(transport.IsOpen);
+        Assert.False(transport.CanCreatePassiveSession);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => transport.EnumerateDevicesAsync().AsTask());
+        Assert.Throws<InvalidOperationException>(
+            () => transport.CreatePassiveSession(
+                new FixedProcessDetector(false)));
+    }
+
+    [Fact]
+    public async Task EventsJsonlContainsExactlyOneValidObjectPerNonemptyLine()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateSingleChunkClosedCaptureAsync();
+        CaptureExportResult result = new CaptureExporter().Export(
+            capture,
+            ExportContext(null),
+            temporary.Path);
+
+        string[] lines = await File.ReadAllLinesAsync(
+            Path.Combine(result.CaptureDirectory, "events.jsonl"));
+        string[] nonempty = lines
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToArray();
+        Assert.Equal(capture.Events.Count, nonempty.Length);
+        Assert.All(
+            nonempty,
+            line =>
+            {
+                using JsonDocument document = JsonDocument.Parse(line);
+                Assert.Equal(JsonValueKind.Object, document.RootElement.ValueKind);
+            });
+    }
+
+    [Fact]
+    public async Task ExportRejectsRootedDllEvidencePathBeforeCreatingOutput()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateZeroByteClosedCaptureAsync();
+        CaptureExportContext context =
+            ExportContext(null) with
+            {
+                D2xxDllRelativePath =
+                    Path.Combine(temporary.Path, "ftd2xx.dll")
+            };
+
+        Assert.Throws<ArgumentException>(
+            () => new CaptureExporter().Export(
+                capture,
+                context,
+                temporary.Path));
+
+        Assert.Empty(
+            Directory.GetDirectories(
+                temporary.Path,
+                "capture-*",
+                SearchOption.TopDirectoryOnly));
+    }
+
+    [Fact]
+    public async Task UnavailableStartupLogDoesNotExportSourcePath()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateZeroByteClosedCaptureAsync();
+
+        CaptureExportResult result = new CaptureExporter().Export(
+            capture,
+            ExportContext(null),
+            temporary.Path);
+
+        string startup = await File.ReadAllTextAsync(
+            Path.Combine(result.CaptureDirectory, "startup.log"));
+        Assert.Contains("unavailable", startup, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(temporary.Path, startup, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task InvalidArchiveIsNotPublishedAndRawDirectoryRemains()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateSingleChunkClosedCaptureAsync();
+        CaptureExporter exporter = new(new InvalidArchiveWriter());
+
+        Assert.Throws<InvalidDataException>(
+            () => exporter.Export(
+                capture,
+                ExportContext(null),
+                temporary.Path));
+
+        string captureDirectory = Assert.Single(
+            Directory.GetDirectories(
+                temporary.Path,
+                "capture-*",
+                SearchOption.TopDirectoryOnly));
+        Assert.Equal(
+            new byte[] { 9, 8, 7 },
+            await File.ReadAllBytesAsync(
+                Path.Combine(captureDirectory, "rx.bin")));
+        Assert.Empty(
+            Directory.GetFiles(
+                temporary.Path,
+                "capture-*.zip",
+                SearchOption.TopDirectoryOnly));
+        Assert.Empty(
+            Directory.GetFiles(
+                temporary.Path,
+                ".*.staging-*.zip",
+                SearchOption.TopDirectoryOnly));
+    }
+
+    [Fact]
+    public async Task ReportedZipHashMatchesPublishedArchive()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateZeroByteClosedCaptureAsync();
+
+        CaptureExportResult result = new CaptureExporter().Export(
+            capture,
+            ExportContext(null),
+            temporary.Path);
+
+        await using FileStream zipStream = File.OpenRead(result.ZipPath);
+        Assert.Equal(
+            await SHA256.HashDataAsync(zipStream),
+            Convert.FromHexString(result.ZipSha256));
+    }
+
     private static async Task<PassiveCaptureResult> CreateZeroByteClosedCaptureAsync()
     {
         ScriptedNativeApi native = NativeWithDevices(ExactDevice());
@@ -608,7 +860,7 @@ public sealed class PassiveD2xxAcceptanceTests
         return capture;
     }
 
-    private static CaptureExportContext ExportContext(string startupPath) =>
+    private static CaptureExportContext ExportContext(string? startupPath) =>
         new(
             "MyPlasm Inspector",
             "1.0.0",
@@ -657,10 +909,13 @@ public sealed class PassiveD2xxAcceptanceTests
     {
         public DateTimeOffset UtcNow { get; private set; } = new(2026, 7, 23, 12, 0, 0, TimeSpan.Zero);
 
+        public TimeSpan Elapsed { get; private set; }
+
         public ValueTask DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             UtcNow += delay;
+            Elapsed += delay;
             return ValueTask.CompletedTask;
         }
     }
@@ -668,6 +923,8 @@ public sealed class PassiveD2xxAcceptanceTests
     private sealed class BlockingClock : IPassiveCaptureClock
     {
         public DateTimeOffset UtcNow { get; } = new(2026, 7, 23, 12, 0, 0, TimeSpan.Zero);
+
+        public TimeSpan Elapsed => TimeSpan.Zero;
 
         public TaskCompletionSource DelayEntered { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -700,6 +957,10 @@ public sealed class PassiveD2xxAcceptanceTests
         public int QueueCalls { get; private set; }
 
         public int ReadCalls { get; private set; }
+
+        public Exception? QueueException { get; set; }
+
+        public List<uint> ReadRequestedCounts { get; } = [];
 
         public D2xxStatus GetLibraryVersion(out uint version)
         {
@@ -744,6 +1005,11 @@ public sealed class PassiveD2xxAcceptanceTests
         public D2xxStatus GetQueueStatus(nint handle, out uint bytesAvailable)
         {
             QueueCalls++;
+            if (QueueException is not null)
+            {
+                throw QueueException;
+            }
+
             (D2xxStatus status, uint depth) = QueueResults.Count > 0
                 ? QueueResults.Dequeue()
                 : (D2xxStatus.Ok, 0);
@@ -754,6 +1020,7 @@ public sealed class PassiveD2xxAcceptanceTests
         public D2xxStatus Read(nint handle, byte[] buffer, uint requestedCount, out uint returnedCount)
         {
             ReadCalls++;
+            ReadRequestedCounts.Add(requestedCount);
             (D2xxStatus status, byte[] bytes, uint? returnedOverride) = ReadResults.Count > 0
                 ? ReadResults.Dequeue()
                 : (D2xxStatus.Ok, [], 0);
@@ -787,5 +1054,20 @@ public sealed class PassiveD2xxAcceptanceTests
     {
         public void CreateFromDirectory(string sourceDirectory, string destinationZipPath) =>
             throw new IOException("Synthetic archive failure.");
+    }
+
+    private sealed class InvalidArchiveWriter : ICaptureArchiveWriter
+    {
+        public void CreateFromDirectory(
+            string sourceDirectory,
+            string destinationZipPath)
+        {
+            using ZipArchive archive = ZipFile.Open(
+                destinationZipPath,
+                ZipArchiveMode.Create);
+            ZipArchiveEntry entry = archive.CreateEntry("unexpected.txt");
+            using StreamWriter writer = new(entry.Open());
+            writer.Write("synthetic invalid archive");
+        }
     }
 }

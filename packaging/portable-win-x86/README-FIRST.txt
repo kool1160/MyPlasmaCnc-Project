@@ -7,7 +7,8 @@ MYPLASM INSPECTOR - PORTABLE WINDOWS PACKAGE
 
 If the app exits unexpectedly, use "Launch MyPlasm Inspector Diagnostic.bat".
 It writes launcher.log in the extracted package, reports the application exit
-code, opens the startup-log folder, and keeps its message window open.
+code, opens the startup-log folder when available, and keeps its message window
+open.
 
 No .NET runtime or SDK is needed on the plasma-table computer. This is a
 self-contained 32-bit Windows application.
@@ -24,14 +25,14 @@ administrator account; starting this package normally does not.
 
 SAFETY
 ------
-This build is PASSIVE RECEIVE ONLY — NO CONTROLLER COMMANDS OR TRANSMITS.
+This build is PASSIVE RECEIVE ONLY - NO CONTROLLER COMMANDS OR TRANSMITS.
 It can list FTDI metadata and identify a device whose description exactly
-matches "MyPlasm CNC". After explicit operator confirmation it can open only
-the exact enumerated serial and record bytes already queued by D2XX. It cannot
-send controller bytes, move axes, change outputs, alter EEPROM, change baud
-rate or bit mode, or update firmware.
+matches "MyPlasm CNC". After explicit confirmation, it can open only the exact
+unique serial returned by enumeration, query documented FTDI metadata, poll
+the receive queue, and preserve already-queued bytes. It cannot send controller
+bytes, move axes, change outputs, alter EEPROM, change baud rate or bit mode,
+reset or purge the device, or update firmware.
 
-In the app, choose "D2XX inspection transport" and then enumerate devices.
 The first window deliberately creates no transport and performs no enumeration.
 Use "Run Fake Enumeration" for an offline demonstration or "Inspect D2XX
 Devices" to explicitly start metadata-only D2XX inspection. Software rendering
@@ -39,13 +40,24 @@ is the safe default. The optional --hardware-rendering command-line argument is
 only for comparison during troubleshooting.
 
 For passive receive, inspect devices, confirm there is exactly one exact
-"MyPlasm CNC" candidate, then choose "Open Exact MyPlasm Device". Use "Start
-Passive Capture" and "Stop Capture"; closing the device or window also stops
-and waits for capture before closing. Captures can be exported after the device
-is closed. A zero-byte capture is valid evidence.
+"MyPlasm CNC" candidate, and click "Open Exact MyPlasm Device". Start and stop
+capture manually. A capture stops after 5 minutes, 64 MiB, or 100,000 events,
+whichever occurs first. Close the device before export. If native close fails,
+the app refuses another open or enumeration until it is restarted.
 
 Startup logs are written to:
 %LOCALAPPDATA%\MyPlasm Inspector\Logs\
+
+Capture evidence is written to:
+%LOCALAPPDATA%\MyPlasm Inspector\Captures\
+
+The package includes package-manifest.json with the exact source commit,
+application hash, safety scope, and verified D2XX architecture, version, size,
+and SHA-256. Do not edit or remove that manifest.
+
+Startup file logging is best effort and can never block the application from
+starting. If the first window says file logging is unavailable, diagnostics
+remain in a bounded application-session buffer and Windows Trace output.
 
 If the launcher reports a missing file, extract the full ZIP again; do not run
 the application from inside the ZIP viewer.

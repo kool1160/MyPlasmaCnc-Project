@@ -25,24 +25,32 @@ public sealed class PassiveCaptureResult
     internal PassiveCaptureResult(
         DateTimeOffset startedUtc,
         DateTimeOffset stoppedUtc,
+        TimeSpan elapsedDuration,
         string stopReason,
         IReadOnlyList<PassiveCaptureChunk> chunks,
         IReadOnlyList<PassiveSessionEvent> events,
         FtdiDeviceInfo selectedDevice,
-        string? driverVersion)
+        string? driverVersion,
+        long captureByteLimit,
+        int captureEventLimit)
     {
         StartedUtc = startedUtc;
         StoppedUtc = stoppedUtc;
+        ElapsedDuration = elapsedDuration;
         StopReason = stopReason;
         Chunks = chunks;
         Events = events;
         SelectedDevice = selectedDevice;
         DriverVersion = driverVersion;
+        CaptureByteLimit = captureByteLimit;
+        CaptureEventLimit = captureEventLimit;
     }
 
     public DateTimeOffset StartedUtc { get; }
 
     public DateTimeOffset StoppedUtc { get; }
+
+    public TimeSpan ElapsedDuration { get; }
 
     public DateTimeOffset? OpenedUtc { get; internal set; }
 
@@ -60,7 +68,13 @@ public sealed class PassiveCaptureResult
 
     public D2xxStatus? CloseStatus { get; internal set; }
 
-    public int TotalBytes => Chunks.Sum(chunk => chunk.Bytes.Length);
+    public string? CloseFailure { get; internal set; }
+
+    public long CaptureByteLimit { get; }
+
+    public int CaptureEventLimit { get; }
+
+    public long TotalBytes => Chunks.Sum(chunk => (long)chunk.Bytes.Length);
 
     public int QueuePollCount => Events.Count(item => item.Operation == PassiveOperations.QueuePoll);
 
@@ -80,4 +94,5 @@ public static class PassiveOperations
     public const string Error = "error";
     public const string Disconnect = "disconnect";
     public const string Close = "close";
+    public const string Limit = "limit";
 }

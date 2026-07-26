@@ -10,7 +10,7 @@ public partial class App : Application
 
     public App()
     {
-        _startupLog = StartupLog.Create();
+        _startupLog = StartupLog.CreateSafe();
         _startupLog.Stage("App constructor entered.");
         DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -49,7 +49,7 @@ public partial class App : Application
         {
             _startupLog.Exception("Application startup", exception);
             MessageBox.Show(
-                $"MyPlasm Inspector could not start. See:{Environment.NewLine}{_startupLog.FilePath}",
+                $"MyPlasm Inspector could not start. Diagnostics:{Environment.NewLine}{_startupLog.DiagnosticLocation}",
                 "MyPlasm Inspector startup error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

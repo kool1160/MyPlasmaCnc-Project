@@ -1,6 +1,6 @@
 namespace MyPlasm.Inspector.Transport.D2xx;
 
-public interface ID2xxNativeApi
+internal interface ID2xxNativeApi
 {
     D2xxStatus GetLibraryVersion(out uint version);
 

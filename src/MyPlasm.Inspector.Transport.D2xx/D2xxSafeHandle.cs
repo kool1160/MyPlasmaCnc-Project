@@ -4,6 +4,7 @@ namespace MyPlasm.Inspector.Transport.D2xx;
 
 internal sealed class D2xxSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
+    private readonly object _closeGate = new();
     private readonly ID2xxNativeApi _nativeApi;
     private bool _closeAttempted;
 
@@ -16,33 +17,48 @@ internal sealed class D2xxSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 
     public D2xxStatus? CloseStatus { get; private set; }
 
+    public string? CloseFailure { get; private set; }
+
     public bool TryClose(out D2xxStatus status)
     {
-        if (_closeAttempted)
+        lock (_closeGate)
         {
-            status = CloseStatus ?? D2xxStatus.InvalidHandle;
+            status = CloseOnceNoThrow();
+            if (status == D2xxStatus.Ok && !IsInvalid)
+            {
+                SetHandleAsInvalid();
+            }
+
             return status == D2xxStatus.Ok;
         }
-
-        _closeAttempted = true;
-        status = _nativeApi.Close(handle);
-        CloseStatus = status;
-        if (status == D2xxStatus.Ok)
-        {
-            SetHandleAsInvalid();
-        }
-
-        return status == D2xxStatus.Ok;
     }
 
     protected override bool ReleaseHandle()
     {
-        if (!_closeAttempted)
+        lock (_closeGate)
         {
-            _closeAttempted = true;
-            CloseStatus = _nativeApi.Close(handle);
+            return CloseOnceNoThrow() == D2xxStatus.Ok;
+        }
+    }
+
+    private D2xxStatus CloseOnceNoThrow()
+    {
+        if (_closeAttempted)
+        {
+            return CloseStatus ?? D2xxStatus.InvalidHandle;
         }
 
-        return CloseStatus == D2xxStatus.Ok;
+        _closeAttempted = true;
+        try
+        {
+            CloseStatus = _nativeApi.Close(handle);
+        }
+        catch (Exception exception)
+        {
+            CloseStatus = D2xxStatus.OtherError;
+            CloseFailure = $"{exception.GetType().Name}: {exception.Message}";
+        }
+
+        return CloseStatus.Value;
     }
 }

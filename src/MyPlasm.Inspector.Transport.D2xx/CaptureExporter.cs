@@ -13,26 +13,51 @@ public sealed record CaptureExportContext(
     string OsVersion,
     string RuntimeVersion,
     string RenderingMode,
-    string D2xxDllPath,
+    string D2xxDllRelativePath,
     PeInspectionResult? DllInspection,
     string? D2xxLibraryVersion,
-    string StartupLogPath);
+    string? StartupLogPath);
 
-public sealed record CaptureExportResult(string CaptureDirectory, string ZipPath);
+public sealed record CaptureExportResult(
+    string CaptureDirectory,
+    string ZipPath,
+    string ZipSha256);
 
 public sealed class CaptureExporter
 {
-    private readonly ICaptureArchiveWriter _archiveWriter;
+    private static readonly string[] EvidenceFileNames =
+    [
+        "events.jsonl",
+        "report.txt",
+        "rx-hex.txt",
+        "rx.bin",
+        "session.json",
+        "startup.log"
+    ];
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions DocumentJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
     };
 
-    public CaptureExporter(ICaptureArchiveWriter? archiveWriter = null)
+    private static readonly JsonSerializerOptions JsonLineOptions = new()
     {
-        _archiveWriter = archiveWriter ?? new ZipCaptureArchiveWriter();
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
+    private readonly ICaptureArchiveWriter _archiveWriter;
+
+    public CaptureExporter()
+        : this(new ZipCaptureArchiveWriter())
+    {
+    }
+
+    internal CaptureExporter(ICaptureArchiveWriter archiveWriter)
+    {
+        _archiveWriter =
+            archiveWriter ?? throw new ArgumentNullException(nameof(archiveWriter));
     }
 
     public CaptureExportResult Export(
@@ -44,48 +69,50 @@ public sealed class CaptureExporter
         ArgumentNullException.ThrowIfNull(context);
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationRoot);
 
-        string folder = Path.Combine(
-            Path.GetFullPath(destinationRoot),
-            $"capture-{capture.StartedUtc:yyyyMMdd-HHmmss-fff}-{Guid.NewGuid():N}");
+        _ = NormalizeRelativeEvidencePath(context.D2xxDllRelativePath);
+        string root = Path.GetFullPath(destinationRoot);
+        Directory.CreateDirectory(root);
+        string exportId =
+            $"capture-{capture.StartedUtc:yyyyMMdd-HHmmss-fff}-{Guid.NewGuid():N}";
+        string folder = Path.Combine(root, exportId);
+        string zipPath = folder + ".zip";
+        string stagedZipPath =
+            Path.Combine(root, $".{exportId}.staging-{Guid.NewGuid():N}.zip");
         Directory.CreateDirectory(folder);
 
-        // Write raw evidence first. If any later export stage fails, this directory
-        // and the bytes already written are deliberately retained.
-        byte[] raw = capture.Chunks.SelectMany(chunk => chunk.Bytes).ToArray();
-        WriteBytes(folder, "rx.bin", raw);
-        WriteText(folder, "rx-hex.txt", FormatHex(raw));
-
-        CaptureSessionDocument session = CreateSessionDocument(capture, context);
-        WriteText(folder, "session.json", JsonSerializer.Serialize(session, JsonOptions));
-        WriteText(
-            folder,
-            "events.jsonl",
-            string.Join(
-                Environment.NewLine,
-                capture.Events.Select(item => JsonSerializer.Serialize(item, JsonOptions))) + Environment.NewLine);
-        WriteText(folder, "report.txt", CreateReport(session));
-
-        if (File.Exists(context.StartupLogPath))
+        try
         {
-            File.Copy(context.StartupLogPath, Path.Combine(folder, "startup.log"), true);
+            // Raw bytes are written first and never reconstructed from formatted
+            // output. A later failure leaves this unique evidence directory intact.
+            WriteRawBytes(folder, capture.Chunks);
+            WriteHex(folder, capture.Chunks);
+
+            CaptureSessionDocument session =
+                CreateSessionDocument(capture, context);
+            WriteText(
+                folder,
+                "session.json",
+                JsonSerializer.Serialize(session, DocumentJsonOptions));
+            WriteEvents(folder, capture.Events);
+            WriteText(folder, "report.txt", CreateReport(session));
+            CopyStartupLogOrWriteDiagnostic(folder, context.StartupLogPath);
+            WriteHashManifest(folder);
+
+            _archiveWriter.CreateFromDirectory(folder, stagedZipPath);
+            ValidateArchive(folder, stagedZipPath);
+            string zipSha256 = ComputeSha256(stagedZipPath);
+            File.Move(stagedZipPath, zipPath);
+
+            return new CaptureExportResult(
+                folder,
+                zipPath,
+                zipSha256);
         }
-        else
+        catch
         {
-            WriteText(folder, "startup.log", $"Startup log unavailable: {context.StartupLogPath}{Environment.NewLine}");
+            TryDeleteGeneratedStagingArchive(stagedZipPath, root);
+            throw;
         }
-
-        string[] evidenceFiles = Directory.GetFiles(folder)
-            .Where(path => !path.EndsWith("hashes.sha256", StringComparison.OrdinalIgnoreCase))
-            .OrderBy(Path.GetFileName, StringComparer.Ordinal)
-            .ToArray();
-        string manifest = string.Join(
-            Environment.NewLine,
-            evidenceFiles.Select(path => $"{ComputeSha256(path)}  {Path.GetFileName(path)}")) + Environment.NewLine;
-        WriteText(folder, "hashes.sha256", manifest);
-
-        string zipPath = folder + ".zip";
-        _archiveWriter.CreateFromDirectory(folder, zipPath);
-        return new CaptureExportResult(folder, zipPath);
     }
 
     private static CaptureSessionDocument CreateSessionDocument(
@@ -100,7 +127,7 @@ public sealed class CaptureExporter
             context.OsVersion,
             context.RuntimeVersion,
             context.RenderingMode,
-            context.D2xxDllPath,
+            NormalizeRelativeEvidencePath(context.D2xxDllRelativePath),
             context.DllInspection?.DllArchitecture.ToString() ?? "Unknown",
             context.DllInspection?.FileVersion ?? "Unknown",
             context.DllInspection?.Sha256 ?? "Unknown",
@@ -127,12 +154,15 @@ public sealed class CaptureExporter
             capture.StoppedUtc,
             capture.ClosedUtc,
             capture.StopReason,
-            capture.StoppedUtc - capture.StartedUtc,
+            capture.ElapsedDuration,
             capture.TotalBytes,
             capture.Chunks.Count,
             capture.QueuePollCount,
+            capture.CaptureByteLimit,
+            capture.CaptureEventLimit,
             capture.Errors,
             capture.CloseStatus?.ToString() ?? "Not closed",
+            capture.CloseFailure,
             0,
             0);
     }
@@ -141,51 +171,276 @@ public sealed class CaptureExporter
         $"""
         MYPLASM INSPECTOR PASSIVE RECEIVE EVIDENCE
         ==========================================
-        Selected device: {session.Description}
-        Serial: {session.SerialNumber}
+        Selected device: {SingleLine(session.Description)}
+        Serial: {SingleLine(session.SerialNumber)}
         Opened UTC: {session.OpenTimestampUtc:O}
         Capture started UTC: {session.CaptureStartTimestampUtc:O}
         Capture stopped UTC: {session.CaptureStopTimestampUtc:O}
         Closed UTC: {session.CloseTimestampUtc:O}
-        Stop reason: {session.StopReason}
+        Stop reason: {SingleLine(session.StopReason)}
         Duration: {session.Duration}
         Total received bytes: {session.TotalBytes}
         Read chunks: {session.ReadChunkCount}
         Queue polls: {session.QueuePollCount}
+        Capture byte limit: {session.CaptureByteLimit}
+        Capture event limit: {session.CaptureEventLimit}
         Last close status: {session.CloseStatus}
+        Close failure: {SingleLine(session.CloseFailure ?? "None")}
         Transmit count: 0
         Production allowlist count: 0 (empty)
         """;
 
-    private static string FormatHex(byte[] bytes)
+    private static void WriteRawBytes(
+        string folder,
+        IReadOnlyList<PassiveCaptureChunk> chunks)
     {
-        if (bytes.Length == 0)
+        using FileStream output = new(
+            Path.Combine(folder, "rx.bin"),
+            FileMode.CreateNew,
+            FileAccess.Write,
+            FileShare.Read);
+        foreach (PassiveCaptureChunk chunk in chunks)
         {
-            return "ZERO RECEIVED BYTES" + Environment.NewLine;
+            output.Write(chunk.Bytes);
         }
-
-        StringBuilder output = new();
-        for (int offset = 0; offset < bytes.Length; offset += 16)
-        {
-            ReadOnlySpan<byte> line = bytes.AsSpan(offset, Math.Min(16, bytes.Length - offset));
-            output.Append(offset.ToString("X8"));
-            output.Append("  ");
-            output.AppendLine(Convert.ToHexString(line).ToLowerInvariant());
-        }
-
-        return output.ToString();
     }
 
-    private static void WriteBytes(string folder, string name, byte[] bytes) =>
-        File.WriteAllBytes(Path.Combine(folder, name), bytes);
+    private static void WriteHex(
+        string folder,
+        IReadOnlyList<PassiveCaptureChunk> chunks)
+    {
+        using StreamWriter output = new(
+            new FileStream(
+                Path.Combine(folder, "rx-hex.txt"),
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.Read),
+            new UTF8Encoding(false));
+        long offset = 0;
+        byte[] line = new byte[16];
+        int lineLength = 0;
+        foreach (PassiveCaptureChunk chunk in chunks)
+        {
+            foreach (byte value in chunk.Bytes)
+            {
+                line[lineLength++] = value;
+                if (lineLength == line.Length)
+                {
+                    WriteHexLine(output, offset, line.AsSpan(0, lineLength));
+                    offset += lineLength;
+                    lineLength = 0;
+                }
+            }
+        }
 
-    private static void WriteText(string folder, string name, string contents) =>
-        File.WriteAllText(Path.Combine(folder, name), contents, new UTF8Encoding(false));
+        if (lineLength > 0)
+        {
+            WriteHexLine(output, offset, line.AsSpan(0, lineLength));
+        }
+        else if (offset == 0)
+        {
+            output.WriteLine("ZERO RECEIVED BYTES");
+        }
+    }
+
+    private static void WriteHexLine(
+        TextWriter output,
+        long offset,
+        ReadOnlySpan<byte> bytes)
+    {
+        output.Write(offset.ToString("X8"));
+        output.Write("  ");
+        output.WriteLine(Convert.ToHexString(bytes).ToLowerInvariant());
+    }
+
+    private static void WriteEvents(
+        string folder,
+        IReadOnlyList<PassiveSessionEvent> events)
+    {
+        using StreamWriter output = new(
+            new FileStream(
+                Path.Combine(folder, "events.jsonl"),
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.Read),
+            new UTF8Encoding(false));
+        foreach (PassiveSessionEvent item in events)
+        {
+            output.WriteLine(JsonSerializer.Serialize(item, JsonLineOptions));
+        }
+    }
+
+    private static void CopyStartupLogOrWriteDiagnostic(
+        string folder,
+        string? startupLogPath)
+    {
+        string destination = Path.Combine(folder, "startup.log");
+        if (string.IsNullOrWhiteSpace(startupLogPath))
+        {
+            WriteText(
+                folder,
+                "startup.log",
+                "Startup file logging was unavailable for this application session.");
+            return;
+        }
+
+        try
+        {
+            using FileStream source = new(
+                startupLogPath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            using FileStream output = new(
+                destination,
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.Read);
+            source.CopyTo(output);
+        }
+        catch (Exception exception)
+            when (exception is IOException or
+                UnauthorizedAccessException or
+                NotSupportedException or
+                ArgumentException)
+        {
+            WriteText(
+                folder,
+                "startup.log",
+                "Startup log copy unavailable: " +
+                $"{exception.GetType().Name}. The source path was not exported.");
+        }
+    }
+
+    private static void WriteHashManifest(string folder)
+    {
+        string manifest = string.Join(
+            "\n",
+            EvidenceFileNames.Select(
+                name => $"{ComputeSha256(Path.Combine(folder, name))}  {name}")) +
+            "\n";
+        WriteText(folder, "hashes.sha256", manifest);
+    }
+
+    private static void ValidateArchive(
+        string sourceDirectory,
+        string zipPath)
+    {
+        if (!File.Exists(zipPath) || new FileInfo(zipPath).Length == 0)
+        {
+            throw new InvalidDataException(
+                "The passive evidence ZIP is missing or empty.");
+        }
+
+        using ZipArchive archive = ZipFile.OpenRead(zipPath);
+        string[] expectedNames = EvidenceFileNames
+            .Append("hashes.sha256")
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToArray();
+        string[] actualNames = archive.Entries
+            .Select(entry => entry.FullName.Replace('\\', '/'))
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToArray();
+        if (!actualNames.SequenceEqual(expectedNames, StringComparer.Ordinal))
+        {
+            throw new InvalidDataException(
+                "The passive evidence ZIP does not contain the exact required file set.");
+        }
+
+        foreach (string name in expectedNames)
+        {
+            ZipArchiveEntry[] matches = archive.Entries
+                .Where(entry => string.Equals(
+                    entry.FullName.Replace('\\', '/'),
+                    name,
+                    StringComparison.Ordinal))
+                .ToArray();
+            if (matches.Length != 1)
+            {
+                throw new InvalidDataException(
+                    $"The passive evidence ZIP contains an ambiguous entry: {name}.");
+            }
+
+            string sourceHash = ComputeSha256(Path.Combine(sourceDirectory, name));
+            using Stream stream = matches[0].Open();
+            string archiveHash = Convert.ToHexString(SHA256.HashData(stream));
+            if (!string.Equals(sourceHash, archiveHash, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    $"The passive evidence ZIP hash does not match: {name}.");
+            }
+        }
+    }
+
+    private static string NormalizeRelativeEvidencePath(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        if (Path.IsPathRooted(path))
+        {
+            throw new ArgumentException(
+                "D2XX evidence path must be package-relative.",
+                nameof(path));
+        }
+
+        string normalized = path.Replace('\\', '/');
+        if (normalized.Split('/').Any(
+            part => part.Length == 0 || part is "." or ".."))
+        {
+            throw new ArgumentException(
+                "D2XX evidence path must be a safe package-relative path.",
+                nameof(path));
+        }
+
+        return normalized;
+    }
+
+    private static string SingleLine(string value) =>
+        value.Replace('\r', ' ').Replace('\n', ' ');
+
+    private static void WriteText(
+        string folder,
+        string name,
+        string contents) =>
+        File.WriteAllText(
+            Path.Combine(folder, name),
+            contents,
+            new UTF8Encoding(false));
 
     private static string ComputeSha256(string path)
     {
-        using FileStream stream = File.OpenRead(path);
+        using FileStream stream = new(
+            path,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read);
         return Convert.ToHexString(SHA256.HashData(stream));
+    }
+
+    private static void TryDeleteGeneratedStagingArchive(
+        string stagedZipPath,
+        string expectedRoot)
+    {
+        try
+        {
+            string fullStage = Path.GetFullPath(stagedZipPath);
+            string fullRoot = Path.GetFullPath(expectedRoot).TrimEnd(
+                Path.DirectorySeparatorChar,
+                Path.AltDirectorySeparatorChar);
+            if (fullStage.StartsWith(
+                    fullRoot + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase) &&
+                Path.GetFileName(fullStage).StartsWith(
+                    ".capture-",
+                    StringComparison.Ordinal) &&
+                File.Exists(fullStage))
+            {
+                File.Delete(fullStage);
+            }
+        }
+        catch
+        {
+            // The unique capture directory remains the authoritative evidence.
+        }
     }
 
     private sealed record SelectedDeviceDocument(
@@ -206,7 +461,7 @@ public sealed class CaptureExporter
         string OsVersion,
         string RuntimeVersion,
         string RenderingMode,
-        string D2xxDllPath,
+        string D2xxDllRelativePath,
         string DllPeArchitecture,
         string DllFileVersion,
         string DllSha256,
@@ -225,23 +480,30 @@ public sealed class CaptureExporter
         DateTimeOffset? CloseTimestampUtc,
         string StopReason,
         TimeSpan Duration,
-        int TotalBytes,
+        long TotalBytes,
         int ReadChunkCount,
         int QueuePollCount,
+        long CaptureByteLimit,
+        int CaptureEventLimit,
         IReadOnlyList<string> D2xxErrors,
         string CloseStatus,
+        string? CloseFailure,
         int TransmitCount,
         int ProductionAllowlistCount);
 }
 
-public interface ICaptureArchiveWriter
+internal interface ICaptureArchiveWriter
 {
-    void CreateFromDirectory(string sourceDirectory, string destinationZipPath);
+    void CreateFromDirectory(
+        string sourceDirectory,
+        string destinationZipPath);
 }
 
-public sealed class ZipCaptureArchiveWriter : ICaptureArchiveWriter
+internal sealed class ZipCaptureArchiveWriter : ICaptureArchiveWriter
 {
-    public void CreateFromDirectory(string sourceDirectory, string destinationZipPath) =>
+    public void CreateFromDirectory(
+        string sourceDirectory,
+        string destinationZipPath) =>
         ZipFile.CreateFromDirectory(
             sourceDirectory,
             destinationZipPath,

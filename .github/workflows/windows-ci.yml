@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-test-format:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -25,14 +25,18 @@ jobs:
         run: dotnet restore MyPlasm.Inspector.sln
 
       - name: Build Release
-        run: dotnet build MyPlasm.Inspector.sln -c Release --no-restore
+        run: dotnet build MyPlasm.Inspector.sln -c Release --no-restore -warnaserror
 
       - name: Run tests
-        run: dotnet test MyPlasm.Inspector.sln -c Release --no-build
+        run: dotnet test MyPlasm.Inspector.sln -c Release --no-build --logger "console;verbosity=normal"
 
-      - name: Audit production native symbols
+      - name: Audit passive production native symbols
         shell: pwsh
         run: ./scripts/Test-ProductionNativeSafety.ps1
+
+      - name: Run portable package transaction tests
+        shell: pwsh
+        run: ./tests/portable-package-tests.ps1
 
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore

@@ -38,17 +38,45 @@ public sealed class ProductionSafetyAuditTests
     }
 
     [Fact]
+    public void NativeInjectionAndProcessDetectorBypassAreNotPublicApis()
+    {
+        Assert.False(typeof(ID2xxNativeApi).IsPublic);
+        Assert.False(typeof(IOriginalMyPlasmProcessDetector).IsPublic);
+        Assert.DoesNotContain(
+            typeof(D2xxInspectionTransport).GetConstructors(),
+            constructor => constructor
+                .GetParameters()
+                .Any(parameter =>
+                    parameter.ParameterType == typeof(ID2xxNativeApi)));
+    }
+
+    [Fact]
     public void ProductionSourceContainsNoProhibitedNativeSymbol()
     {
         string root = FindRepositoryRoot();
-        string[] productionFiles = Directory
-            .GetFiles(Path.Combine(root, "src"), "*.cs", SearchOption.AllDirectories)
+        string[] productionFiles =
+        [
+            .. Directory.GetFiles(
+                Path.Combine(root, "src", "MyPlasm.Inspector.App"),
+                "*.cs",
+                SearchOption.AllDirectories),
+            .. Directory.GetFiles(
+                Path.Combine(root, "src", "MyPlasm.Inspector.Core"),
+                "*.cs",
+                SearchOption.AllDirectories),
+            .. Directory.GetFiles(
+                Path.Combine(root, "src", "MyPlasm.Inspector.Transport.D2xx"),
+                "*.cs",
+                SearchOption.AllDirectories)
+        ];
+        productionFiles = productionFiles
             .Where(path => !path.Contains(
                 $"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}",
                 StringComparison.OrdinalIgnoreCase))
             .Where(path => !path.Contains(
                 $"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}",
                 StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
         foreach (string file in productionFiles)

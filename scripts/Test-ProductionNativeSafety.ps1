@@ -3,7 +3,11 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
-$sourceRoot = Join-Path $repositoryRoot 'src'
+$sourceRoots = @(
+    (Join-Path $repositoryRoot 'src\MyPlasm.Inspector.App'),
+    (Join-Path $repositoryRoot 'src\MyPlasm.Inspector.Core'),
+    (Join-Path $repositoryRoot 'src\MyPlasm.Inspector.Transport.D2xx')
+)
 $prohibitedSymbols = @(
     'FT_Write',
     'FT_EE_',
@@ -19,7 +23,10 @@ $prohibitedSymbols = @(
     'FT_Firmware'
 )
 
-$sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File -Filter '*.cs' |
+$sourceFiles = $sourceRoots |
+    ForEach-Object {
+        Get-ChildItem -LiteralPath $_ -Recurse -File -Filter '*.cs'
+    } |
     Where-Object {
         $_.FullName -notmatch '[\\/](bin|obj)[\\/]'
     }

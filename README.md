@@ -43,16 +43,23 @@ See GitHub Issue #1: **Project 1: Build read-only MyPlasm Inspector for Windows*
 
 ## Current foundation
 
-The completed Issue #1 foundation slices contain:
+The current bounded Issue #1 slices contain:
 
 - `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
 - `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
-- `MyPlasm.Inspector.Transport.D2xx` — enumeration plus operator-confirmed, passive-receive-only D2XX interop;
+- `MyPlasm.Inspector.Transport.D2xx` — handle-free enumeration plus a separate
+  operator-confirmed, passive-receive-only session;
 - `MyPlasm.Inspector.App` — a WPF shell with explicit fake and D2XX inspection modes;
-- `MyPlasm.Inspector.Tests` — offline fake-transport and safety-policy tests.
+- `MyPlasm.Inspector.Tests` — offline fake-transport, D2XX-enumeration, and
+  safety-policy tests;
 - `MyPlasm.Inspector.PeInspector` — local vendor-DLL architecture, version, and hash inspection.
 
-The production command allowlist remains empty because no controller request bytes are confirmed. D2XX enumeration does not open devices. After exactly one `MyPlasm CNC` device is enumerated, the operator can explicitly open its exact serial number and capture only bytes already waiting in the D2XX receive queue. The production native surface has no transmit or configuration-changing function.
+The production command allowlist remains empty because no controller request
+bytes are confirmed. Enumeration remains handle-free. After exactly one unique
+`MyPlasm CNC` candidate is found, an explicit operator action may open only its
+enumerated serial, query driver metadata, poll receive-queue depth, read
+already-queued bytes, and close. The native production surface contains no
+write, communication-configuration, reset, purge, EEPROM, or firmware function.
 
 ### Build and test
 
@@ -85,7 +92,8 @@ Use `--architecture x86` or `--architecture x64` to check a chosen application a
 ### Portable Windows package
 
 With an inspected, legally obtained x86 `ftd2xx.dll` staged at
-`native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It creates:
+`native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It
+creates:
 
 ```text
 artifacts/MyPlasmInspector-win-x86-passive-capture.zip
@@ -93,30 +101,112 @@ artifacts/MyPlasmInspector-win-x86-passive-capture.zip
 
 The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
 plasma-table PC, extract the complete archive, and double-click
-`Launch MyPlasm Inspector.bat`. No .NET SDK or runtime is required on that target
-PC. The FTDI driver is still required by Windows and may need administrator rights
-to install; launching the package does not. The first window uses software rendering
-and creates no transport until an operator clicks a manual enumeration button. If it
-exits unexpectedly, use `Launch MyPlasm Inspector Diagnostic.bat`; it writes
-`launcher.log` beside the app and opens `%LOCALAPPDATA%\MyPlasm Inspector\Logs`.
-See `native/README.md` and the packaged `README-FIRST.txt` for the safety setup and
-full instructions.
+`Launch MyPlasm Inspector.bat`. No .NET SDK or runtime is required on the
+target PC. The FTDI driver is still required by Windows and may need
+administrator rights to install; launching the package does not.
+
+The builder requires a clean Git worktree and accepts only the verified D2XX
+identity documented in this repository: x86, file version `3.01.19`, size
+`206144` bytes, and SHA-256
+`381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`.
+It publishes into a unique staging directory, writes
+`package-manifest.json`, reopens and validates the ZIP, then replaces the
+previous package with rollback protection. A failed build or validation leaves
+the previous verified package active.
+
+The first window uses software rendering and creates no transport until the
+operator clicks a manual enumeration button. If the application exits
+unexpectedly, use `Launch MyPlasm Inspector Diagnostic.bat`; it writes
+`launcher.log` beside the app and opens
+`%LOCALAPPDATA%\MyPlasm Inspector\Logs`. See `native/README.md` and the
+packaged `README-FIRST.txt` for the safety setup and complete instructions.
+Startup file logging is best effort and cannot prevent the application from
+starting. If persistent logging is unavailable, the first window reports that
+diagnostics are retained in a bounded application-session buffer and Trace.
 
 ### Passive receive capture
 
-Passive receive is a separate, operator-confirmed action after D2XX enumeration.
-The application rejects unrelated, missing, duplicate, ambiguous, or already-open
-devices and refuses to open while the original MyPlasm application is running.
-`Start Passive Capture` runs off the WPF thread; `Stop Capture`, `Close Device`,
-and window close cancel and await an active capture before attempting native
-close. The default duration is 30 seconds and the hard maximum is 5 minutes.
+Passive receive is never automatic. The operator must run D2XX inspection,
+confirm the isolated hardware state, and explicitly open the one exact unique
+candidate. The original MyPlasm application must not be running. Capture is
+bounded by duration (five minutes), retained bytes (64 MiB), and event count
+(100,000), and it uses monotonic elapsed time.
 
-Completed zero-byte and nonzero captures can be exported beneath
-`%LOCALAPPDATA%\MyPlasm Inspector\Captures\`. Each retained capture directory and
-ZIP contains `session.json`, `events.jsonl`, `rx.bin`, `rx-hex.txt`, `report.txt`,
-`hashes.sha256`, and `startup.log`. Transmit count and production allowlist count
-are fixed at zero.
+Stop, close, and window close await active capture work before native close. A
+failed native close is terminal for that process: the app reports the
+unconfirmed state and refuses another open or enumeration until restart.
+
+Exports under `%LOCALAPPDATA%\MyPlasm Inspector\Captures\` retain raw bytes,
+compact JSONL events, metadata, a readable report, startup diagnostics, and
+SHA-256 evidence. The ZIP is reopened and hash-validated before its unique
+final name is published. Export failure leaves the raw capture directory
+intact. Raw captures may contain private identifiers, machine state, and local
+paths in startup diagnostics; keep them outside Git and review before sharing.
 
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.
+
+## FTD2XX protocol recorder
+
+The repository also contains a bounded native reverse-engineering tool: a
+32-bit forwarding `ftd2xx.dll` that records calls made by the original
+32-bit MyPlasm application while forwarding them to a same-directory
+`ftd2xx_real.dll`.
+
+This recorder is not part of the replacement Inspector transport and does not
+generate, decode, filter, approve, or rewrite controller commands. It forwards
+only calls initiated by the original application. Because those vendor-originated
+calls may include motion or output commands, the first live startup-only capture
+requires the motor supply, plasma source, and torch-start connection to be
+disabled as documented.
+
+Supported build environment:
+
+- Windows with Visual Studio 2019 or 2022 C++ Build Tools;
+- CMake 3.21 or newer;
+- the Win32/x86 MSVC toolchain.
+
+Configure, build, and test:
+
+```powershell
+cmake -S tools/ftd2xx-protocol-recorder -B build/protocol-recorder -G "Visual Studio 17 2022" -A Win32
+cmake --build build/protocol-recorder --config Release
+ctest --test-dir build/protocol-recorder -C Release --output-on-failure
+```
+
+No vendor executable, DLL, driver, firmware, controller, or plasma table is
+needed for these tests. Capture writes are serialized and physically flushed
+only at a 64 KiB threshold, a one-second threshold, or after `FT_Close`; an
+abnormal termination can therefore lose the final buffered records. Installer
+and restoration rollback use verified transaction copies and preserve
+unexpected files under unique quarantine names. See
+[docs/protocol-recorder.md](docs/protocol-recorder.md) for the architecture,
+log schema, transactional installation and restoration, and the required first
+live capture procedure.
+
+## Offline protocol analyzer
+
+The .NET 8 analyzer validates and structurally summarizes recorder
+`traffic.jsonl` files without loading D2XX, accessing hardware, replaying
+packets, or assigning packet meaning:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- analyze `
+  --input "C:\PrivateEvidence\traffic.jsonl" `
+  --output "C:\PrivateEvidence\analysis" `
+  --expected-sha256 "<64-character capture SHA-256>"
+```
+
+It streams large captures, fails closed on malformed or inconsistent evidence,
+uses a documented FIFO write/read pairing rule per open handle, and produces
+deterministic JSON, Markdown, CSV, variability, and SHA-256 reports. Default
+reports exclude raw payloads, pointer values, controller selectors, recorder
+session identifiers, and local directory paths. Before reading the capture, it
+rejects any normalized or link-resolved collision between the input evidence
+and a report destination. `--overwrite` never permits replacing the input.
+
+Raw captures and generated private evidence must remain outside Git. Structural
+fingerprints and timing do not establish packet meaning or command safety. See
+[docs/protocol-analysis.md](docs/protocol-analysis.md) for validation rules,
+outputs, privacy handling, exit codes, and limitations.

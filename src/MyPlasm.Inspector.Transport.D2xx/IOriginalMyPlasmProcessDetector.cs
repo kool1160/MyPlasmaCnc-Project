@@ -2,12 +2,12 @@ using System.Diagnostics;
 
 namespace MyPlasm.Inspector.Transport.D2xx;
 
-public interface IOriginalMyPlasmProcessDetector
+internal interface IOriginalMyPlasmProcessDetector
 {
     bool IsRunning();
 }
 
-public sealed class OriginalMyPlasmProcessDetector : IOriginalMyPlasmProcessDetector
+internal sealed class OriginalMyPlasmProcessDetector : IOriginalMyPlasmProcessDetector
 {
     public bool IsRunning()
     {

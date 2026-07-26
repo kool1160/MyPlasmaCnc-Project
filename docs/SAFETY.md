@@ -67,60 +67,94 @@ The application fails closed:
 
 ## D2XX enumeration implementation status
 
-- `D2xxInspectionTransport` performs DLL inspection, enumeration, library
-  metadata, and exact-candidate discovery without opening a device.
+- `D2xxInspectionTransport` keeps enumeration handle-free through
+  `FT_CreateDeviceInfoList`, `FT_GetDeviceInfoList`, and
+  `FT_GetLibraryVersion`.
 - Its application-facing `IControllerTransport` open, read, and write methods
-  remain non-functional. Operator-confirmed passive work uses the separate
-  `PassiveD2xxSession`.
-- Driver version is queried only after a successful explicit session open.
-- Missing DLL, PE architecture mismatch, load failure, driver/device absence,
-  and duplicate identifiers produce diagnostics without opening a device.
+  remain non-functional and throw `NotSupportedException`.
+- A separate operator-confirmed session can use only `FT_OpenEx` with the exact
+  enumerated serial, `FT_GetDriverVersion`, `FT_GetQueueStatus`, `FT_Read`, and
+  `FT_Close`.
+- Native injection is internal to the transport assembly and its test friend;
+  application callers cannot supply an arbitrary native API or serial.
+- Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
+- The production native loader centralizes exactly eight required passive
+  export names. Automated tests reject any compiled `FT_Write`, configuration,
+  bit-mode, baud-rate, reset, purge, EEPROM, or firmware export reference.
+- Inconsistent native device counts fail closed without returning a partial
+  device list, and a disposed inspection transport cannot reload or enumerate.
 - The production command allowlist remains empty.
 
 ## Portable package safety status
 
-- The self-contained `win-x86` package includes an inspected local FTDI DLL but
-  remains subject to the same empty production command allowlist.
-- Its D2XX inspection mode does not open automatically. A separate confirmed
-  passive session can open the unique exact serial and read queued receive
-  bytes, but cannot transmit, alter EEPROM, change communication configuration,
-  reset, purge, or update firmware.
-- The launcher only verifies package files and starts the application; it does not
-  request elevation or communicate with a controller.
-- The packaged `README-FIRST.txt` repeats the required first-live-validation power
-  isolation: 24 V controller power only, with motor power, plasma source, and
-  torch-start circuit disabled.
+- The self-contained `win-x86` package includes an inspected local FTDI DLL
+  but remains subject to the same empty production command allowlist.
+- Its D2XX inspection mode remains handle-free. A separately confirmed passive
+  session can open the unique exact candidate and read queued bytes, but it has
+  no controller-write, EEPROM, configuration, reset, purge, or firmware path.
+- The launcher only verifies package files and starts the application; it does
+  not request elevation or communicate with a controller.
+- The packaged `README-FIRST.txt` repeats the required first-live-validation
+  power isolation: 24 V controller power only, with motor power, plasma source,
+  and torch-start circuit disabled.
 
 ## Startup-safe diagnostic package
 
 - WPF software rendering is forced before `MainWindow` construction unless the
   operator explicitly passes `--hardware-rendering` for comparison.
-- The first window creates no fake or D2XX transport, inspects no DLL, enumerates
-  no devices, and cannot reach a controller open, read, or write operation.
+- The first window creates no fake or D2XX transport, inspects no DLL,
+  enumerates no devices, and cannot reach a controller open, read, or write
+  operation.
 - Fake enumeration and D2XX metadata inspection each require a separate manual
   button click. D2XX native loading cannot begin before that click.
-- Startup exceptions are written with stack traces to
-  `%LOCALAPPDATA%\MyPlasm Inspector\Logs\`.
+- Startup logging is non-throwing from the application's perspective.
+  Directory, append, locking, permissions, disk, environment-probe, DLL
+  presence, and DLL hashing failures cannot block startup or exception
+  handling.
+- When persistent logging is available, startup exceptions are written with
+  stack traces to `%LOCALAPPDATA%\MyPlasm Inspector\Logs\`.
+- The first persistent logging failure disables further file writes for that
+  logger instance. Later entries remain in a bounded in-memory buffer and
+  best-effort Trace output without recursive retry.
+- The first window clearly reports when startup file logging is unavailable.
 
-## Passive receive implementation status
+## Transactional portable-package status
 
-- D2XX enumeration remains handle-free and cannot automatically open a device.
-- Opening requires a separate operator confirmation, exactly one exact
-  `MyPlasm CNC` description match, a nonempty unique serial number, a unique
-  location, a not-already-open enumeration result, and confirmation that the
-  original MyPlasm process is not running.
-- The exact serial returned by enumeration is the only value passed to native
-  open. The application exposes no arbitrary serial input.
-- A dedicated safe handle records native close status. A failed close remains
-  visible as a failure and is not reported as successfully closed.
-- Passive capture uses only queue-status polling and receive reads. Every queue
-  poll, including zero depth, and every open, metadata, read, cancellation,
-  disconnect, error, and close operation is timestamped in the session evidence.
-- Capture work runs outside the WPF thread. Stop, device close, and window close
-  cancel and await active capture work before native close.
-- Receive counts are validated against both the request and buffer before bytes
-  are copied. Invalid counts stop safely and preserve earlier bytes.
-- Zero-byte captures are valid and exportable.
-- CI scans production source for prohibited native transmit, EEPROM,
-  communication-configuration, reset, purge, and firmware entry points.
-- The production command allowlist and transmit count remain fixed at zero.
+- The package builder accepts only the confirmed x86 D2XX DLL with file version
+  `3.01.19`, size `206144` bytes, and the documented SHA-256.
+- Packaging requires a clean Git worktree and records the exact source commit,
+  application hash, and D2XX evidence in `package-manifest.json`.
+- Publish, template copy, PE checks, evidence checks, manifest creation, and ZIP
+  creation occur in a unique staging directory.
+- The staged ZIP is reopened and every required entry, safe relative path,
+  application hash, DLL hash/size, and manifest field is validated before the
+  final package changes.
+- A prior package directory and ZIP are validated as a pair. Ambiguous states
+  are refused. Publication failures restore the prior pair and preserve failed
+  replacement evidence in quarantine.
+
+## Passive receive safety status
+
+- Startup, fake enumeration, and D2XX enumeration still create no device
+  handle automatically.
+- Opening requires exactly one exact `MyPlasm CNC` description, a nonempty
+  serial, no duplicate serial or available location, a not-already-open
+  enumeration result, an explicit operator confirmation, and no running
+  `MyPlasmCNC` process.
+- Only the enumerated serial reaches `FT_OpenEx`; there is no arbitrary serial
+  input and no public native-injection surface.
+- Capture is limited to five minutes, 64 MiB of retained bytes, and 100,000
+  capture events. Elapsed duration uses a monotonic clock.
+- Queue/read counts are validated before bytes are retained. Zero queue depth
+  never calls read. Native exceptions and invalid counts stop the capture while
+  preserving prior evidence.
+- Stop, close, and window close cancel and await capture before native close.
+  Close is attempted exactly once and cannot be suppressed by cancellation.
+- A failed or exceptional native close is recorded as unresolved. No later
+  open or enumeration is allowed in that process.
+- Raw bytes and events are streamed to unique export files. JSONL contains one
+  compact object per line. A staged ZIP is reopened and every entry hash is
+  compared with its source before the final ZIP name is published.
+- Export failure preserves the unique raw evidence directory. Local D2XX source
+  paths are not written to structured metadata.
+- Transmit count and production allowlist count remain fixed at zero.

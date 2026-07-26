@@ -10,15 +10,17 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
     private readonly List<D2xxDiagnostic> _diagnostics = [];
     private readonly Architecture? _applicationArchitecture;
+    private readonly SemaphoreSlim _disposeGate = new(1, 1);
     private readonly PeFileInspector _peInspector;
     private readonly string? _libraryPath;
     private ID2xxNativeApi? _nativeApi;
+    private bool _disposed;
     private bool _ownsNativeApi;
     private IReadOnlyList<FtdiDeviceInfo> _lastDevices = [];
     private bool _enumerationSucceeded;
     private PassiveD2xxSession? _activeSession;
 
-    public D2xxInspectionTransport(ID2xxNativeApi nativeApi)
+    internal D2xxInspectionTransport(ID2xxNativeApi nativeApi)
     {
         _nativeApi = nativeApi ?? throw new ArgumentNullException(nameof(nativeApi));
         _peInspector = new PeFileInspector();
@@ -35,7 +37,9 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         _applicationArchitecture = applicationArchitecture;
     }
 
-    public bool IsOpen => _activeSession?.IsOpen == true;
+    public bool IsOpen =>
+        _activeSession?.IsOpen == true ||
+        _activeSession?.HasUnresolvedCloseFailure == true;
 
     public string? LibraryVersion { get; private set; }
 
@@ -49,10 +53,15 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     {
         get
         {
+            if (_disposed || IsOpen)
+            {
+                return false;
+            }
+
             try
             {
                 _ = SelectExactCandidate();
-                return !IsOpen;
+                return true;
             }
             catch (InvalidOperationException)
             {
@@ -67,10 +76,12 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     public ValueTask<IReadOnlyList<FtdiDeviceInfo>> EnumerateDevicesAsync(
         CancellationToken cancellationToken = default)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         cancellationToken.ThrowIfCancellationRequested();
         if (IsOpen)
         {
-            throw new InvalidOperationException("Enumeration cannot replace device state while a passive session is open.");
+            throw new InvalidOperationException(
+                "Enumeration cannot replace device state while a passive session is open or its close is unresolved.");
         }
 
         _diagnostics.Clear();
@@ -78,85 +89,107 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         _lastDevices = [];
         LibraryVersion = null;
 
-        if (!TryEnsureNativeApi())
+        try
         {
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
+            if (!TryEnsureNativeApi())
+            {
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
 
-        D2xxStatus versionStatus = _nativeApi!.GetLibraryVersion(out uint rawLibraryVersion);
-        if (versionStatus == D2xxStatus.Ok)
-        {
-            LibraryVersion = D2xxVersion.Format(rawLibraryVersion);
-        }
-        else
-        {
-            AddStatusError("LIBRARY_VERSION_FAILED", "FT_GetLibraryVersion", versionStatus);
-        }
+            D2xxStatus versionStatus = _nativeApi!.GetLibraryVersion(out uint rawLibraryVersion);
+            if (versionStatus == D2xxStatus.Ok)
+            {
+                LibraryVersion = D2xxVersion.Format(rawLibraryVersion);
+            }
+            else
+            {
+                AddStatusError("LIBRARY_VERSION_FAILED", "FT_GetLibraryVersion", versionStatus);
+            }
 
-        D2xxStatus countStatus = _nativeApi.CreateDeviceInfoList(out uint deviceCount);
-        if (countStatus != D2xxStatus.Ok)
-        {
-            AddStatusError("DEVICE_LIST_CREATE_FAILED", "FT_CreateDeviceInfoList", countStatus);
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
+            D2xxStatus countStatus = _nativeApi.CreateDeviceInfoList(out uint deviceCount);
+            if (countStatus != D2xxStatus.Ok)
+            {
+                AddStatusError("DEVICE_LIST_CREATE_FAILED", "FT_CreateDeviceInfoList", countStatus);
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
 
-        if (deviceCount == 0)
-        {
-            _diagnostics.Add(new D2xxDiagnostic(
-                "NO_DEVICES",
-                D2xxDiagnosticSeverity.Warning,
-                "D2XX reported no devices. The driver may be absent, or no supported FTDI device is connected."));
+            if (deviceCount == 0)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "NO_DEVICES",
+                    D2xxDiagnosticSeverity.Warning,
+                    "D2XX reported no devices. The driver may be absent, or no supported FTDI device is connected."));
+                AddDriverVersionDiagnostic();
+                _enumerationSucceeded = true;
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (deviceCount > MaximumDeviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_INVALID",
+                    D2xxDiagnosticSeverity.Error,
+                    $"D2XX reported {deviceCount} devices, above the safety limit of {MaximumDeviceCount}."));
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            D2xxNativeDeviceInfo[] nativeDevices =
+                new D2xxNativeDeviceInfo[checked((int)deviceCount)];
+            uint returnedCount = deviceCount;
+            D2xxStatus listStatus = _nativeApi.GetDeviceInfoList(nativeDevices, ref returnedCount);
+            if (listStatus != D2xxStatus.Ok)
+            {
+                AddStatusError("DEVICE_LIST_READ_FAILED", "FT_GetDeviceInfoList", listStatus);
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (returnedCount > deviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_INCREASED",
+                    D2xxDiagnosticSeverity.Error,
+                    $"D2XX returned {returnedCount} entries after allocating for {deviceCount}; " +
+                    "the inconsistent result was discarded."));
+                return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            }
+
+            if (returnedCount != deviceCount)
+            {
+                _diagnostics.Add(new D2xxDiagnostic(
+                    "DEVICE_COUNT_CHANGED",
+                    D2xxDiagnosticSeverity.Warning,
+                    $"D2XX device count changed from {deviceCount} to {returnedCount} during enumeration."));
+            }
+
+            int mappedCount = checked((int)returnedCount);
+            List<FtdiDeviceInfo> devices = new(mappedCount);
+            for (int index = 0; index < mappedCount; index++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                D2xxNativeDeviceInfo native = nativeDevices[index];
+                devices.Add(MapDevice(checked((uint)index), native));
+            }
+
+            AddDuplicateDiagnostics(devices);
             AddDriverVersionDiagnostic();
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
+            _lastDevices = devices;
+            _enumerationSucceeded = true;
+            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>(devices);
         }
-
-        if (deviceCount > MaximumDeviceCount)
+        catch (Exception exception) when (
+            exception is DllNotFoundException or
+            EntryPointNotFoundException or
+            BadImageFormatException or
+            FileLoadException or
+            MarshalDirectiveException or
+            SEHException)
         {
             _diagnostics.Add(new D2xxDiagnostic(
-                "DEVICE_COUNT_INVALID",
+                "NATIVE_ENUMERATION_FAILED",
                 D2xxDiagnosticSeverity.Error,
-                $"D2XX reported {deviceCount} devices, above the safety limit of {MaximumDeviceCount}."));
+                $"D2XX enumeration failed safely without opening a device: {exception.Message}"));
             return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
         }
-
-        D2xxNativeDeviceInfo[] nativeDevices = new D2xxNativeDeviceInfo[checked((int)deviceCount)];
-        uint returnedCount = deviceCount;
-        D2xxStatus listStatus = _nativeApi.GetDeviceInfoList(nativeDevices, ref returnedCount);
-        if (listStatus != D2xxStatus.Ok)
-        {
-            AddStatusError("DEVICE_LIST_READ_FAILED", "FT_GetDeviceInfoList", listStatus);
-            return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>([]);
-        }
-
-        int mappedCount = Math.Min(nativeDevices.Length, checked((int)returnedCount));
-        List<FtdiDeviceInfo> devices = new(mappedCount);
-        for (int index = 0; index < mappedCount; index++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            D2xxNativeDeviceInfo native = nativeDevices[index];
-            devices.Add(MapDevice(checked((uint)index), native));
-        }
-
-        AddDuplicateDiagnostics(devices);
-        AddDriverVersionDiagnostic();
-        _lastDevices = devices;
-        _enumerationSucceeded = true;
-        return ValueTask.FromResult<IReadOnlyList<FtdiDeviceInfo>>(devices);
-    }
-
-    public PassiveD2xxSession CreatePassiveSession(
-        IOriginalMyPlasmProcessDetector processDetector,
-        IPassiveCaptureClock? clock = null)
-    {
-        ArgumentNullException.ThrowIfNull(processDetector);
-        if (_activeSession?.IsOpen == true)
-        {
-            throw new InvalidOperationException("A passive D2XX session is already open.");
-        }
-
-        FtdiDeviceInfo candidate = SelectExactCandidate();
-        _activeSession = new PassiveD2xxSession(_nativeApi!, candidate, processDetector, clock);
-        return _activeSession;
     }
 
     public ValueTask OpenAsync(string serialNumber, CancellationToken cancellationToken = default) =>
@@ -175,45 +208,89 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         CancellationToken cancellationToken = default) =>
         throw EnumerationOnlyException();
 
+    public PassiveD2xxSession CreatePassiveSession() =>
+        CreatePassiveSession(new OriginalMyPlasmProcessDetector());
+
+    internal PassiveD2xxSession CreatePassiveSession(
+        IOriginalMyPlasmProcessDetector processDetector,
+        IPassiveCaptureClock? clock = null)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(processDetector);
+        if (IsOpen)
+        {
+            throw new InvalidOperationException(
+                "A passive D2XX session is already open or its close is unresolved.");
+        }
+
+        FtdiDeviceInfo candidate = SelectExactCandidate();
+        _activeSession = new PassiveD2xxSession(
+            _nativeApi!,
+            candidate,
+            processDetector,
+            clock);
+        return _activeSession;
+    }
+
     public async ValueTask DisposeAsync()
     {
-        if (_activeSession is not null)
+        await _disposeGate.WaitAsync().ConfigureAwait(false);
+        try
         {
-            await _activeSession.DisposeAsync();
-            _activeSession = null;
-        }
+            if (_disposed)
+            {
+                return;
+            }
 
-        if (_ownsNativeApi && _nativeApi is IDisposable disposable)
+            _disposed = true;
+            if (_activeSession is not null)
+            {
+                await _activeSession.DisposeAsync();
+                _activeSession = null;
+            }
+
+            if (_ownsNativeApi && _nativeApi is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _nativeApi = null;
+            _ownsNativeApi = false;
+        }
+        finally
         {
-            disposable.Dispose();
+            _disposeGate.Release();
         }
-
-        _nativeApi = null;
-        _ownsNativeApi = false;
     }
 
     private FtdiDeviceInfo SelectExactCandidate()
     {
         if (!_enumerationSucceeded || _nativeApi is null)
         {
-            throw new InvalidOperationException("Enumerate devices successfully before creating a passive session.");
+            throw new InvalidOperationException(
+                "Enumerate devices successfully before creating a passive session.");
         }
 
-        FtdiDeviceInfo[] candidates = _lastDevices.Where(device => device.IsMyPlasmController).ToArray();
+        FtdiDeviceInfo[] candidates = _lastDevices
+            .Where(device => device.IsMyPlasmController)
+            .ToArray();
         if (candidates.Length != 1)
         {
-            throw new InvalidOperationException("Exactly one MyPlasm CNC candidate is required.");
+            throw new InvalidOperationException(
+                "Exactly one MyPlasm CNC candidate is required.");
         }
 
         FtdiDeviceInfo candidate = candidates[0];
         if (string.IsNullOrWhiteSpace(candidate.SerialNumber))
         {
-            throw new InvalidOperationException("The exact candidate has no serial number.");
+            throw new InvalidOperationException(
+                "The exact candidate has no serial number.");
         }
 
         if (candidate.IsOpen)
         {
-            throw new InvalidOperationException("The exact candidate is already open.");
+            throw new InvalidOperationException(
+                "The exact candidate was already open during enumeration.");
         }
 
         bool duplicateSerial = _lastDevices
@@ -226,7 +303,8 @@ public sealed class D2xxInspectionTransport : IControllerTransport
             .Any(group => group.Count() > 1);
         if (duplicateSerial || duplicateLocation)
         {
-            throw new InvalidOperationException("Duplicate serial number or location ambiguity prevents opening.");
+            throw new InvalidOperationException(
+                "Duplicate serial number or location ambiguity prevents opening.");
         }
 
         return candidate;
@@ -312,8 +390,8 @@ public sealed class D2xxInspectionTransport : IControllerTransport
 
         return new FtdiDeviceInfo(
             index,
-            native.Description,
-            native.SerialNumber,
+            native.Description ?? string.Empty,
+            native.SerialNumber ?? string.Empty,
             FormatDeviceType(native.Type),
             vendorId,
             productId,
@@ -387,5 +465,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
     }
 
     private static NotSupportedException EnumerationOnlyException() =>
-        new("The D2XX inspection transport exposes enumeration only through IControllerTransport. Passive opening and reads require the dedicated session layer.");
+        new(
+            "The IControllerTransport surface remains enumeration-only. " +
+            "Passive open and receive require the dedicated operator-confirmed session.");
 }
