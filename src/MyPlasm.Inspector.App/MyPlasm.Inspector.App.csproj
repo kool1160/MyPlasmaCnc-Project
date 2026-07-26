@@ -5,7 +5,12 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MyPlasm Inspector</AssemblyName>
     <Platforms>AnyCPU;x86;x64</Platforms>
+    <MyPlasmSourceCommit Condition="'$(MyPlasmSourceCommit)' == ''">Unknown</MyPlasmSourceCommit>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="MyPlasmSourceCommit"
+                      Value="$(MyPlasmSourceCommit)" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyPlasm.Inspector.Core\MyPlasm.Inspector.Core.csproj" />
     <ProjectReference Include="..\MyPlasm.Inspector.Transport.D2xx\MyPlasm.Inspector.Transport.D2xx.csproj" />

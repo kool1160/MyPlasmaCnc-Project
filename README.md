@@ -128,17 +128,22 @@ diagnostics are retained in a bounded application-session buffer and Trace.
 
 Passive receive is never automatic. The operator must run D2XX inspection,
 confirm the isolated hardware state, and explicitly open the one exact unique
-candidate. The original MyPlasm application must not be running. Capture is
-bounded by duration (five minutes), retained bytes (64 MiB), and event count
-(100,000), and it uses monotonic elapsed time.
+candidate. Its serial and nonzero location identifier must both be present and
+unambiguous. The original MyPlasm application must not be running. If a failed
+`FT_OpenEx` unexpectedly returns a native handle, the Inspector owns and closes
+that handle exactly once; unresolved cleanup blocks reuse until restart.
+Capture is bounded by duration (five minutes), retained bytes (64 MiB), event
+count (100,000), and receive chunks (16,384), and it uses monotonic elapsed
+time.
 
 Stop, close, and window close await active capture work before native close. A
 failed native close is terminal for that process: the app reports the
 unconfirmed state and refuses another open or enumeration until restart.
 
 Exports under `%LOCALAPPDATA%\MyPlasm Inspector\Captures\` retain raw bytes,
-compact JSONL events, metadata, a readable report, startup diagnostics, and
-SHA-256 evidence. The ZIP is reopened and hash-validated before its unique
+compact JSONL events with unique contiguous sequence numbers, metadata, the
+portable application's source commit, a readable report, startup diagnostics,
+and SHA-256 evidence. The ZIP is reopened and hash-validated before its unique
 final name is published. Export failure leaves the raw capture directory
 intact. Raw captures may contain private identifiers, machine state, and local
 paths in startup diagnostics; keep them outside Git and review before sharing.

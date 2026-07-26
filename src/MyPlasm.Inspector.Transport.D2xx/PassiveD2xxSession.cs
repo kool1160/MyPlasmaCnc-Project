@@ -119,8 +119,10 @@ public sealed class PassiveD2xxSession : IAsyncDisposable
                     : $"FT_OpenEx returned {openStatus}.");
             if (openStatus != D2xxStatus.Ok)
             {
+                string cleanup = CloseUnexpectedFailedOpenHandle(rawHandle);
                 return ValueTask.FromException(
-                    new InvalidOperationException($"FT_OpenEx failed: {openStatus}."));
+                    new InvalidOperationException(
+                        $"FT_OpenEx failed: {openStatus}.{cleanup}"));
             }
 
             if (rawHandle == 0 || rawHandle == -1)
@@ -363,6 +365,13 @@ public sealed class PassiveD2xxSession : IAsyncDisposable
                 "The exact candidate has no serial number.");
         }
 
+        if (!SelectedDevice.LocationId.HasValue ||
+            SelectedDevice.LocationId.Value == 0)
+        {
+            throw new InvalidOperationException(
+                "The exact candidate has no nonzero location identifier.");
+        }
+
         if (SelectedDevice.IsOpen)
         {
             throw new InvalidOperationException(
@@ -393,15 +402,6 @@ public sealed class PassiveD2xxSession : IAsyncDisposable
         D2xxStatus status = D2xxStatus.Ok,
         string? error = null)
     {
-        PassiveSessionEvent item = new(
-            _clock.UtcNow,
-            operation,
-            queueDepth,
-            requested,
-            returned,
-            status,
-            _clock.Elapsed - _sessionStartedElapsed,
-            error);
         lock (_eventGate)
         {
             if (_events.Count >= MaximumRetainedEvents)
@@ -410,8 +410,51 @@ public sealed class PassiveD2xxSession : IAsyncDisposable
                     "The passive session event safety limit was exceeded.");
             }
 
+            PassiveSessionEvent item = new(
+                checked(_events.Count + 1L),
+                _clock.UtcNow,
+                operation,
+                queueDepth,
+                requested,
+                returned,
+                status,
+                _clock.Elapsed - _sessionStartedElapsed,
+                error);
             _events.Add(item);
         }
+    }
+
+    private string CloseUnexpectedFailedOpenHandle(nint rawHandle)
+    {
+        if (rawHandle == 0 || rawHandle == -1)
+        {
+            return string.Empty;
+        }
+
+        D2xxSafeHandle unexpectedHandle =
+            new(_nativeApi, rawHandle);
+        bool closed = unexpectedHandle.TryClose(out D2xxStatus closeStatus);
+        string? closeFailure = unexpectedHandle.CloseFailure;
+        string error = closed
+            ? "FT_OpenEx returned a handle with a failed status; the unexpected handle was closed."
+            : closeFailure is null
+                ? $"Unexpected handle cleanup returned {closeStatus}; native closure is unconfirmed."
+                : $"Unexpected handle cleanup failed with {closeStatus}: {closeFailure}; native closure is unconfirmed.";
+        AddEvent(
+            PassiveOperations.Close,
+            status: closeStatus,
+            error: error);
+
+        if (closed)
+        {
+            unexpectedHandle.Dispose();
+            return " The unexpected native handle was closed.";
+        }
+
+        _handle = unexpectedHandle;
+        _closeStatus = closeStatus;
+        _closeFailure = closeFailure;
+        return " Unexpected native-handle cleanup is unresolved; reuse is blocked until process restart.";
     }
 
     private static string Describe(Exception exception) =>

@@ -103,6 +103,7 @@ try {
         --self-contained true `
         -p:PublishSingleFile=false `
         -p:PublishTrimmed=false `
+        -p:MyPlasmSourceCommit=$sourceCommit `
         --output $stagedPackageDirectory
     if ($LASTEXITCODE -ne 0) {
         throw 'Self-contained win-x86 publish failed.'

@@ -3,6 +3,7 @@ using MyPlasm.Inspector.Core.Transport;
 namespace MyPlasm.Inspector.Transport.D2xx;
 
 public sealed record PassiveSessionEvent(
+    long Sequence,
     DateTimeOffset TimestampUtc,
     string Operation,
     uint QueueDepth,
@@ -32,7 +33,8 @@ public sealed class PassiveCaptureResult
         FtdiDeviceInfo selectedDevice,
         string? driverVersion,
         long captureByteLimit,
-        int captureEventLimit)
+        int captureEventLimit,
+        int captureChunkLimit)
     {
         StartedUtc = startedUtc;
         StoppedUtc = stoppedUtc;
@@ -44,6 +46,7 @@ public sealed class PassiveCaptureResult
         DriverVersion = driverVersion;
         CaptureByteLimit = captureByteLimit;
         CaptureEventLimit = captureEventLimit;
+        CaptureChunkLimit = captureChunkLimit;
     }
 
     public DateTimeOffset StartedUtc { get; }
@@ -73,6 +76,8 @@ public sealed class PassiveCaptureResult
     public long CaptureByteLimit { get; }
 
     public int CaptureEventLimit { get; }
+
+    public int CaptureChunkLimit { get; }
 
     public long TotalBytes => Chunks.Sum(chunk => (long)chunk.Bytes.Length);
 

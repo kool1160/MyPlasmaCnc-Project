@@ -9,6 +9,7 @@ namespace MyPlasm.Inspector.Transport.D2xx;
 public sealed record CaptureExportContext(
     string ApplicationName,
     string ApplicationVersion,
+    string SourceCommit,
     string ProcessArchitecture,
     string OsVersion,
     string RuntimeVersion,
@@ -32,6 +33,7 @@ public sealed class CaptureExporter
         "rx-hex.txt",
         "rx.bin",
         "session.json",
+        "source-commit.txt",
         "startup.log"
     ];
 
@@ -70,6 +72,8 @@ public sealed class CaptureExporter
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationRoot);
 
         _ = NormalizeRelativeEvidencePath(context.D2xxDllRelativePath);
+        string sourceCommit = NormalizeSourceCommit(context.SourceCommit);
+        ValidateEventSequence(capture.Events);
         string root = Path.GetFullPath(destinationRoot);
         Directory.CreateDirectory(root);
         string exportId =
@@ -86,6 +90,7 @@ public sealed class CaptureExporter
             // output. A later failure leaves this unique evidence directory intact.
             WriteRawBytes(folder, capture.Chunks);
             WriteHex(folder, capture.Chunks);
+            WriteText(folder, "source-commit.txt", sourceCommit + "\n");
 
             CaptureSessionDocument session =
                 CreateSessionDocument(capture, context);
@@ -123,6 +128,7 @@ public sealed class CaptureExporter
         return new CaptureSessionDocument(
             context.ApplicationName,
             context.ApplicationVersion,
+            NormalizeSourceCommit(context.SourceCommit),
             context.ProcessArchitecture,
             context.OsVersion,
             context.RuntimeVersion,
@@ -160,6 +166,7 @@ public sealed class CaptureExporter
             capture.QueuePollCount,
             capture.CaptureByteLimit,
             capture.CaptureEventLimit,
+            capture.CaptureChunkLimit,
             capture.Errors,
             capture.CloseStatus?.ToString() ?? "Not closed",
             capture.CloseFailure,
@@ -173,6 +180,7 @@ public sealed class CaptureExporter
         ==========================================
         Selected device: {SingleLine(session.Description)}
         Serial: {SingleLine(session.SerialNumber)}
+        Source commit: {session.SourceCommit}
         Opened UTC: {session.OpenTimestampUtc:O}
         Capture started UTC: {session.CaptureStartTimestampUtc:O}
         Capture stopped UTC: {session.CaptureStopTimestampUtc:O}
@@ -184,6 +192,7 @@ public sealed class CaptureExporter
         Queue polls: {session.QueuePollCount}
         Capture byte limit: {session.CaptureByteLimit}
         Capture event limit: {session.CaptureEventLimit}
+        Capture chunk limit: {session.CaptureChunkLimit}
         Last close status: {session.CloseStatus}
         Close failure: {SingleLine(session.CloseFailure ?? "None")}
         Transmit count: 0
@@ -394,6 +403,39 @@ public sealed class CaptureExporter
         return normalized;
     }
 
+    private static string NormalizeSourceCommit(string sourceCommit)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceCommit);
+        if (string.Equals(sourceCommit, "Unknown", StringComparison.Ordinal))
+        {
+            return sourceCommit;
+        }
+
+        if (sourceCommit.Length != 40 ||
+            sourceCommit.Any(value => !Uri.IsHexDigit(value)))
+        {
+            throw new ArgumentException(
+                "Source commit must be Unknown or one exact 40-character Git SHA.",
+                nameof(sourceCommit));
+        }
+
+        return sourceCommit.ToLowerInvariant();
+    }
+
+    private static void ValidateEventSequence(
+        IReadOnlyList<PassiveSessionEvent> events)
+    {
+        for (int index = 0; index < events.Count; index++)
+        {
+            long expected = checked(index + 1L);
+            if (events[index].Sequence != expected)
+            {
+                throw new InvalidDataException(
+                    $"Passive event sequence must be contiguous from 1; expected {expected}, found {events[index].Sequence}.");
+            }
+        }
+    }
+
     private static string SingleLine(string value) =>
         value.Replace('\r', ' ').Replace('\n', ' ');
 
@@ -457,6 +499,7 @@ public sealed class CaptureExporter
     private sealed record CaptureSessionDocument(
         string ApplicationName,
         string ApplicationVersion,
+        string SourceCommit,
         string ProcessArchitecture,
         string OsVersion,
         string RuntimeVersion,
@@ -485,6 +528,7 @@ public sealed class CaptureExporter
         int QueuePollCount,
         long CaptureByteLimit,
         int CaptureEventLimit,
+        int CaptureChunkLimit,
         IReadOnlyList<string> D2xxErrors,
         string CloseStatus,
         string? CloseFailure,

@@ -41,9 +41,10 @@ only for comparison during troubleshooting.
 
 For passive receive, inspect devices, confirm there is exactly one exact
 "MyPlasm CNC" candidate, and click "Open Exact MyPlasm Device". Start and stop
-capture manually. A capture stops after 5 minutes, 64 MiB, or 100,000 events,
-whichever occurs first. Close the device before export. If native close fails,
-the app refuses another open or enumeration until it is restarted.
+capture manually. A capture stops after 5 minutes, 64 MiB, 100,000 events, or
+16,384 receive chunks, whichever occurs first. Close the device before export.
+If native close fails, the app refuses another open or enumeration until it is
+restarted.
 
 Startup logs are written to:
 %LOCALAPPDATA%\MyPlasm Inspector\Logs\
@@ -54,6 +55,8 @@ Capture evidence is written to:
 The package includes package-manifest.json with the exact source commit,
 application hash, safety scope, and verified D2XX architecture, version, size,
 and SHA-256. Do not edit or remove that manifest.
+Every exported capture also records that source commit in session.json,
+report.txt, and source-commit.txt; hashes.sha256 covers the source-commit file.
 
 Startup file logging is best effort and can never block the application from
 starting. If the first window says file logging is unavailable, diagnostics

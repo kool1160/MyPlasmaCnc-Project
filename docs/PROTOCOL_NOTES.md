@@ -120,17 +120,26 @@ not access a controller.
 
 - The passive production surface contains enumeration, exact-serial open,
   driver metadata, queue status, receive read, and close only.
+- Exact-candidate selection requires a nonempty serial and a present nonzero
+  location identifier. Missing and zero native location values fail closed
+  before `FT_OpenEx`.
+- A valid native handle returned alongside a failed `FT_OpenEx` status is
+  immediately owned and closed exactly once. An unresolved cleanup is terminal
+  for that process.
 - No `FT_Write`, communication configuration, reset, purge, EEPROM, firmware,
   controller request, protocol decoder, or replay function is present.
 - Native injection and the process-detector bypass are internal test seams, not
   public application APIs.
-- Capture uses monotonic elapsed time and stops at five minutes, 64 MiB, or
-  100,000 events. Returned counts are checked before bytes are copied.
+- Capture uses monotonic elapsed time and stops at five minutes, 64 MiB,
+  100,000 events, or 16,384 receive chunks. Returned counts are checked before
+  bytes are copied.
 - A close failure is terminal for that process and blocks another enumeration
   or open.
 - Export streams raw bytes and compact JSONL, omits local D2XX source paths
-  from structured metadata, hashes every evidence file, validates a staged ZIP
-  by reopening it, and publishes the final ZIP only after validation.
+  from structured metadata, assigns unique contiguous event sequence numbers,
+  records the packaged source commit in hashed evidence, hashes every evidence
+  file, validates a staged ZIP by reopening it, and publishes the final ZIP
+  only after validation.
 - Automated tests use synthetic bytes and injected native behavior only.
 
 Safety impact: this slice can preserve bytes already waiting in the FTDI

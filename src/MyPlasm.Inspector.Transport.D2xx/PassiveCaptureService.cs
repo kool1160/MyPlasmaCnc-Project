@@ -6,6 +6,7 @@ public sealed class PassiveCaptureService : IAsyncDisposable
     public static readonly TimeSpan MaximumDuration = TimeSpan.FromMinutes(5);
     public const long MaximumCaptureBytes = 64L * 1024L * 1024L;
     public const int MaximumCaptureEvents = 100_000;
+    public const int MaximumCaptureChunks = 16_384;
     public const int ReceiveBufferSize = 4096;
 
     private readonly object _gate = new();
@@ -14,6 +15,7 @@ public sealed class PassiveCaptureService : IAsyncDisposable
     private readonly IPassiveCaptureClock _clock;
     private readonly long _maximumCaptureBytes;
     private readonly int _maximumCaptureEvents;
+    private readonly int _maximumCaptureChunks;
     private readonly int _receiveBufferSize;
     private CancellationTokenSource? _captureCancellation;
     private Task<PassiveCaptureResult>? _activeCapture;
@@ -31,12 +33,14 @@ public sealed class PassiveCaptureService : IAsyncDisposable
         IPassiveCaptureClock? clock,
         long maximumCaptureBytes = MaximumCaptureBytes,
         int maximumCaptureEvents = MaximumCaptureEvents,
+        int maximumCaptureChunks = MaximumCaptureChunks,
         int receiveBufferSize = ReceiveBufferSize)
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _clock = clock ?? new SystemPassiveCaptureClock();
         if (maximumCaptureBytes <= 0 ||
             maximumCaptureEvents < 4 ||
+            maximumCaptureChunks <= 0 ||
             receiveBufferSize <= 0)
         {
             throw new ArgumentOutOfRangeException(
@@ -46,6 +50,7 @@ public sealed class PassiveCaptureService : IAsyncDisposable
 
         _maximumCaptureBytes = maximumCaptureBytes;
         _maximumCaptureEvents = maximumCaptureEvents;
+        _maximumCaptureChunks = maximumCaptureChunks;
         _receiveBufferSize = receiveBufferSize;
     }
 
@@ -234,6 +239,14 @@ public sealed class PassiveCaptureService : IAsyncDisposable
                     continue;
                 }
 
+                if (chunks.Count >= _maximumCaptureChunks)
+                {
+                    stopReason = "chunk safety limit reached";
+                    _session.RecordLimit(
+                        $"Capture stopped at the chunk limit of {_maximumCaptureChunks}.");
+                    break;
+                }
+
                 long remainingBytes = _maximumCaptureBytes - totalBytes;
                 if (remainingBytes <= 0)
                 {
@@ -291,6 +304,14 @@ public sealed class PassiveCaptureService : IAsyncDisposable
                     break;
                 }
 
+                if (chunks.Count >= _maximumCaptureChunks)
+                {
+                    stopReason = "chunk safety limit reached";
+                    _session.RecordLimit(
+                        $"Capture stopped at the chunk limit of {_maximumCaptureChunks}.");
+                    break;
+                }
+
                 await _clock.DelayAsync(
                     TimeSpan.FromMilliseconds(1),
                     cancellationToken).ConfigureAwait(false);
@@ -325,7 +346,8 @@ public sealed class PassiveCaptureService : IAsyncDisposable
             _session.SelectedDevice,
             _session.DriverVersion,
             _maximumCaptureBytes,
-            _maximumCaptureEvents)
+            _maximumCaptureEvents,
+            _maximumCaptureChunks)
         {
             OpenedUtc = _session.OpenedUtc
         };

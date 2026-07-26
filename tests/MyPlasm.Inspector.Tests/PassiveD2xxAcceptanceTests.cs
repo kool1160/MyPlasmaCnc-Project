@@ -8,6 +8,9 @@ namespace MyPlasm.Inspector.Tests;
 
 public sealed class PassiveD2xxAcceptanceTests
 {
+    private const string TestSourceCommit =
+        "0123456789abcdef0123456789abcdef01234567";
+
     [Fact]
     public async Task EnumerationNeverCallsOpen()
     {
@@ -61,6 +64,43 @@ public sealed class PassiveD2xxAcceptanceTests
 
         Assert.Throws<InvalidOperationException>(
             () => transport.CreatePassiveSession(new FixedProcessDetector(false)));
+    }
+
+    [Fact]
+    public async Task MissingOrZeroLocationIsRejectedBeforeOpen()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice(location: 0));
+        await using D2xxInspectionTransport transport = new(native);
+        await transport.EnumerateDevicesAsync();
+
+        Assert.False(transport.CanCreatePassiveSession);
+        Assert.Contains(
+            transport.Diagnostics,
+            diagnostic =>
+                diagnostic.Code == "MYPLASM_LOCATION_MISSING" &&
+                diagnostic.Severity == D2xxDiagnosticSeverity.Error);
+        Assert.Throws<InvalidOperationException>(
+            () => transport.CreatePassiveSession(new FixedProcessDetector(false)));
+        Assert.Equal(0, native.OpenCalls);
+
+        FtdiDeviceInfo zeroLocationCandidate = new(
+            0,
+            FtdiDeviceInfo.MyPlasmDescription,
+            "EXACT",
+            "FT_DEVICE_232R (5)",
+            0x0403,
+            0x6001,
+            false,
+            0,
+            0x04036001);
+        await using PassiveD2xxSession directSession = new(
+            native,
+            zeroLocationCandidate,
+            new FixedProcessDetector(false));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => directSession.OpenAsync().AsTask());
+        Assert.Equal(0, native.OpenCalls);
     }
 
     [Fact]
@@ -153,6 +193,56 @@ public sealed class PassiveD2xxAcceptanceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => session.OpenAsync().AsTask());
 
         Assert.False(session.IsOpen);
+    }
+
+    [Fact]
+    public async Task FailedOpenUnexpectedHandleIsClosedExactlyOnce()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.OpenStatus = D2xxStatus.IoError;
+        native.OpenHandleOverride = 123;
+        await using PassiveD2xxSession session = Session(native);
+
+        InvalidOperationException exception =
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => session.OpenAsync().AsTask());
+
+        Assert.Contains("IoError", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("unexpected native handle was closed", exception.Message);
+        Assert.Equal(1, native.CloseCalls);
+        Assert.False(session.IsOpen);
+        Assert.False(session.HasUnresolvedCloseFailure);
+        Assert.Equal(
+            [PassiveOperations.Open, PassiveOperations.Close],
+            session.Events.Select(item => item.Operation));
+        await session.DisposeAsync();
+        Assert.Equal(1, native.CloseCalls);
+    }
+
+    [Fact]
+    public async Task FailedOpenUnresolvedUnexpectedHandleBlocksReuse()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.OpenStatus = D2xxStatus.IoError;
+        native.OpenHandleOverride = 123;
+        native.CloseStatus = D2xxStatus.IoError;
+        await using D2xxInspectionTransport transport = new(native);
+        await transport.EnumerateDevicesAsync();
+        PassiveD2xxSession session =
+            transport.CreatePassiveSession(new FixedProcessDetector(false));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => session.OpenAsync().AsTask());
+
+        Assert.True(session.HasUnresolvedCloseFailure);
+        Assert.True(transport.IsOpen);
+        Assert.False(transport.CanCreatePassiveSession);
+        Assert.Equal(1, native.CloseCalls);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => transport.EnumerateDevicesAsync().AsTask());
+
+        await session.DisposeAsync();
+        Assert.Equal(1, native.CloseCalls);
     }
 
     [Fact]
@@ -285,6 +375,48 @@ public sealed class PassiveD2xxAcceptanceTests
 
         Assert.Equal(2, result.Chunks.Count);
         Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, result.Chunks.SelectMany(item => item.Bytes));
+    }
+
+    [Fact]
+    public async Task EventSequenceNumbersAreUniqueContiguousAndDeterministic()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.QueueResults.Enqueue((D2xxStatus.Ok, 2));
+        native.ReadResults.Enqueue((D2xxStatus.Ok, new byte[] { 1, 2 }, null));
+        AdvancingClock clock = new();
+        await using PassiveD2xxSession session = Session(native, clock);
+        await session.OpenAsync();
+        await using PassiveCaptureService service = new(session, clock);
+
+        PassiveCaptureResult result =
+            await service.StartAsync(TimeSpan.FromMilliseconds(1));
+
+        long[] sequence = result.Events.Select(item => item.Sequence).ToArray();
+        Assert.Equal(
+            Enumerable.Range(1, sequence.Length).Select(value => (long)value),
+            sequence);
+        Assert.Equal(sequence.Length, sequence.Distinct().Count());
+    }
+
+    [Fact]
+    public async Task ConcurrentEventRecordingStillAllocatesOneContiguousSequence()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        await using PassiveD2xxSession session = Session(native);
+        await session.OpenAsync();
+
+        await Task.WhenAll(
+            Enumerable.Range(0, 64)
+                .Select(index => Task.Run(
+                    () => session.RecordError($"synthetic-{index}"))));
+
+        long[] sequence = session.Events
+            .Select(item => item.Sequence)
+            .ToArray();
+        Assert.Equal(
+            Enumerable.Range(1, sequence.Length).Select(value => (long)value),
+            sequence);
+        Assert.Equal(sequence.Length, sequence.Distinct().Count());
     }
 
     [Fact]
@@ -518,25 +650,31 @@ public sealed class PassiveD2xxAcceptanceTests
         string[] required =
         [
             "session.json", "events.jsonl", "rx.bin", "rx-hex.txt",
-            "report.txt", "hashes.sha256", "startup.log"
+            "report.txt", "hashes.sha256", "source-commit.txt", "startup.log"
         ];
         Assert.All(required, name => Assert.True(File.Exists(Path.Combine(result.CaptureDirectory, name)), name));
         using JsonDocument session = JsonDocument.Parse(
             await File.ReadAllTextAsync(Path.Combine(result.CaptureDirectory, "session.json")));
         string[] metadata =
         [
-            "applicationName", "applicationVersion", "processArchitecture", "osVersion",
+            "applicationName", "applicationVersion", "sourceCommit",
+            "processArchitecture", "osVersion",
             "runtimeVersion", "renderingMode", "d2xxDllRelativePath", "dllPeArchitecture",
             "dllFileVersion", "dllSha256", "d2xxLibraryVersion", "ftdiDriverVersion",
             "selectedDevice", "serialNumber", "description", "deviceType", "vendorId",
             "productId", "locationId", "openTimestampUtc", "captureStartTimestampUtc",
             "captureStopTimestampUtc", "closeTimestampUtc", "stopReason", "duration",
             "totalBytes", "readChunkCount", "queuePollCount", "captureByteLimit",
-            "captureEventLimit", "d2xxErrors", "closeFailure", "transmitCount",
+            "captureEventLimit", "captureChunkLimit", "d2xxErrors",
+            "closeFailure", "transmitCount",
             "productionAllowlistCount"
         ];
         Assert.All(metadata, name => Assert.True(session.RootElement.TryGetProperty(name, out _), name));
         Assert.Equal(0, new FileInfo(Path.Combine(result.CaptureDirectory, "rx.bin")).Length);
+        Assert.Equal(
+            TestSourceCommit + "\n",
+            await File.ReadAllTextAsync(
+                Path.Combine(result.CaptureDirectory, "source-commit.txt")));
     }
 
     [Fact]
@@ -635,6 +773,39 @@ public sealed class PassiveD2xxAcceptanceTests
     }
 
     [Fact]
+    public async Task ChunkSafetyLimitStopsWithoutAnExtraRead()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.QueueResults.Enqueue((D2xxStatus.Ok, 1));
+        native.QueueResults.Enqueue((D2xxStatus.Ok, 1));
+        native.QueueResults.Enqueue((D2xxStatus.Ok, 1));
+        native.ReadResults.Enqueue((D2xxStatus.Ok, new byte[] { 1 }, null));
+        native.ReadResults.Enqueue((D2xxStatus.Ok, new byte[] { 2 }, null));
+        native.ReadResults.Enqueue((D2xxStatus.Ok, new byte[] { 3 }, null));
+        AdvancingClock clock = new();
+        await using PassiveD2xxSession session = Session(native, clock);
+        await session.OpenAsync();
+        await using PassiveCaptureService service = new(
+            session,
+            clock,
+            maximumCaptureBytes: 1024,
+            maximumCaptureEvents: 20,
+            maximumCaptureChunks: 2,
+            receiveBufferSize: 8);
+
+        PassiveCaptureResult result =
+            await service.StartAsync(TimeSpan.FromMinutes(1));
+
+        Assert.Equal("chunk safety limit reached", result.StopReason);
+        Assert.Equal(2, result.Chunks.Count);
+        Assert.Equal(2, result.CaptureChunkLimit);
+        Assert.Equal(2, native.ReadCalls);
+        Assert.Contains(
+            result.Events,
+            item => item.Operation == PassiveOperations.Limit);
+    }
+
+    [Fact]
     public async Task NativeQueueExceptionStopsSafelyWithEvidence()
     {
         ScriptedNativeApi native = NativeWithDevices(ExactDevice());
@@ -726,13 +897,57 @@ public sealed class PassiveD2xxAcceptanceTests
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .ToArray();
         Assert.Equal(capture.Events.Count, nonempty.Length);
-        Assert.All(
-            nonempty,
-            line =>
-            {
-                using JsonDocument document = JsonDocument.Parse(line);
-                Assert.Equal(JsonValueKind.Object, document.RootElement.ValueKind);
-            });
+        for (int index = 0; index < nonempty.Length; index++)
+        {
+            using JsonDocument document = JsonDocument.Parse(nonempty[index]);
+            Assert.Equal(JsonValueKind.Object, document.RootElement.ValueKind);
+            Assert.Equal(
+                capture.Events[index].Sequence,
+                document.RootElement.GetProperty("sequence").GetInt64());
+        }
+    }
+
+    [Fact]
+    public async Task InvalidSourceCommitIsRejectedBeforeCreatingOutput()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateZeroByteClosedCaptureAsync();
+        CaptureExportContext context =
+            ExportContext(null) with { SourceCommit = "not-a-commit" };
+
+        Assert.Throws<ArgumentException>(
+            () => new CaptureExporter().Export(
+                capture,
+                context,
+                temporary.Path));
+        Assert.Empty(
+            Directory.GetDirectories(
+                temporary.Path,
+                "capture-*",
+                SearchOption.TopDirectoryOnly));
+    }
+
+    [Fact]
+    public async Task NoncontiguousEventSequenceIsRejectedBeforeCreatingOutput()
+    {
+        using TemporaryDirectory temporary = new();
+        PassiveCaptureResult capture =
+            await CreateZeroByteClosedCaptureAsync();
+        capture.Events = capture.Events
+            .Select(item => item with { Sequence = item.Sequence + 1 })
+            .ToArray();
+
+        Assert.Throws<InvalidDataException>(
+            () => new CaptureExporter().Export(
+                capture,
+                ExportContext(null),
+                temporary.Path));
+        Assert.Empty(
+            Directory.GetDirectories(
+                temporary.Path,
+                "capture-*",
+                SearchOption.TopDirectoryOnly));
     }
 
     [Fact]
@@ -864,6 +1079,7 @@ public sealed class PassiveD2xxAcceptanceTests
         new(
             "MyPlasm Inspector",
             "1.0.0",
+            TestSourceCommit,
             "X86",
             "Windows test",
             ".NET 8 test",
@@ -946,6 +1162,8 @@ public sealed class PassiveD2xxAcceptanceTests
 
         public D2xxStatus OpenStatus { get; set; } = D2xxStatus.Ok;
 
+        public nint? OpenHandleOverride { get; set; }
+
         public D2xxStatus CloseStatus { get; set; } = D2xxStatus.Ok;
 
         public int OpenCalls { get; private set; }
@@ -985,7 +1203,8 @@ public sealed class PassiveD2xxAcceptanceTests
         {
             OpenCalls++;
             OpenSerials.Add(serialNumber);
-            handle = OpenStatus == D2xxStatus.Ok ? 123 : 0;
+            handle = OpenHandleOverride ??
+                (OpenStatus == D2xxStatus.Ok ? 123 : 0);
             return OpenStatus;
         }
 

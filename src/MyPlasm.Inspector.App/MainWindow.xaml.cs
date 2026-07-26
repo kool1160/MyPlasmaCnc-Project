@@ -119,7 +119,10 @@ public partial class MainWindow : Window
             if (_passiveSession is not null)
             {
                 await _passiveSession.DisposeAsync();
-                _passiveSession = null;
+                if (!_passiveSession.HasUnresolvedCloseFailure)
+                {
+                    _passiveSession = null;
+                }
             }
 
             _captureService = null;
@@ -252,6 +255,7 @@ public partial class MainWindow : Window
                 "MyPlasm Inspector",
                 Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ??
                     "Unknown",
+                ApplicationBuildEvidence.SourceCommit,
                 RuntimeInformation.ProcessArchitecture.ToString(),
                 RuntimeInformation.OSDescription,
                 RuntimeInformation.FrameworkDescription,

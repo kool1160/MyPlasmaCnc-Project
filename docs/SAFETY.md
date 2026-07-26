@@ -138,13 +138,17 @@ The application fails closed:
 - Startup, fake enumeration, and D2XX enumeration still create no device
   handle automatically.
 - Opening requires exactly one exact `MyPlasm CNC` description, a nonempty
-  serial, no duplicate serial or available location, a not-already-open
-  enumeration result, an explicit operator confirmation, and no running
-  `MyPlasmCNC` process.
+  serial, a present nonzero location, no duplicate serial or location, a
+  not-already-open enumeration result, an explicit operator confirmation, and
+  no running `MyPlasmCNC` process.
 - Only the enumerated serial reaches `FT_OpenEx`; there is no arbitrary serial
   input and no public native-injection surface.
-- Capture is limited to five minutes, 64 MiB of retained bytes, and 100,000
-  capture events. Elapsed duration uses a monotonic clock.
+- A nonzero handle returned with a failed `FT_OpenEx` status is treated as
+  unexpectedly live and closed exactly once. Failed cleanup is recorded as
+  unresolved and blocks all later open or enumeration work in that process.
+- Capture is limited to five minutes, 64 MiB of retained bytes, 100,000
+  capture events, and 16,384 receive chunks. Elapsed duration uses a monotonic
+  clock.
 - Queue/read counts are validated before bytes are retained. Zero queue depth
   never calls read. Native exceptions and invalid counts stop the capture while
   preserving prior evidence.
@@ -152,8 +156,11 @@ The application fails closed:
   Close is attempted exactly once and cannot be suppressed by cancellation.
 - A failed or exceptional native close is recorded as unresolved. No later
   open or enumeration is allowed in that process.
-- Raw bytes and events are streamed to unique export files. JSONL contains one
-  compact object per line. A staged ZIP is reopened and every entry hash is
+- Raw bytes and events are streamed to unique export files. Event sequence
+  numbers are allocated under the event lock and are unique and contiguous.
+  JSONL contains one compact object per line. The exact packaged source commit
+  is recorded in `session.json`, `report.txt`, and `source-commit.txt`, which is
+  covered by `hashes.sha256`. A staged ZIP is reopened and every entry hash is
   compared with its source before the final ZIP name is published.
 - Export failure preserves the unique raw evidence directory. Local D2XX source
   paths are not written to structured metadata.

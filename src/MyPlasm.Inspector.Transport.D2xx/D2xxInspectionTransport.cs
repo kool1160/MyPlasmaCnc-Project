@@ -171,6 +171,7 @@ public sealed class D2xxInspectionTransport : IControllerTransport
             }
 
             AddDuplicateDiagnostics(devices);
+            AddMissingIdentityDiagnostics(devices);
             AddDriverVersionDiagnostic();
             _lastDevices = devices;
             _enumerationSucceeded = true;
@@ -285,6 +286,12 @@ public sealed class D2xxInspectionTransport : IControllerTransport
         {
             throw new InvalidOperationException(
                 "The exact candidate has no serial number.");
+        }
+
+        if (!candidate.LocationId.HasValue || candidate.LocationId.Value == 0)
+        {
+            throw new InvalidOperationException(
+                "The exact candidate has no nonzero location identifier.");
         }
 
         if (candidate.IsOpen)
@@ -461,6 +468,20 @@ public sealed class D2xxInspectionTransport : IControllerTransport
                 "DUPLICATE_LOCATION",
                 D2xxDiagnosticSeverity.Warning,
                 $"Multiple FTDI entries reported location 0x{location:X8}. All entries remain visible."));
+        }
+    }
+
+    private void AddMissingIdentityDiagnostics(
+        IReadOnlyList<FtdiDeviceInfo> devices)
+    {
+        foreach (FtdiDeviceInfo device in devices.Where(
+            item => item.IsMyPlasmController &&
+                (!item.LocationId.HasValue || item.LocationId.Value == 0)))
+        {
+            _diagnostics.Add(new D2xxDiagnostic(
+                "MYPLASM_LOCATION_MISSING",
+                D2xxDiagnosticSeverity.Error,
+                $"Exact MyPlasm candidate at index {device.Index} has no nonzero location identifier; opening is refused."));
         }
     }
 

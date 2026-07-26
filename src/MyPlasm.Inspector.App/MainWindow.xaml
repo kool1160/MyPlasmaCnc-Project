@@ -79,7 +79,7 @@
             </WrapPanel>
 
             <TextBlock Margin="0,10,0,0"
-                       Text="Each capture stops after 5 minutes, 64 MiB, or 100,000 capture events—whichever occurs first."
+                       Text="Each capture stops after 5 minutes, 64 MiB, 100,000 events, or 16,384 receive chunks—whichever occurs first."
                        TextWrapping="Wrap" />
             <TextBlock x:Name="InspectionStatusText" Margin="0,18,0,0" Text="No transport has been created." />
 
