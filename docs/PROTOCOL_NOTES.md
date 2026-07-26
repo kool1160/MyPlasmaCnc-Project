@@ -112,6 +112,42 @@ its diagnostic evidence; this change removes automatic transport work,
 prevents logging failures from becoming startup failures, and provides
 reproducible package evidence.
 
+## Passive receive hardening — 2026-07-26
+
+Classification: `confirmed` for code structure and deterministic offline tests;
+`unknown` for live Inspector receive behavior because this reconciliation did
+not access a controller.
+
+- The passive production surface contains enumeration, exact-serial open,
+  driver metadata, queue status, receive read, and close only.
+- Exact-candidate selection requires a nonempty serial and a present nonzero
+  location identifier. Missing and zero native location values fail closed
+  before `FT_OpenEx`.
+- A valid native handle returned alongside a failed `FT_OpenEx` status, or
+  assigned before `FT_OpenEx` throws, is immediately owned and closed exactly
+  once through the shared safe-handle cleanup policy. An unresolved cleanup is
+  terminal for that process.
+- No `FT_Write`, communication configuration, reset, purge, EEPROM, firmware,
+  controller request, protocol decoder, or replay function is present.
+- Native injection and the process-detector bypass are internal test seams, not
+  public application APIs.
+- Capture uses monotonic elapsed time and stops at five minutes, 64 MiB,
+  100,000 events, or 16,384 receive chunks. Returned counts are checked before
+  bytes are copied.
+- A close failure is terminal for that process and blocks another enumeration
+  or open.
+- Export streams raw bytes and compact JSONL, omits local D2XX source paths
+  from structured metadata, assigns unique contiguous event sequence numbers,
+  reports event count, sequence range, uniqueness, monotonicity, and contiguity,
+  records the packaged source commit in hashed evidence, hashes every evidence
+  file, validates a staged ZIP by reopening it, and publishes the final ZIP
+  only after validation.
+- Automated tests use synthetic bytes and injected native behavior only.
+
+Safety impact: this slice can preserve bytes already waiting in the FTDI
+receive queue without originating traffic. A zero-byte result remains valid
+evidence and does not justify adding a request to the empty command allowlist.
+
 ## Vendor references
 
 - FTDI D2XX Programmer's Guide: <https://ftdichip.com/wp-content/uploads/2025/06/D2XX_Programmers_Guide.pdf>

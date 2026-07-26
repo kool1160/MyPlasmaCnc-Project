@@ -116,11 +116,11 @@ function New-TransactionFixture {
     )
 
     $artifacts = Join-Path $testRoot $Name
-    $finalDirectory = Join-Path $artifacts 'MyPlasmInspector-win-x86-diagnostic'
-    $finalZip = Join-Path $artifacts 'MyPlasmInspector-win-x86-diagnostic.zip'
+    $finalDirectory = Join-Path $artifacts 'MyPlasmInspector-win-x86-passive-capture'
+    $finalZip = Join-Path $artifacts 'MyPlasmInspector-win-x86-passive-capture.zip'
     $stagingRoot = Join-Path $artifacts '.staging'
-    $stagedDirectory = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-diagnostic'
-    $stagedZip = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-diagnostic.zip'
+    $stagedDirectory = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-passive-capture'
+    $stagedZip = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-passive-capture.zip'
     [System.IO.Directory]::CreateDirectory($finalDirectory) | Out-Null
     [System.IO.Directory]::CreateDirectory($stagedDirectory) | Out-Null
     [System.IO.File]::WriteAllText((Join-Path $finalDirectory 'state.txt'), 'OLD-DIRECTORY')

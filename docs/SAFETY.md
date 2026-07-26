@@ -67,14 +67,20 @@ The application fails closed:
 
 ## D2XX enumeration implementation status
 
-- `D2xxInspectionTransport` exposes enumeration through only `FT_CreateDeviceInfoList`, `FT_GetDeviceInfoList`, and `FT_GetLibraryVersion`.
-- Its injectable native API has no open, read, write, configuration, bit-mode, baud-rate, or EEPROM functions.
-- The D2XX transport's application-facing open, read, and write methods are non-functional and throw `NotSupportedException`.
-- Driver version remains unqueried because FTDI documents `FT_GetDriverVersion` as requiring an open device handle.
+- `D2xxInspectionTransport` keeps enumeration handle-free through
+  `FT_CreateDeviceInfoList`, `FT_GetDeviceInfoList`, and
+  `FT_GetLibraryVersion`.
+- Its application-facing `IControllerTransport` open, read, and write methods
+  remain non-functional and throw `NotSupportedException`.
+- A separate operator-confirmed session can use only `FT_OpenEx` with the exact
+  enumerated serial, `FT_GetDriverVersion`, `FT_GetQueueStatus`, `FT_Read`, and
+  `FT_Close`.
+- Native injection is internal to the transport assembly and its test friend;
+  application callers cannot supply an arbitrary native API or serial.
 - Missing DLL, PE architecture mismatch, load failure, driver/device absence, and duplicate identifiers produce diagnostics without opening a device.
-- The production native loader centralizes exactly three required export names;
-  automated tests reject any compiled `FT_Open`, `FT_Read`, `FT_Write`,
-  configuration, bit-mode, baud-rate, or EEPROM export reference.
+- The production native loader centralizes exactly eight required passive
+  export names. Automated tests reject any compiled `FT_Write`, configuration,
+  bit-mode, baud-rate, reset, purge, EEPROM, or firmware export reference.
 - Inconsistent native device counts fail closed without returning a partial
   device list, and a disposed inspection transport cannot reload or enumerate.
 - The production command allowlist remains empty.
@@ -83,8 +89,9 @@ The application fails closed:
 
 - The self-contained `win-x86` package includes an inspected local FTDI DLL
   but remains subject to the same empty production command allowlist.
-- Its D2XX inspection mode is device enumeration only: it has no
-  controller-open, read, write, EEPROM, baud-rate, or bit-mode path.
+- Its D2XX inspection mode remains handle-free. A separately confirmed passive
+  session can open the unique exact candidate and read queued bytes, but it has
+  no controller-write, EEPROM, configuration, reset, purge, or firmware path.
 - The launcher only verifies package files and starts the application; it does
   not request elevation or communicate with a controller.
 - The packaged `README-FIRST.txt` repeats the required first-live-validation
@@ -125,3 +132,39 @@ The application fails closed:
 - A prior package directory and ZIP are validated as a pair. Ambiguous states
   are refused. Publication failures restore the prior pair and preserve failed
   replacement evidence in quarantine.
+
+## Passive receive safety status
+
+- Startup, fake enumeration, and D2XX enumeration still create no device
+  handle automatically.
+- Opening requires exactly one exact `MyPlasm CNC` description, a nonempty
+  serial, a present nonzero location, no duplicate serial or location, a
+  not-already-open enumeration result, an explicit operator confirmation, and
+  no running `MyPlasmCNC` process.
+- Only the enumerated serial reaches `FT_OpenEx`; there is no arbitrary serial
+  input and no public native-injection surface.
+- A nonzero handle returned with a failed `FT_OpenEx` status, or assigned before
+  `FT_OpenEx` throws, is treated as unexpectedly live and closed exactly once
+  through the same cleanup policy. Failed cleanup is recorded as unresolved
+  and blocks all later open or enumeration work in that process.
+- Capture is limited to five minutes, 64 MiB of retained bytes, 100,000
+  capture events, and 16,384 receive chunks. Elapsed duration uses a monotonic
+  clock.
+- Queue/read counts are validated before bytes are retained. Zero queue depth
+  never calls read. Native exceptions and invalid counts stop the capture while
+  preserving prior evidence.
+- Stop, close, and window close cancel and await capture before native close.
+  Close is attempted exactly once and cannot be suppressed by cancellation.
+- A failed or exceptional native close is recorded as unresolved. No later
+  open or enumeration is allowed in that process.
+- Raw bytes and events are streamed to unique export files. Event sequence
+  numbers are allocated under the event lock and are unique and contiguous.
+  JSONL contains one compact object per line. `session.json` and `report.txt`
+  include event count, first and last sequence, and explicit unique, monotonic,
+  and contiguous results. The exact packaged source commit is recorded in
+  `session.json`, `report.txt`, and `source-commit.txt`, which is covered by
+  `hashes.sha256`. A staged ZIP is reopened and every entry hash is compared
+  with its source before the final ZIP name is published.
+- Export failure preserves the unique raw evidence directory. Local D2XX source
+  paths are not written to structured metadata.
+- Transmit count and production allowlist count remain fixed at zero.

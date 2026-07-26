@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
 
+$script:PortablePackageName = 'MyPlasmInspector-win-x86-passive-capture'
+$script:PortableSafetyScope =
+    'Passive receive only. No controller commands or transmits.'
+
 function Get-TrustedD2xxEvidence {
     [CmdletBinding()]
     param()
@@ -154,12 +158,12 @@ function New-PortablePackageManifestJson {
     $manifest = [ordered]@{
         schemaVersion = 1
         product = 'MyPlasm Inspector'
-        package = 'MyPlasmInspector-win-x86-diagnostic'
+        package = $script:PortablePackageName
         sourceCommit = $SourceCommit.ToLowerInvariant()
         buildConfiguration = 'Release'
         runtimeIdentifier = 'win-x86'
         selfContained = $true
-        safetyScope = 'Device enumeration only. No controller commands.'
+        safetyScope = $script:PortableSafetyScope
         application = [ordered]@{
             path = 'MyPlasm Inspector.exe'
             architecture = 'x86'
@@ -198,10 +202,11 @@ function Read-PackageManifest {
 
     if ($manifest.schemaVersion -ne 1 -or
         $manifest.product -ne 'MyPlasm Inspector' -or
-        $manifest.package -ne 'MyPlasmInspector-win-x86-diagnostic' -or
+        $manifest.package -ne $script:PortablePackageName -or
         $manifest.buildConfiguration -ne 'Release' -or
         $manifest.runtimeIdentifier -ne 'win-x86' -or
         $manifest.selfContained -ne $true -or
+        $manifest.safetyScope -ne $script:PortableSafetyScope -or
         $manifest.sourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
         throw "Package manifest identity is invalid in $SourceDescription."
     }

@@ -47,13 +47,19 @@ The current bounded Issue #1 slices contain:
 
 - `MyPlasm.Inspector.Core` — transport contracts and the centralized command safety boundary;
 - `MyPlasm.Inspector.Transport.Fake` — deterministic, hardware-free FTDI behavior;
-- `MyPlasm.Inspector.Transport.D2xx` — enumeration-only production D2XX interop;
+- `MyPlasm.Inspector.Transport.D2xx` — handle-free enumeration plus a separate
+  operator-confirmed, passive-receive-only session;
 - `MyPlasm.Inspector.App` — a WPF shell with explicit fake and D2XX inspection modes;
 - `MyPlasm.Inspector.Tests` — offline fake-transport, D2XX-enumeration, and
   safety-policy tests;
 - `MyPlasm.Inspector.PeInspector` — local vendor-DLL architecture, version, and hash inspection.
 
-The production command allowlist remains empty because no controller request bytes are confirmed. D2XX mode can list device metadata but cannot open, read, configure, or write a device. Driver version is deliberately not queried because FTDI documents that operation as requiring an open device handle.
+The production command allowlist remains empty because no controller request
+bytes are confirmed. Enumeration remains handle-free. After exactly one unique
+`MyPlasm CNC` candidate is found, an explicit operator action may open only its
+enumerated serial, query driver metadata, poll receive-queue depth, read
+already-queued bytes, and close. The native production surface contains no
+write, communication-configuration, reset, purge, EEPROM, or firmware function.
 
 ### Build and test
 
@@ -90,7 +96,7 @@ With an inspected, legally obtained x86 `ftd2xx.dll` staged at
 creates:
 
 ```text
-artifacts/MyPlasmInspector-win-x86-diagnostic.zip
+artifacts/MyPlasmInspector-win-x86-passive-capture.zip
 ```
 
 The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
@@ -117,6 +123,33 @@ packaged `README-FIRST.txt` for the safety setup and complete instructions.
 Startup file logging is best effort and cannot prevent the application from
 starting. If persistent logging is unavailable, the first window reports that
 diagnostics are retained in a bounded application-session buffer and Trace.
+
+### Passive receive capture
+
+Passive receive is never automatic. The operator must run D2XX inspection,
+confirm the isolated hardware state, and explicitly open the one exact unique
+candidate. Its serial and nonzero location identifier must both be present and
+unambiguous. The original MyPlasm application must not be running. If a failed
+`FT_OpenEx` returns a native handle, or assigns one before throwing, the
+Inspector owns and closes that handle exactly once; unresolved cleanup blocks
+reuse until restart.
+Capture is bounded by duration (five minutes), retained bytes (64 MiB), event
+count (100,000), and receive chunks (16,384), and it uses monotonic elapsed
+time.
+
+Stop, close, and window close await active capture work before native close. A
+failed native close is terminal for that process: the app reports the
+unconfirmed state and refuses another open or enumeration until restart.
+
+Exports under `%LOCALAPPDATA%\MyPlasm Inspector\Captures\` retain raw bytes,
+compact JSONL events with unique contiguous sequence numbers, metadata, the
+portable application's source commit, a readable report, startup diagnostics,
+and SHA-256 evidence. The ZIP is reopened and hash-validated before its unique
+final name is published. `session.json` and `report.txt` summarize event count,
+first and last sequence, and whether sequences are unique, monotonic, and
+contiguous. Export failure leaves the raw capture directory intact. Raw
+captures may contain private identifiers, machine state, and local paths in
+startup diagnostics; keep them outside Git and review before sharing.
 
 ## Ground rule
 

@@ -12,12 +12,12 @@ $peInspectorProject = Join-Path $repositoryRoot 'tools\MyPlasm.Inspector.PeInspe
 $localDll = Join-Path $repositoryRoot 'native\local\ftd2xx.dll'
 $packageTemplateDirectory = Join-Path $repositoryRoot 'packaging\portable-win-x86'
 $artifactsDirectory = Join-Path $repositoryRoot 'artifacts'
-$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic'
-$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-diagnostic.zip'
+$packageDirectory = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-passive-capture'
+$packageZip = Join-Path $artifactsDirectory 'MyPlasmInspector-win-x86-passive-capture.zip'
 $transactionId = [Guid]::NewGuid().ToString('N')
 $stagingRoot = Join-Path $artifactsDirectory ".portable-staging-$transactionId"
-$stagedPackageDirectory = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-diagnostic'
-$stagedPackageZip = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-diagnostic.zip'
+$stagedPackageDirectory = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-passive-capture'
+$stagedPackageZip = Join-Path $stagingRoot 'MyPlasmInspector-win-x86-passive-capture.zip'
 $applicationExecutable = Join-Path $stagedPackageDirectory 'MyPlasm Inspector.exe'
 $packagedDll = Join-Path $stagedPackageDirectory 'native\ftd2xx.dll'
 $manifestPath = Join-Path $stagedPackageDirectory 'package-manifest.json'
@@ -61,6 +61,11 @@ $localDllEvidence = Assert-TrustedD2xxFile `
     -Path $localDll `
     -ExpectedEvidence $trustedD2xxEvidence
 
+& (Join-Path $PSScriptRoot 'Test-ProductionNativeSafety.ps1')
+if ($LASTEXITCODE -ne 0) {
+    throw 'The production native safety audit failed before packaging.'
+}
+
 & $DotnetCommand run `
     --project $peInspectorProject `
     --configuration Release `
@@ -98,6 +103,7 @@ try {
         --self-contained true `
         -p:PublishSingleFile=false `
         -p:PublishTrimmed=false `
+        -p:MyPlasmSourceCommit=$sourceCommit `
         --output $stagedPackageDirectory
     if ($LASTEXITCODE -ne 0) {
         throw 'Self-contained win-x86 publish failed.'

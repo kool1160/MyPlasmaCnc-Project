@@ -147,7 +147,7 @@ public sealed class D2xxInspectionTransportTests
     }
 
     [Fact]
-    public void InjectableNativeSurfaceContainsOnlyEnumerationAndLibraryMetadata()
+    public void InjectableNativeSurfaceContainsOnlyPassiveReceiveFunctions()
     {
         string[] methodNames = typeof(ID2xxNativeApi)
             .GetMethods()
@@ -156,18 +156,32 @@ public sealed class D2xxInspectionTransportTests
             .ToArray();
 
         Assert.Equal(
-            ["CreateDeviceInfoList", "GetDeviceInfoList", "GetLibraryVersion"],
+            [
+                "Close",
+                "CreateDeviceInfoList",
+                "GetDeviceInfoList",
+                "GetDriverVersion",
+                "GetLibraryVersion",
+                "GetQueueStatus",
+                "OpenExBySerialNumber",
+                "Read"
+            ],
             methodNames);
     }
 
     [Fact]
-    public void ProductionNativeLibraryResolvesOnlyThreeReadOnlyEnumerationExports()
+    public void ProductionNativeLibraryResolvesOnlyPassiveReceiveExports()
     {
         Assert.Equal(
             [
                 "FT_CreateDeviceInfoList",
                 "FT_GetDeviceInfoList",
-                "FT_GetLibraryVersion"
+                "FT_GetLibraryVersion",
+                "FT_OpenEx",
+                "FT_Close",
+                "FT_GetDriverVersion",
+                "FT_GetQueueStatus",
+                "FT_Read"
             ],
             D2xxNativeLibrary.RequiredExports);
 
@@ -175,18 +189,18 @@ public sealed class D2xxInspectionTransportTests
             File.ReadAllBytes(typeof(D2xxInspectionTransport).Assembly.Location));
         string[] prohibitedExports =
         [
-            "FT_Open",
-            "FT_OpenEx",
-            "FT_Read",
             "FT_Write",
             "FT_SetBaudRate",
             "FT_SetBitMode",
             "FT_SetDataCharacteristics",
             "FT_SetFlowControl",
             "FT_SetLatencyTimer",
+            "FT_ResetDevice",
+            "FT_Purge",
             "FT_EraseEE",
             "FT_EE_Write",
-            "FT_EE_Program"
+            "FT_EE_Program",
+            "FT_Firmware"
         ];
 
         Assert.All(
@@ -307,6 +321,42 @@ public sealed class D2xxInspectionTransportTests
             int count = Math.Min(devices.Length, _devices.Length);
             Array.Copy(_devices, devices, count);
             deviceCount = ReturnedCountOverride ?? checked((uint)count);
+            return D2xxStatus.Ok;
+        }
+
+        public D2xxStatus OpenExBySerialNumber(
+            string serialNumber,
+            out nint handle)
+        {
+            handle = 1;
+            return D2xxStatus.Ok;
+        }
+
+        public D2xxStatus Close(nint handle) => D2xxStatus.Ok;
+
+        public D2xxStatus GetDriverVersion(
+            nint handle,
+            out uint version)
+        {
+            version = 0x00030102;
+            return D2xxStatus.Ok;
+        }
+
+        public D2xxStatus GetQueueStatus(
+            nint handle,
+            out uint bytesAvailable)
+        {
+            bytesAvailable = 0;
+            return D2xxStatus.Ok;
+        }
+
+        public D2xxStatus Read(
+            nint handle,
+            byte[] buffer,
+            uint requestedCount,
+            out uint returnedCount)
+        {
+            returnedCount = 0;
             return D2xxStatus.Ok;
         }
     }

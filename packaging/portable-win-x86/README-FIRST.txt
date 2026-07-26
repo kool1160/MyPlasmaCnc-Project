@@ -1,7 +1,7 @@
 MYPLASM INSPECTOR - PORTABLE WINDOWS PACKAGE
 =============================================
 
-1. Copy MyPlasmInspector-win-x86-diagnostic.zip to the plasma-table computer.
+1. Copy MyPlasmInspector-win-x86-passive-capture.zip to the plasma-table computer.
 2. Extract the ENTIRE ZIP to a normal writable folder, for example Desktop\MyPlasmInspector.
 3. Double-click "Launch MyPlasm Inspector.bat".
 
@@ -25,11 +25,13 @@ administrator account; starting this package normally does not.
 
 SAFETY
 ------
-This build is DEVICE ENUMERATION ONLY — NO CONTROLLER COMMANDS.
+This build is PASSIVE RECEIVE ONLY - NO CONTROLLER COMMANDS OR TRANSMITS.
 It can list FTDI metadata and identify a device whose description exactly
-matches "MyPlasm CNC". It cannot open a controller, read controller traffic,
-send controller bytes, move axes, change outputs, alter EEPROM, change baud
-rate or bit mode, or update firmware.
+matches "MyPlasm CNC". After explicit confirmation, it can open only the exact
+unique serial returned by enumeration, query documented FTDI metadata, poll
+the receive queue, and preserve already-queued bytes. It cannot send controller
+bytes, move axes, change outputs, alter EEPROM, change baud rate or bit mode,
+reset or purge the device, or update firmware.
 
 The first window deliberately creates no transport and performs no enumeration.
 Use "Run Fake Enumeration" for an offline demonstration or "Inspect D2XX
@@ -37,12 +39,28 @@ Devices" to explicitly start metadata-only D2XX inspection. Software rendering
 is the safe default. The optional --hardware-rendering command-line argument is
 only for comparison during troubleshooting.
 
+For passive receive, inspect devices, confirm there is exactly one exact
+"MyPlasm CNC" candidate, and click "Open Exact MyPlasm Device". Start and stop
+capture manually. A capture stops after 5 minutes, 64 MiB, 100,000 events, or
+16,384 receive chunks, whichever occurs first. Close the device before export.
+If native close fails, the app refuses another open or enumeration until it is
+restarted.
+If FT_OpenEx assigns a handle and then throws, that unexpected handle is owned
+and closed exactly once; unresolved cleanup also blocks reuse until restart.
+
 Startup logs are written to:
 %LOCALAPPDATA%\MyPlasm Inspector\Logs\
 
+Capture evidence is written to:
+%LOCALAPPDATA%\MyPlasm Inspector\Captures\
+
 The package includes package-manifest.json with the exact source commit,
-application hash, and verified D2XX architecture, version, size, and SHA-256.
-Do not edit or remove that manifest.
+application hash, safety scope, and verified D2XX architecture, version, size,
+and SHA-256. Do not edit or remove that manifest.
+Every exported capture also records that source commit in session.json,
+report.txt, and source-commit.txt; hashes.sha256 covers the source-commit file.
+session.json and report.txt also record the event count, first and last event
+sequence, and explicit unique, monotonic, and contiguous sequence results.
 
 Startup file logging is best effort and can never block the application from
 starting. If the first window says file logging is unavailable, diagnostics
