@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Threading;
 using MyPlasm.Inspector.Core.Safety;
 using MyPlasm.Inspector.Core.Transport;
 using MyPlasm.Inspector.Transport.D2xx;
@@ -458,7 +459,14 @@ public partial class MainWindow : Window
         finally
         {
             _closeReady = true;
-            Close();
+            Closing -= Window_Closing;
+
+            // WPF keeps the window in its internal closing state until this
+            // event handler returns. Queue the final close so that even
+            // synchronously completed cleanup cannot re-enter Close().
+            _ = Dispatcher.BeginInvoke(
+                DispatcherPriority.Normal,
+                new Action(Close));
         }
     }
 }
