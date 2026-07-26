@@ -39,4 +39,7 @@ jobs:
         run: ./tests/portable-package-tests.ps1
 
       - name: Verify formatting
-        run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore
+        shell: pwsh
+        run: |
+          $env:DOTNET_HOST_PATH = (Get-Command dotnet).Source
+          dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore
