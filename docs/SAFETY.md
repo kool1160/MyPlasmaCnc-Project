@@ -168,3 +168,18 @@ The application fails closed:
 - Export failure preserves the unique raw evidence directory. Local D2XX source
   paths are not written to structured metadata.
 - Transmit count and production allowlist count remain fixed at zero.
+
+## Offline three-run comparison safety status
+
+- The comparison command accepts exactly three manifest-verified directories
+  containing only the analyzer's six sanitized outputs.
+- Raw captures, binaries, archives, payload files, duplicate inputs, and
+  normalized or link-resolved input/output collisions fail closed.
+- Comparison has no D2XX, hardware, native-library, transport, replay, or
+  command-generation path and never modifies an input report set.
+- `Stable across all three captures` means only exact sanitized fingerprint
+  presence in all three inputs. It does not mean safe, meaningful, causal, or
+  replayable.
+- Live collection remains operator-controlled under
+  `docs/differential-capture-campaign.md`; it is not performed by CI or the
+  comparison tool.

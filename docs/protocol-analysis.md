@@ -218,6 +218,63 @@ CLI against the invented fixture twice, compares every output byte, and checks
 that raw synthetic payload sentinels do not appear in reports. CI downloads no
 vendor software, capture, firmware, driver, or binary.
 
+## Comparing exactly three sanitized analyses
+
+The offline `compare` command consumes exactly three directories produced by
+`analyze`:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- compare `
+  --analysis "C:\PrivateEvidence\run-1\analysis" `
+  --analysis "C:\PrivateEvidence\run-2\analysis" `
+  --analysis "C:\PrivateEvidence\run-3\analysis" `
+  --output "C:\PrivateEvidence\campaign-comparison"
+```
+
+Each input directory must contain exactly the six sanitized analyzer outputs
+listed above. The command verifies the five reports listed by
+`hashes.sha256`, validates the manifest itself and all report schemas, and
+rejects missing, extra, malformed, hash-mismatched, ambiguous, or duplicate
+sets. It accepts no raw capture, ZIP, payload, native DLL, firmware, or vendor
+file. Input directories are never modified.
+
+The output directory must not be the same as, inside, or an ancestor of an
+input directory. Normalized aliases and existing symbolic-link or junction
+aliases are resolved before reading inputs and again before committing every
+output. `--overwrite` replaces only the six known comparison reports and
+cannot authorize an evidence collision.
+
+The comparison writes:
+
+- `campaign-summary.json`;
+- `campaign-report.md`;
+- `stable-transaction-classes.csv`;
+- `class-frequency-by-run.csv`;
+- `run-structure-comparison.csv`; and
+- `hashes.sha256`.
+
+Canonical run labels are assigned after sorting by the SHA-256 of all six
+verified sanitized reports, then sanitized capture SHA-256 and record count.
+Tied sets are byte-identical. Therefore supplying the same three directories
+in any argument order produces byte-for-byte identical reports.
+
+Reports compare structural counts, functions and statuses, phases and
+reconnect transitions, sanitized open sessions, deterministic pairs and
+anomalies, class presence and frequency, first/last occurrence and phase
+overlap, length/fingerprint structure, same-length variability metrics, and
+available cadence and latency summaries. A transaction class is labeled
+`stable across all three captures` only when the exact sanitized class
+fingerprint appears in every run.
+
+Comparison schema version `1` supports analyzer version `1.0.1` and recorder
+schema version `1`. Incompatible versions fail closed. Outputs exclude raw
+payload fields, recorder session identifiers, selectors and serials, pointer
+values, machine identifiers, and absolute local paths.
+
+Use the exact isolated operator procedure in
+[differential-capture-campaign.md](differential-capture-campaign.md). No live
+three-run campaign has been completed or approved by this implementation.
+
 ## Comparing future targeted captures
 
 Preserve every raw capture unchanged and record its SHA-256. Analyze each
@@ -242,3 +299,6 @@ does not establish causation or semantics.
   reveal meaning.
 - The tool does not decode framing, checksums, commands, status, coordinates,
   firmware, inputs, or safety.
+- Cross-run stability is presence of an exact sanitized fingerprint in three
+  verified report sets; it cannot establish causation, meaning, safety, or
+  replay suitability.

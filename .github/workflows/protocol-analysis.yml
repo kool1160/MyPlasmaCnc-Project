@@ -33,22 +33,26 @@ jobs:
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore
 
-      - name: Run analyzer twice against invented fixture
+      - name: Run analyzer and comparison twice against invented fixture
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $input = 'tests/MyPlasm.Inspector.ProtocolAnalysis.Tests/Fixtures/normal-startup.jsonl'
-          $expected = (Get-FileHash -LiteralPath $input -Algorithm SHA256).Hash
+          $capturePath = 'tests/MyPlasm.Inspector.ProtocolAnalysis.Tests/Fixtures/normal-startup.jsonl'
+          $expected = (Get-FileHash -LiteralPath $capturePath -Algorithm SHA256).Hash
 
           dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
-            analyze --input $input --output artifacts/analysis-first --expected-sha256 $expected
-          if ($LASTEXITCODE -ne 0) { throw "First analyzer run failed with $LASTEXITCODE." }
+            analyze --input $capturePath --output artifacts/analysis-first --expected-sha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "First analysis failed with $LASTEXITCODE." }
 
           dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
-            analyze --input $input --output artifacts/analysis-second --expected-sha256 $expected
-          if ($LASTEXITCODE -ne 0) { throw "Second analyzer run failed with $LASTEXITCODE." }
+            analyze --input $capturePath --output artifacts/analysis-second --expected-sha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "Second analysis failed with $LASTEXITCODE." }
 
-          $names = @(
+          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+            analyze --input $capturePath --output artifacts/analysis-third --expected-sha256 $expected
+          if ($LASTEXITCODE -ne 0) { throw "Third analysis failed with $LASTEXITCODE." }
+
+          $analysisNames = @(
             'capture-summary.json',
             'capture-report.md',
             'phase-timeline.csv',
@@ -56,18 +60,106 @@ jobs:
             'payload-variability.json',
             'hashes.sha256'
           )
-          foreach ($name in $names) {
+          foreach ($name in $analysisNames) {
             $first = (Get-FileHash -LiteralPath "artifacts/analysis-first/$name" -Algorithm SHA256).Hash
             $second = (Get-FileHash -LiteralPath "artifacts/analysis-second/$name" -Algorithm SHA256).Hash
-            if ($first -ne $second) {
+            $third = (Get-FileHash -LiteralPath "artifacts/analysis-third/$name" -Algorithm SHA256).Hash
+            if ($first -ne $second -or $first -ne $third) {
               throw "Deterministic output mismatch for $name."
             }
           }
 
-          $leaks = Get-ChildItem -LiteralPath artifacts/analysis-first -File |
+          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+            compare `
+            --analysis artifacts/analysis-first `
+            --analysis artifacts/analysis-second `
+            --analysis artifacts/analysis-third `
+            --output artifacts/comparison-first
+          if ($LASTEXITCODE -ne 0) { throw "First comparison failed with $LASTEXITCODE." }
+
+          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+            compare `
+            --analysis artifacts/analysis-third `
+            --analysis artifacts/analysis-first `
+            --analysis artifacts/analysis-second `
+            --output artifacts/comparison-second
+          if ($LASTEXITCODE -ne 0) { throw "Second comparison failed with $LASTEXITCODE." }
+
+          $comparisonNames = @(
+            'campaign-summary.json',
+            'campaign-report.md',
+            'stable-transaction-classes.csv',
+            'class-frequency-by-run.csv',
+            'run-structure-comparison.csv',
+            'hashes.sha256'
+          )
+          foreach ($name in $comparisonNames) {
+            $firstPath = "artifacts/comparison-first/$name"
+            $secondPath = "artifacts/comparison-second/$name"
+            $firstHash = (Get-FileHash -LiteralPath $firstPath -Algorithm SHA256).Hash
+            $secondHash = (Get-FileHash -LiteralPath $secondPath -Algorithm SHA256).Hash
+            if ($firstHash -ne $secondHash) {
+              throw "Argument-order or repeated-run mismatch for $name."
+            }
+
+            $firstBytes = [System.IO.File]::ReadAllBytes($firstPath)
+            $secondBytes = [System.IO.File]::ReadAllBytes($secondPath)
+            $firstBase64 = [Convert]::ToBase64String($firstBytes)
+            $secondBase64 = [Convert]::ToBase64String($secondBytes)
+            if ($firstBase64 -cne $secondBase64) {
+              throw "Byte comparison failed for $name."
+            }
+          }
+
+          $manifestPath = 'artifacts/comparison-first/hashes.sha256'
+          $manifestLines = Get-Content -LiteralPath $manifestPath |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+          $expectedManifestNames = $comparisonNames |
+            Where-Object { $_ -ne 'hashes.sha256' } |
+            Sort-Object
+          $actualManifestNames = @()
+          foreach ($line in $manifestLines) {
+            if ($line -notmatch '^([0-9A-F]{64})  ([^\\/]+)$') {
+              throw "Malformed comparison manifest entry: $line"
+            }
+
+            $manifestHash = $Matches[1]
+            $manifestName = $Matches[2]
+            $actualManifestNames += $manifestName
+            $actualHash = (Get-FileHash -LiteralPath "artifacts/comparison-first/$manifestName" -Algorithm SHA256).Hash
+            if ($manifestHash -ne $actualHash) {
+              throw "Comparison manifest mismatch for $manifestName."
+            }
+          }
+          if (($expectedManifestNames -join "`n") -cne ($actualManifestNames -join "`n")) {
+            throw 'Comparison manifest has unexpected names or ordering.'
+          }
+
+          $analysisLeaks = Get-ChildItem -LiteralPath artifacts/analysis-first -File |
             Select-String -Pattern 'FACEB00C|C001D00D|SYNTHETIC-DEVICE|0x00002000'
-          if ($leaks) {
+          if ($analysisLeaks) {
             throw 'A sanitized report contains raw synthetic evidence.'
           }
 
-          Get-Content -LiteralPath artifacts/analysis-first/hashes.sha256
+          $comparisonLeakPatterns = @(
+            'write_hex',
+            'read_hex',
+            'session_id',
+            'selector_pointer',
+            'serial_number',
+            'SYNTHETIC-DEVICE',
+            'FACEB00C',
+            'C001D00D',
+            '0x00002000',
+            $env:GITHUB_WORKSPACE
+          )
+          foreach ($path in Get-ChildItem -LiteralPath artifacts/comparison-first -File) {
+            $text = Get-Content -LiteralPath $path.FullName -Raw
+            foreach ($pattern in $comparisonLeakPatterns) {
+              if ($text.Contains($pattern, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Comparison output $($path.Name) leaked prohibited text '$pattern'."
+              }
+            }
+          }
+
+          Get-Content -LiteralPath $manifestPath
