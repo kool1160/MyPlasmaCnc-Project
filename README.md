@@ -83,6 +83,41 @@ dotnet run --project tools/MyPlasm.Inspector.PeInspector -- native/local/ftd2xx.
 
 Use `--architecture x86` or `--architecture x64` to check a chosen application architecture. See `native/README.md` for the complete local-only setup.
 
+### Portable Windows package
+
+With an inspected, legally obtained x86 `ftd2xx.dll` staged at
+`native/local/ftd2xx.dll`, double-click `Build Portable Inspector.bat`. It
+creates:
+
+```text
+artifacts/MyPlasmInspector-win-x86-diagnostic.zip
+```
+
+The ZIP is a self-contained .NET 8 `win-x86` package. Copy it to the
+plasma-table PC, extract the complete archive, and double-click
+`Launch MyPlasm Inspector.bat`. No .NET SDK or runtime is required on the
+target PC. The FTDI driver is still required by Windows and may need
+administrator rights to install; launching the package does not.
+
+The builder requires a clean Git worktree and accepts only the verified D2XX
+identity documented in this repository: x86, file version `3.01.19`, size
+`206144` bytes, and SHA-256
+`381117C743766E3A696609BB29CA075772AA603CFF196E16C3854C06EE1AB254`.
+It publishes into a unique staging directory, writes
+`package-manifest.json`, reopens and validates the ZIP, then replaces the
+previous package with rollback protection. A failed build or validation leaves
+the previous verified package active.
+
+The first window uses software rendering and creates no transport until the
+operator clicks a manual enumeration button. If the application exits
+unexpectedly, use `Launch MyPlasm Inspector Diagnostic.bat`; it writes
+`launcher.log` beside the app and opens
+`%LOCALAPPDATA%\MyPlasm Inspector\Logs`. See `native/README.md` and the
+packaged `README-FIRST.txt` for the safety setup and complete instructions.
+Startup file logging is best effort and cannot prevent the application from
+starting. If persistent logging is unavailable, the first window reports that
+diagnostics are retained in a bounded application-session buffer and Trace.
+
 ## Ground rule
 
 Confirmed facts, hypotheses, and unknowns must be labeled separately. No controller command is considered safe merely because it appears plausible.

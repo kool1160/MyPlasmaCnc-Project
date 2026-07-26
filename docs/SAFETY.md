@@ -78,3 +78,50 @@ The application fails closed:
 - Inconsistent native device counts fail closed without returning a partial
   device list, and a disposed inspection transport cannot reload or enumerate.
 - The production command allowlist remains empty.
+
+## Portable package safety status
+
+- The self-contained `win-x86` package includes an inspected local FTDI DLL
+  but remains subject to the same empty production command allowlist.
+- Its D2XX inspection mode is device enumeration only: it has no
+  controller-open, read, write, EEPROM, baud-rate, or bit-mode path.
+- The launcher only verifies package files and starts the application; it does
+  not request elevation or communicate with a controller.
+- The packaged `README-FIRST.txt` repeats the required first-live-validation
+  power isolation: 24 V controller power only, with motor power, plasma source,
+  and torch-start circuit disabled.
+
+## Startup-safe diagnostic package
+
+- WPF software rendering is forced before `MainWindow` construction unless the
+  operator explicitly passes `--hardware-rendering` for comparison.
+- The first window creates no fake or D2XX transport, inspects no DLL,
+  enumerates no devices, and cannot reach a controller open, read, or write
+  operation.
+- Fake enumeration and D2XX metadata inspection each require a separate manual
+  button click. D2XX native loading cannot begin before that click.
+- Startup logging is non-throwing from the application's perspective.
+  Directory, append, locking, permissions, disk, environment-probe, DLL
+  presence, and DLL hashing failures cannot block startup or exception
+  handling.
+- When persistent logging is available, startup exceptions are written with
+  stack traces to `%LOCALAPPDATA%\MyPlasm Inspector\Logs\`.
+- The first persistent logging failure disables further file writes for that
+  logger instance. Later entries remain in a bounded in-memory buffer and
+  best-effort Trace output without recursive retry.
+- The first window clearly reports when startup file logging is unavailable.
+
+## Transactional portable-package status
+
+- The package builder accepts only the confirmed x86 D2XX DLL with file version
+  `3.01.19`, size `206144` bytes, and the documented SHA-256.
+- Packaging requires a clean Git worktree and records the exact source commit,
+  application hash, and D2XX evidence in `package-manifest.json`.
+- Publish, template copy, PE checks, evidence checks, manifest creation, and ZIP
+  creation occur in a unique staging directory.
+- The staged ZIP is reopened and every required entry, safe relative path,
+  application hash, DLL hash/size, and manifest field is validated before the
+  final package changes.
+- A prior package directory and ZIP are validated as a pair. Ambiguous states
+  are refused. Publication failures restore the prior pair and preserve failed
+  replacement evidence in quarantine.

@@ -85,6 +85,33 @@ The later locally obtained original DLL matched the recorder evidence and the
 confirmed x86/version/hash values above. The DLL remains ignored and was not
 added to Git.
 
+## Portable startup diagnostic — 2026-07-23
+
+Classification: `confirmed` for the previous application's eager startup
+design; `unknown` for the exact target-PC crash mechanism until its new startup
+log is collected.
+
+- The prior WPF window automatically ran fake transport enumeration in
+  `Window_Loaded`, before the operator could interact with the window.
+- The prior package did not force WPF software rendering before window creation
+  and did not write an application startup log before `MainWindow`
+  construction.
+- The diagnostic package forces software rendering by default, logs environment
+  and startup stages before `MainWindow` exists, and defers every transport
+  action until an explicit button click.
+- Startup logging failures are isolated from application startup. Persistent
+  file logging falls back once to a bounded in-memory/Trace diagnostic path and
+  does not retry a failed file sink.
+- Portable packaging accepts only the confirmed D2XX DLL architecture,
+  version, size, and SHA-256 above. A package manifest binds generated
+  application and DLL evidence to an exact clean source commit.
+
+Safety impact: no controller operation is attempted during startup. The exact
+root cause of the target PC's renderer/startup crash remains unknown pending
+its diagnostic evidence; this change removes automatic transport work,
+prevents logging failures from becoming startup failures, and provides
+reproducible package evidence.
+
 ## Vendor references
 
 - FTDI D2XX Programmer's Guide: <https://ftdichip.com/wp-content/uploads/2025/06/D2XX_Programmers_Guide.pdf>
