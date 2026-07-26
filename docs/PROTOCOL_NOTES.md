@@ -158,3 +158,21 @@ The structural capture facts above do not identify payload meaning, framing,
 checksums, firmware fields, coordinates, status, inputs, or command safety. See
 `docs/protocol-analysis.md` for the offline analyzer's deterministic evidence
 rules.
+
+## Offline three-run comparison — 2026-07-26
+
+Classification: `confirmed` for deterministic synthetic tests and code
+structure; `unknown` for live three-run evidence because the operator campaign
+has not occurred.
+
+- Issue #13 adds an exactly-three-set comparison over the six sanitized
+  analyzer reports.
+- Synthetic evidence confirms manifest validation, canonical
+  all-six-permutation output, structural class presence and frequency
+  comparison, variability comparison, per-file identity locking, post-parse
+  stability verification, duplicate-evidence rejection, transactional
+  publication/rollback, and path/privacy guards.
+- The comparison neither reads raw captures nor accesses hardware, D2XX,
+  transports, controller bytes, or the production command policy.
+- Packet framing, fields, counters, checksums, semantics, command safety,
+  causation, and replay suitability remain unknown.

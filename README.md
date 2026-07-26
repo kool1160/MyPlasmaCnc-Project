@@ -218,3 +218,26 @@ Raw captures and generated private evidence must remain outside Git. Structural
 fingerprints and timing do not establish packet meaning or command safety. See
 [docs/protocol-analysis.md](docs/protocol-analysis.md) for validation rules,
 outputs, privacy handling, exit codes, and limitations.
+
+Compare exactly three manifest-verified sanitized analyses offline:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- compare `
+  --analysis "C:\PrivateEvidence\run-1\analysis" `
+  --analysis "C:\PrivateEvidence\run-2\analysis" `
+  --analysis "C:\PrivateEvidence\run-3\analysis" `
+  --output "C:\PrivateEvidence\campaign-comparison"
+```
+
+Argument order does not affect the deterministic six-file comparison bundle.
+The command reads no raw capture and has no hardware, native-library, replay,
+or transport path. Every required report is identity-locked and rehashed after
+parsing, duplicate complete evidence sets fail closed, and the complete
+six-file output is staged, verified, and published with rollback protection.
+Without `--overwrite`, a nonempty output is refused; with it, only known
+reports are transactionally replaced and unrelated files are preserved.
+
+The three-run campaign has not been performed; operators
+must follow the complete physical-isolation, identical-action, stop-condition,
+and privacy procedure in
+[docs/differential-capture-campaign.md](docs/differential-capture-campaign.md).

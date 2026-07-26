@@ -213,10 +213,106 @@ settings, relative and directory-link aliases, legacy temporary filenames, and
 a generated 120,002-record streaming capture. Collision tests verify input
 bytes and timestamps remain unchanged and that no output is written.
 
-CI builds with warnings as errors, runs all tests, verifies formatting, runs the
-CLI against the invented fixture twice, compares every output byte, and checks
-that raw synthetic payload sentinels do not appear in reports. CI downloads no
-vendor software, capture, firmware, driver, or binary.
+Campaign tests use three structurally distinct invented analyses. They cover
+all six argument orders, duplicate complete sets, linked and hard-linked scoped
+files, output aliases, post-hash mutation/replacement/deletion/link
+redirection, nonempty output policy, incomplete prior sets, unrelated files,
+and deterministic failures after every staging, manifest, verification,
+backup, publication, and rollback-restoration checkpoint.
+
+CI builds with warnings as errors, runs all tests, verifies formatting, analyzes
+three structurally distinct invented captures, executes all six input
+permutations, compares every output byte and SHA-256, verifies manifests, and
+checks that raw synthetic payload sentinels do not appear in reports. CI
+downloads no vendor software, capture, firmware, driver, or binary.
+
+## Comparing exactly three sanitized analyses
+
+The offline `compare` command consumes exactly three directories produced by
+`analyze`:
+
+```powershell
+dotnet run --project tools/MyPlasm.ProtocolAnalyzer -- compare `
+  --analysis "C:\PrivateEvidence\run-1\analysis" `
+  --analysis "C:\PrivateEvidence\run-2\analysis" `
+  --analysis "C:\PrivateEvidence\run-3\analysis" `
+  --output "C:\PrivateEvidence\campaign-comparison"
+```
+
+Each input directory must contain exactly the six sanitized analyzer outputs
+listed above. The command verifies the five reports listed by
+`hashes.sha256`, validates the manifest itself and all report schemas, and
+rejects missing, extra, malformed, hash-mismatched, ambiguous, or duplicate
+sets. It accepts no raw capture, ZIP, payload, native DLL, firmware, or vendor
+file. Input directories are never modified.
+
+All 18 required report files are individually protected. A safely resolved
+analysis-directory link is allowed, but a required report that is itself a
+symbolic link or reparse point is rejected. Protected read handles detect
+shared physical files and hard-link aliases among the scoped input and output
+reports. The output directory must not be the same as, inside, or an ancestor
+of an input directory.
+
+Each input file's resolved path, byte length, last-write timestamp, and
+SHA-256 are recorded before parsing. After parsing, and again immediately
+before publication, every file is re-resolved and rehashed while its protected
+handle prevents write, delete, or replacement. A changed, missing, replaced,
+retargeted, or differently resolved report fails closed before output is
+published.
+
+The three canonical report-set fingerprints must be distinct. Copies of one
+complete sanitized analysis set are rejected even when stored in different
+directories; a copied set is not accepted as an independent run.
+
+The comparison writes:
+
+- `campaign-summary.json`;
+- `campaign-report.md`;
+- `stable-transaction-classes.csv`;
+- `class-frequency-by-run.csv`;
+- `run-structure-comparison.csv`; and
+- `hashes.sha256`.
+
+Canonical run labels are assigned after sorting by the SHA-256 of all six
+verified sanitized reports, then sanitized capture SHA-256 and record count.
+Ties are rejected as duplicate evidence. All six argument permutations of
+three distinct inputs produce byte-for-byte identical reports.
+
+### Transactional output behavior
+
+Without `--overwrite`, any nonempty output directory is refused. With
+`--overwrite`, unrelated files are preserved and only the six known campaign
+reports are replaced. Existing campaign report links or reparse points are
+rejected; `--overwrite` never authorizes an evidence collision.
+
+The writer creates all five data reports in a unique exclusive staging
+directory, calculates their hashes, stages `hashes.sha256`, and reopens and
+verifies the complete set. After input and output identities are revalidated,
+only existing known reports are moved into a unique backup. The complete new
+set is then published and verified.
+
+Any handled failure before final verification removes a partial new set and
+restores the exact previous complete or incomplete known set byte-for-byte.
+Unrelated files are never moved. A failure when no previous set existed leaves
+no campaign report file. Staging and backup directories are removed after
+success or a successful rollback.
+
+Reports compare structural counts, functions and statuses, phases and
+reconnect transitions, sanitized open sessions, deterministic pairs and
+anomalies, class presence and frequency, first/last occurrence and phase
+overlap, length/fingerprint structure, same-length variability metrics, and
+available cadence and latency summaries. A transaction class is labeled
+`stable across all three captures` only when the exact sanitized class
+fingerprint appears in every run.
+
+Comparison schema version `1` supports analyzer version `1.0.1` and recorder
+schema version `1`. Incompatible versions fail closed. Outputs exclude raw
+payload fields, recorder session identifiers, selectors and serials, pointer
+values, machine identifiers, and absolute local paths.
+
+Use the exact isolated operator procedure in
+[differential-capture-campaign.md](differential-capture-campaign.md). No live
+three-run campaign has been completed or approved by this implementation.
 
 ## Comparing future targeted captures
 
@@ -242,3 +338,6 @@ does not establish causation or semantics.
   reveal meaning.
 - The tool does not decode framing, checksums, commands, status, coordinates,
   firmware, inputs, or safety.
+- Cross-run stability is presence of an exact sanitized fingerprint in three
+  verified report sets; it cannot establish causation, meaning, safety, or
+  replay suitability.

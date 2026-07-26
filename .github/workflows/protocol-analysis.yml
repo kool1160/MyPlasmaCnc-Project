@@ -33,41 +33,175 @@ jobs:
       - name: Verify formatting
         run: dotnet format MyPlasm.Inspector.sln --verify-no-changes --no-restore
 
-      - name: Run analyzer twice against invented fixture
+      - name: Run analyzer and all six comparison permutations
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $input = 'tests/MyPlasm.Inspector.ProtocolAnalysis.Tests/Fixtures/normal-startup.jsonl'
-          $expected = (Get-FileHash -LiteralPath $input -Algorithm SHA256).Hash
+          $capturePath = 'tests/MyPlasm.Inspector.ProtocolAnalysis.Tests/Fixtures/normal-startup.jsonl'
+          New-Item -ItemType Directory -Path artifacts/synthetic-captures -Force | Out-Null
 
-          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
-            analyze --input $input --output artifacts/analysis-first --expected-sha256 $expected
-          if ($LASTEXITCODE -ne 0) { throw "First analyzer run failed with $LASTEXITCODE." }
+          function New-InventedCapture {
+            param(
+              [Parameter(Mandatory)][int] $ExtraPairs,
+              [Parameter(Mandatory)][string] $Destination
+            )
 
-          dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
-            analyze --input $input --output artifacts/analysis-second --expected-sha256 $expected
-          if ($LASTEXITCODE -ne 0) { throw "Second analyzer run failed with $LASTEXITCODE." }
+            $baseRecords = Get-Content -LiteralPath $capturePath |
+              ForEach-Object { $_ | ConvertFrom-Json }
+            $records = [Collections.Generic.List[object]]::new()
+            foreach ($index in 0..5) {
+              $records.Add($baseRecords[$index])
+            }
 
-          $names = @(
-            'capture-summary.json',
-            'capture-report.md',
-            'phase-timeline.csv',
-            'transaction-classes.csv',
-            'payload-variability.json',
-            'hashes.sha256'
+            $sequence = 7
+            for ($pair = 0; $pair -lt $ExtraPairs; $pair++) {
+              foreach ($index in @(3, 4, 5)) {
+                $clone = $baseRecords[$index] |
+                  ConvertTo-Json -Compress -Depth 10 |
+                  ConvertFrom-Json
+                $clone.sequence = $sequence
+                $clone.elapsed_us = $sequence * 1000
+                $clone.utc_timestamp = [DateTimeOffset]::Parse(
+                  '2026-01-02T03:04:05Z'
+                ).AddMilliseconds($sequence).ToString('O')
+                $records.Add($clone)
+                $sequence++
+              }
+            }
+
+            $close = $baseRecords[6] |
+              ConvertTo-Json -Compress -Depth 10 |
+              ConvertFrom-Json
+            $close.sequence = $sequence
+            $close.elapsed_us = $sequence * 1000
+            $close.utc_timestamp = [DateTimeOffset]::Parse(
+              '2026-01-02T03:04:05Z'
+            ).AddMilliseconds($sequence).ToString('O')
+            $records.Add($close)
+            $lines = $records |
+              ForEach-Object { $_ | ConvertTo-Json -Compress -Depth 10 }
+            [IO.File]::WriteAllLines($Destination, $lines)
+          }
+
+          $analysisDirectories = @(
+            'artifacts/analysis-first',
+            'artifacts/analysis-second',
+            'artifacts/analysis-third'
           )
-          foreach ($name in $names) {
-            $first = (Get-FileHash -LiteralPath "artifacts/analysis-first/$name" -Algorithm SHA256).Hash
-            $second = (Get-FileHash -LiteralPath "artifacts/analysis-second/$name" -Algorithm SHA256).Hash
-            if ($first -ne $second) {
-              throw "Deterministic output mismatch for $name."
+          for ($run = 0; $run -lt 3; $run++) {
+            $inventedCapture = "artifacts/synthetic-captures/run-$($run + 1).jsonl"
+            New-InventedCapture -ExtraPairs $run -Destination $inventedCapture
+            $expected = (Get-FileHash -LiteralPath $inventedCapture -Algorithm SHA256).Hash
+            dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+              analyze `
+              --input $inventedCapture `
+              --output $analysisDirectories[$run] `
+              --expected-sha256 $expected
+            if ($LASTEXITCODE -ne 0) {
+              throw "Invented analysis $($run + 1) failed with $LASTEXITCODE."
             }
           }
 
-          $leaks = Get-ChildItem -LiteralPath artifacts/analysis-first -File |
+          $permutations = @(
+            '0,1,2',
+            '0,2,1',
+            '1,0,2',
+            '1,2,0',
+            '2,0,1',
+            '2,1,0'
+          )
+          for ($index = 0; $index -lt $permutations.Count; $index++) {
+            $order = $permutations[$index].Split(',') |
+              ForEach-Object { [int]$_ }
+            dotnet run --project tools/MyPlasm.ProtocolAnalyzer --configuration Release --no-build -- `
+              compare `
+              --analysis $analysisDirectories[$order[0]] `
+              --analysis $analysisDirectories[$order[1]] `
+              --analysis $analysisDirectories[$order[2]] `
+              --output "artifacts/comparison-$($index + 1)"
+            if ($LASTEXITCODE -ne 0) {
+              throw "Comparison permutation $($index + 1) failed with $LASTEXITCODE."
+            }
+          }
+
+          $comparisonNames = @(
+            'campaign-summary.json',
+            'campaign-report.md',
+            'stable-transaction-classes.csv',
+            'class-frequency-by-run.csv',
+            'run-structure-comparison.csv',
+            'hashes.sha256'
+          )
+          foreach ($name in $comparisonNames) {
+            $baselinePath = "artifacts/comparison-1/$name"
+            $baselineHash = (Get-FileHash -LiteralPath $baselinePath -Algorithm SHA256).Hash
+            $baselineBytes = [Convert]::ToBase64String(
+              [IO.File]::ReadAllBytes($baselinePath)
+            )
+            for ($index = 2; $index -le 6; $index++) {
+              $candidatePath = "artifacts/comparison-$index/$name"
+              $candidateHash = (Get-FileHash -LiteralPath $candidatePath -Algorithm SHA256).Hash
+              $candidateBytes = [Convert]::ToBase64String(
+                [IO.File]::ReadAllBytes($candidatePath)
+              )
+              if ($baselineHash -ne $candidateHash -or
+                  $baselineBytes -cne $candidateBytes) {
+                throw "Permutation mismatch for $name in comparison $index."
+              }
+            }
+          }
+
+          $manifestPath = 'artifacts/comparison-1/hashes.sha256'
+          $manifestLines = Get-Content -LiteralPath $manifestPath |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+          $expectedManifestNames = $comparisonNames |
+            Where-Object { $_ -ne 'hashes.sha256' } |
+            Sort-Object
+          $actualManifestNames = @()
+          foreach ($line in $manifestLines) {
+            if ($line -notmatch '^([0-9A-F]{64})  ([^\\/]+)$') {
+              throw "Malformed comparison manifest entry: $line"
+            }
+
+            $manifestHash = $Matches[1]
+            $manifestName = $Matches[2]
+            $actualManifestNames += $manifestName
+            $actualHash = (Get-FileHash -LiteralPath "artifacts/comparison-1/$manifestName" -Algorithm SHA256).Hash
+            if ($manifestHash -ne $actualHash) {
+              throw "Comparison manifest mismatch for $manifestName."
+            }
+          }
+          if (($expectedManifestNames -join "`n") -cne ($actualManifestNames -join "`n")) {
+            throw 'Comparison manifest has unexpected names or ordering.'
+          }
+
+          $analysisLeaks = Get-ChildItem -LiteralPath $analysisDirectories -File |
             Select-String -Pattern 'FACEB00C|C001D00D|SYNTHETIC-DEVICE|0x00002000'
-          if ($leaks) {
+          if ($analysisLeaks) {
             throw 'A sanitized report contains raw synthetic evidence.'
           }
 
-          Get-Content -LiteralPath artifacts/analysis-first/hashes.sha256
+          $comparisonLeakPatterns = @(
+            'write_hex',
+            'read_hex',
+            'session_id',
+            'selector_pointer',
+            'serial_number',
+            'SYNTHETIC-DEVICE',
+            'FACEB00C',
+            'C001D00D',
+            '0x00002000',
+            $env:GITHUB_WORKSPACE
+          )
+          for ($index = 1; $index -le 6; $index++) {
+            foreach ($path in Get-ChildItem -LiteralPath "artifacts/comparison-$index" -File) {
+              $text = Get-Content -LiteralPath $path.FullName -Raw
+              foreach ($pattern in $comparisonLeakPatterns) {
+                if ($text.Contains($pattern, [StringComparison]::OrdinalIgnoreCase)) {
+                  throw "Comparison $index output $($path.Name) leaked prohibited text '$pattern'."
+                }
+              }
+            }
+          }
+
+          Get-Content -LiteralPath $manifestPath

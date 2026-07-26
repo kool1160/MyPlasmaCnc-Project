@@ -14,6 +14,16 @@ public sealed record AnalysisResult(
     long TransactionCount,
     IReadOnlyDictionary<string, string> OutputSha256);
 
+public sealed record CampaignComparisonRequest(
+    IReadOnlyList<string> AnalysisDirectories,
+    string OutputDirectory,
+    bool Overwrite = false);
+
+public sealed record CampaignComparisonResult(
+    int RunCount,
+    int StableTransactionClassCount,
+    IReadOnlyDictionary<string, string> OutputSha256);
+
 public sealed class CaptureValidationException : Exception
 {
     public CaptureValidationException(long lineNumber, string message)
@@ -63,4 +73,25 @@ public sealed class InputOutputPathCollisionException : AnalysisOutputException
     }
 
     public string ReportFileName { get; }
+}
+
+public sealed class CampaignInputValidationException : Exception
+{
+    public CampaignInputValidationException(string message)
+        : base(message)
+    {
+    }
+
+    public CampaignInputValidationException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}
+
+public sealed class CampaignPathCollisionException : AnalysisOutputException
+{
+    public CampaignPathCollisionException(string message)
+        : base(message)
+    {
+    }
 }
