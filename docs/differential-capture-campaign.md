@@ -110,7 +110,9 @@ the worksheet; never hide, correct, or silently discard a deviation.
 
 The comparison validates each sanitized report set before using it. It does
 not accept `traffic.jsonl`, a ZIP, payload file, vendor DLL, firmware, or other
-capture artifact.
+capture artifact. Do not copy one analysis directory to stand in for another
+run: byte-identical complete report sets are rejected because they do not
+establish independent evidence identity.
 
 ## Private campaign worksheet
 

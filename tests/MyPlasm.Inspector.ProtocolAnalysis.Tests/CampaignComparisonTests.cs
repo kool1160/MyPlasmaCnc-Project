@@ -90,31 +90,69 @@ public sealed class CampaignComparisonTests
     }
 
     [Fact]
-    public async Task ArgumentOrderAndRepeatedRunsProduceByteIdenticalOutputs()
+    public async Task AllSixArgumentPermutationsProduceByteIdenticalOutputs()
     {
         using TestWorkspace workspace = new();
         SyntheticCampaignFixture fixture =
             await SyntheticAnalysisCampaign.CreateAsync(workspace);
-        string first = workspace.PathFor("comparison-first");
-        string second = workspace.PathFor("comparison-second");
-
-        CampaignComparisonResult firstResult =
-            await new CampaignComparator().CompareAsync(
-                new CampaignComparisonRequest(
-                    fixture.AnalysisDirectories,
-                    first));
-        CampaignComparisonResult secondResult =
-            await new CampaignComparator().CompareAsync(
-                new CampaignComparisonRequest(
-                    fixture.AnalysisDirectories.Reverse().ToArray(),
-                    second));
-
-        Assert.Equal(firstResult.OutputSha256, secondResult.OutputSha256);
-        foreach (string name in RequiredOutputs)
+        int[][] permutations =
+        [
+            [0, 1, 2],
+            [0, 2, 1],
+            [1, 0, 2],
+            [1, 2, 0],
+            [2, 0, 1],
+            [2, 1, 0]
+        ];
+        Dictionary<string, byte[]>? baselineBytes = null;
+        IReadOnlyDictionary<string, string>? baselineHashes = null;
+        foreach ((int[] permutation, int index) in
+                 permutations.Select((value, index) => (value, index)))
         {
+            string output = workspace.PathFor($"comparison-{index + 1}");
+            CampaignComparisonResult result =
+                await new CampaignComparator().CompareAsync(
+                    new CampaignComparisonRequest(
+                        permutation
+                            .Select(item => fixture.AnalysisDirectories[item])
+                            .ToArray(),
+                        output));
+            await CampaignTestAssertions.AssertCompleteVerifiedSetAsync(output);
+            await AssertSanitizedAsync(output, workspace.Root);
+
+            using JsonDocument document = JsonDocument.Parse(
+                await File.ReadAllTextAsync(
+                    Path.Combine(output, "campaign-summary.json")));
+            JsonElement[] runs = document.RootElement
+                .GetProperty("runs")
+                .EnumerateArray()
+                .ToArray();
             Assert.Equal(
-                await File.ReadAllBytesAsync(Path.Combine(first, name)),
-                await File.ReadAllBytesAsync(Path.Combine(second, name)));
+                ["run-1", "run-2", "run-3"],
+                runs.Select(run =>
+                    run.GetProperty("run_label").GetString()));
+            string?[] orderedFingerprints = runs
+                .Select(run =>
+                    run.GetProperty("analysis_set_sha256").GetString())
+                .ToArray();
+            Assert.Equal(
+                orderedFingerprints.Order(StringComparer.Ordinal),
+                orderedFingerprints);
+
+            Dictionary<string, byte[]> currentBytes =
+                CampaignTestAssertions.SnapshotKnownReports(output);
+            if (baselineBytes is null)
+            {
+                baselineBytes = currentBytes;
+                baselineHashes = result.OutputSha256;
+                continue;
+            }
+
+            Assert.Equal(baselineHashes, result.OutputSha256);
+            foreach (string name in RequiredOutputs)
+            {
+                Assert.Equal(baselineBytes[name], currentBytes[name]);
+            }
         }
     }
 
@@ -280,5 +318,37 @@ public sealed class CampaignComparisonTests
         Assert.Equal(
             stable,
             item.GetProperty("stable_across_all_three_captures").GetBoolean());
+    }
+
+    private static async Task AssertSanitizedAsync(
+        string output,
+        string localPath)
+    {
+        string[] prohibited =
+        [
+            "A1B2",
+            "C3D4",
+            "0102",
+            "0304",
+            "11111111-2222-3333-4444-555555555555",
+            "SYNTHETIC-DEVICE",
+            "write_hex",
+            "read_hex",
+            "session_id",
+            "selector_pointer",
+            "serial_number",
+            "0x00002000",
+            localPath
+        ];
+        foreach (string path in Directory.GetFiles(output))
+        {
+            string contents = await File.ReadAllTextAsync(path);
+            Assert.All(
+                prohibited,
+                value => Assert.DoesNotContain(
+                    value,
+                    contents,
+                    StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

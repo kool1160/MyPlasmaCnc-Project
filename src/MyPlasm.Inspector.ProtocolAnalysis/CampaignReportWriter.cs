@@ -28,30 +28,39 @@ internal static class CampaignReportWriter
     };
 
     public static async Task<IReadOnlyDictionary<string, string>> WriteAsync(
-        IReadOnlyList<string> analysisDirectories,
-        string outputDirectory,
+        CampaignEvidenceGuard evidence,
         bool overwrite,
         CampaignReportBundle reports,
         CancellationToken cancellationToken)
     {
+        string outputDirectory = evidence.Paths.OutputDirectory;
+        string? parentDirectory = Directory.GetParent(outputDirectory)?.FullName;
+        if (parentDirectory is null)
+        {
+            throw new AnalysisOutputException(
+                "The comparison output directory must have a parent directory.");
+        }
+
+        string outputName = Path.GetFileName(outputDirectory);
+        string transactionId = Guid.NewGuid().ToString("N");
+        string stagingDirectory = Path.Combine(
+            parentDirectory,
+            $".{outputName}.campaign-stage-{transactionId}");
+        string backupDirectory = Path.Combine(
+            parentDirectory,
+            $".{outputName}.campaign-backup-{transactionId}");
+        List<string> backedUp = [];
+        List<string> published = [];
+        SortedDictionary<string, FileEvidence> previous =
+            new(StringComparer.Ordinal);
+        bool publicationCommitted = false;
         try
         {
-            _ = CampaignPathSafety.Validate(
-                analysisDirectories,
-                outputDirectory);
-            if (Directory.Exists(outputDirectory))
-            {
-                if (!overwrite &&
-                    Directory.EnumerateFileSystemEntries(outputDirectory).Any())
-                {
-                    throw new AnalysisOutputException(
-                        "The comparison output directory is not empty. Use --overwrite to replace campaign report files explicitly.");
-                }
-            }
-            else
-            {
-                Directory.CreateDirectory(outputDirectory);
-            }
+            await evidence.VerifyStableAsync(cancellationToken)
+                .ConfigureAwait(false);
+            evidence.ValidateOutputIdentity(overwrite);
+            Directory.CreateDirectory(parentDirectory);
+            Directory.CreateDirectory(stagingDirectory);
 
             SortedDictionary<string, string> content = new(StringComparer.Ordinal)
             {
@@ -68,92 +77,431 @@ internal static class CampaignReportWriter
 
             foreach ((string fileName, string fileContent) in content)
             {
-                await WriteAtomicAsync(
-                        analysisDirectories,
-                        outputDirectory,
-                        Path.Combine(outputDirectory, fileName),
+                await WriteNewFileAsync(
+                        Path.Combine(stagingDirectory, fileName),
                         fileContent,
                         cancellationToken)
                     .ConfigureAwait(false);
+                evidence.OnPublicationCheckpoint(
+                    CampaignPublicationCheckpoint.AfterStagedReport,
+                    fileName);
             }
 
             SortedDictionary<string, string> hashes = new(StringComparer.Ordinal);
-            foreach (string fileName in ReportFileNames
-                         .Where(name => name != "hashes.sha256")
-                         .Order(StringComparer.Ordinal))
+            foreach (string fileName in DataReportFileNames())
             {
                 hashes[fileName] = await CaptureAnalyzer.CalculateSha256Async(
-                        Path.Combine(outputDirectory, fileName),
+                        Path.Combine(stagingDirectory, fileName),
                         cancellationToken)
                     .ConfigureAwait(false);
             }
 
             string manifest = string.Concat(
                 hashes.Select(pair => $"{pair.Value}  {pair.Key}\n"));
-            await WriteAtomicAsync(
-                    analysisDirectories,
-                    outputDirectory,
-                    Path.Combine(outputDirectory, "hashes.sha256"),
+            await WriteNewFileAsync(
+                    Path.Combine(stagingDirectory, "hashes.sha256"),
                     manifest,
                     cancellationToken)
                 .ConfigureAwait(false);
+            evidence.OnPublicationCheckpoint(
+                CampaignPublicationCheckpoint.AfterStagedManifest,
+                "hashes.sha256");
+
+            await VerifyReportSetAsync(
+                    stagingDirectory,
+                    requireExactSet: true,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            evidence.OnPublicationCheckpoint(
+                CampaignPublicationCheckpoint.AfterStagedSetVerification,
+                reportFileName: null);
+
+            await evidence.VerifyStableAsync(cancellationToken)
+                .ConfigureAwait(false);
+            evidence.ValidateOutputIdentity(overwrite);
+            Directory.CreateDirectory(outputDirectory);
+
+            foreach (string fileName in ReportFileNames)
+            {
+                string finalPath = Path.Combine(outputDirectory, fileName);
+                if (!File.Exists(finalPath))
+                {
+                    continue;
+                }
+
+                FileInfo info = new(finalPath);
+                previous[fileName] = new FileEvidence(
+                    info.Length,
+                    await CaptureAnalyzer.CalculateSha256Async(
+                            finalPath,
+                            cancellationToken)
+                        .ConfigureAwait(false));
+            }
+
+            if (previous.Count > 0)
+            {
+                Directory.CreateDirectory(backupDirectory);
+            }
+
+            foreach (string fileName in ReportFileNames)
+            {
+                if (!previous.ContainsKey(fileName))
+                {
+                    continue;
+                }
+
+                File.Move(
+                    Path.Combine(outputDirectory, fileName),
+                    Path.Combine(backupDirectory, fileName));
+                backedUp.Add(fileName);
+                evidence.OnPublicationCheckpoint(
+                    CampaignPublicationCheckpoint.AfterBackedUpReport,
+                    fileName);
+            }
+
+            await evidence.VerifyStableAsync(cancellationToken)
+                .ConfigureAwait(false);
+            await ValidatePrepublicationStateAsync(
+                    outputDirectory,
+                    backupDirectory,
+                    backedUp,
+                    previous,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            foreach (string fileName in ReportFileNames)
+            {
+                File.Move(
+                    Path.Combine(stagingDirectory, fileName),
+                    Path.Combine(outputDirectory, fileName));
+                published.Add(fileName);
+                evidence.OnPublicationCheckpoint(
+                    CampaignPublicationCheckpoint.AfterPublishedReport,
+                    fileName);
+            }
+
+            await VerifyReportSetAsync(
+                    outputDirectory,
+                    requireExactSet: false,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            publicationCommitted = true;
+            DeleteDirectoryIfPresent(backupDirectory);
+            DeleteDirectoryIfPresent(stagingDirectory);
             return hashes;
         }
-        catch (AnalysisOutputException)
+        catch (Exception exception)
         {
-            throw;
-        }
-        catch (Exception exception) when (
-            exception is IOException or
-                UnauthorizedAccessException or
-                NotSupportedException)
-        {
+            if (publicationCommitted)
+            {
+                throw new AnalysisOutputException(
+                    "The complete new campaign report set was verified, but transaction cleanup failed. The verified new set remains active; staging or backup evidence may remain for diagnosis.",
+                    exception);
+            }
+
+            IReadOnlyList<Exception> rollbackErrors = await RollbackAsync(
+                    evidence,
+                    outputDirectory,
+                    stagingDirectory,
+                    backupDirectory,
+                    published,
+                    backedUp,
+                    previous)
+                .ConfigureAwait(false);
+            if (exception is OperationCanceledException &&
+                rollbackErrors.Count == 0)
+            {
+                throw;
+            }
+
+            Exception cause = rollbackErrors.Count == 0
+                ? exception
+                : new AggregateException(
+                    "Campaign publication failed and rollback reported additional errors.",
+                    [exception, .. rollbackErrors]);
             throw new AnalysisOutputException(
-                $"Could not write deterministic campaign reports: {exception.Message}",
-                exception);
+                $"Transactional campaign publication failed: {cause.Message}",
+                cause);
         }
     }
 
-    private static async Task WriteAtomicAsync(
-        IReadOnlyList<string> analysisDirectories,
-        string outputDirectory,
+    private static async Task WriteNewFileAsync(
         string destination,
         string content,
         CancellationToken cancellationToken)
     {
-        string temporary = Path.Combine(
-            outputDirectory,
-            $".{Path.GetFileName(destination)}.{Guid.NewGuid():N}.tmp");
-        try
+        byte[] bytes = Utf8WithoutBom.GetBytes(content);
+        await using FileStream stream = new(
+            destination,
+            FileMode.CreateNew,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 64 * 1024,
+            FileOptions.Asynchronous);
+        await stream.WriteAsync(bytes, cancellationToken)
+            .ConfigureAwait(false);
+        await stream.FlushAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private static async Task VerifyReportSetAsync(
+        string directory,
+        bool requireExactSet,
+        CancellationToken cancellationToken)
+    {
+        if (requireExactSet)
         {
-            byte[] bytes = Utf8WithoutBom.GetBytes(content);
-            await using (FileStream stream = new(
-                             temporary,
-                             FileMode.CreateNew,
-                             FileAccess.Write,
-                             FileShare.None,
-                             bufferSize: 64 * 1024,
-                             FileOptions.Asynchronous))
+            string[] actual = Directory
+                .EnumerateFileSystemEntries(directory)
+                .Select(Path.GetFileName)
+                .Order(StringComparer.Ordinal)
+                .ToArray()!;
+            string[] expected = ReportFileNames
+                .Order(StringComparer.Ordinal)
+                .ToArray();
+            if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
             {
-                await stream.WriteAsync(bytes, cancellationToken)
-                    .ConfigureAwait(false);
-                await stream.FlushAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                throw new AnalysisOutputException(
+                    "The staged campaign report set is incomplete or contains unexpected files.");
+            }
+        }
+
+        foreach (string fileName in ReportFileNames)
+        {
+            string path = Path.Combine(directory, fileName);
+            if (!File.Exists(path))
+            {
+                throw new AnalysisOutputException(
+                    $"Campaign report set is missing '{fileName}'.");
             }
 
-            _ = CampaignPathSafety.Validate(
-                analysisDirectories,
-                outputDirectory);
-            File.Move(temporary, destination, overwrite: true);
+            CampaignEvidenceGuard.RejectLinkedFile(
+                path,
+                $"Campaign report '{fileName}'");
         }
-        finally
+
+        string[] manifestLines = await File.ReadAllLinesAsync(
+                Path.Combine(directory, "hashes.sha256"),
+                cancellationToken)
+            .ConfigureAwait(false);
+        string[] expectedNames = DataReportFileNames().ToArray();
+        if (manifestLines.Length != expectedNames.Length)
         {
-            if (File.Exists(temporary))
+            throw new AnalysisOutputException(
+                "Campaign report manifest has an unexpected entry count.");
+        }
+
+        for (int index = 0; index < manifestLines.Length; index++)
+        {
+            string line = manifestLines[index];
+            if (line.Length < 67 ||
+                line[64..66] != "  " ||
+                line[..64].Any(character => !char.IsAsciiHexDigit(character)) ||
+                line[66..] != expectedNames[index])
             {
-                File.Delete(temporary);
+                throw new AnalysisOutputException(
+                    "Campaign report manifest is malformed or not canonically ordered.");
+            }
+
+            string actualHash = await CaptureAnalyzer.CalculateSha256Async(
+                    Path.Combine(directory, expectedNames[index]),
+                    cancellationToken)
+                .ConfigureAwait(false);
+            if (!string.Equals(
+                    actualHash,
+                    line[..64],
+                    StringComparison.Ordinal))
+            {
+                throw new AnalysisOutputException(
+                    $"Campaign report manifest hash mismatch for '{expectedNames[index]}'.");
             }
         }
     }
+
+    private static async Task<IReadOnlyList<Exception>> RollbackAsync(
+        CampaignEvidenceGuard evidence,
+        string outputDirectory,
+        string stagingDirectory,
+        string backupDirectory,
+        IReadOnlyList<string> published,
+        IReadOnlyList<string> backedUp,
+        IReadOnlyDictionary<string, FileEvidence> previous)
+    {
+        List<Exception> errors = [];
+        foreach (string fileName in published.Reverse())
+        {
+            try
+            {
+                string finalPath = Path.Combine(outputDirectory, fileName);
+                if (File.Exists(finalPath))
+                {
+                    Directory.CreateDirectory(stagingDirectory);
+                    File.Move(
+                        finalPath,
+                        Path.Combine(stagingDirectory, fileName),
+                        overwrite: true);
+                }
+            }
+            catch (Exception exception)
+            {
+                errors.Add(exception);
+            }
+        }
+
+        foreach (string fileName in backedUp.Reverse())
+        {
+            try
+            {
+                string backupPath = Path.Combine(backupDirectory, fileName);
+                string finalPath = Path.Combine(outputDirectory, fileName);
+                if (!File.Exists(backupPath))
+                {
+                    throw new IOException(
+                        $"Rollback backup is missing '{fileName}'.");
+                }
+
+                File.Move(backupPath, finalPath);
+                evidence.OnPublicationCheckpoint(
+                    CampaignPublicationCheckpoint.AfterRollbackRestoredReport,
+                    fileName);
+            }
+            catch (Exception exception)
+            {
+                errors.Add(exception);
+            }
+        }
+
+        bool recoveryVerified = true;
+        foreach (string fileName in ReportFileNames)
+        {
+            try
+            {
+                string path = Path.Combine(outputDirectory, fileName);
+                if (!previous.TryGetValue(fileName, out FileEvidence? expected))
+                {
+                    if (OutputEntryExists(outputDirectory, fileName))
+                    {
+                        throw new IOException(
+                            $"Rollback left unexpected campaign report '{fileName}' active.");
+                    }
+
+                    continue;
+                }
+
+                FileInfo info = new(path);
+                string hash = await CaptureAnalyzer.CalculateSha256Async(
+                        path,
+                        CancellationToken.None)
+                    .ConfigureAwait(false);
+                if (info.Length != expected.Length ||
+                    !string.Equals(
+                        hash,
+                        expected.Sha256,
+                        StringComparison.Ordinal))
+                {
+                    throw new IOException(
+                        $"Rollback verification failed for '{fileName}'.");
+                }
+            }
+            catch (Exception exception)
+            {
+                recoveryVerified = false;
+                errors.Add(exception);
+            }
+        }
+
+        if (backedUp.Any(
+                fileName =>
+                    OutputEntryExists(backupDirectory, fileName)))
+        {
+            recoveryVerified = false;
+            errors.Add(
+                new IOException(
+                    "Rollback left one or more prior campaign reports in the backup directory."));
+        }
+
+        if (recoveryVerified)
+        {
+            foreach (string directory in
+                     new[] { stagingDirectory, backupDirectory })
+            {
+                try
+                {
+                    DeleteDirectoryIfPresent(directory);
+                }
+                catch (Exception exception)
+                {
+                    errors.Add(exception);
+                }
+            }
+        }
+
+        return errors;
+    }
+
+    private static async Task ValidatePrepublicationStateAsync(
+        string outputDirectory,
+        string backupDirectory,
+        IReadOnlyList<string> backedUp,
+        IReadOnlyDictionary<string, FileEvidence> previous,
+        CancellationToken cancellationToken)
+    {
+        if (ReportFileNames.Any(
+                name => File.Exists(Path.Combine(outputDirectory, name))))
+        {
+            throw new CampaignPathCollisionException(
+                "A campaign report path reappeared after backup and before publication.");
+        }
+
+        foreach (string fileName in backedUp)
+        {
+            string path = Path.Combine(backupDirectory, fileName);
+            CampaignEvidenceGuard.RejectLinkedFile(
+                path,
+                $"Backed-up campaign report '{fileName}'");
+            FileInfo info = new(path);
+            string hash = await CaptureAnalyzer.CalculateSha256Async(
+                    path,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            FileEvidence expected = previous[fileName];
+            if (info.Length != expected.Length ||
+                !string.Equals(
+                    hash,
+                    expected.Sha256,
+                    StringComparison.Ordinal))
+            {
+                throw new AnalysisOutputException(
+                    $"Backed-up campaign report '{fileName}' failed prepublication verification.");
+            }
+        }
+    }
+
+    private static IEnumerable<string> DataReportFileNames() =>
+        ReportFileNames
+            .Where(name => name != "hashes.sha256")
+            .Order(StringComparer.Ordinal);
+
+    private static void DeleteDirectoryIfPresent(string directory)
+    {
+        if (Directory.Exists(directory))
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    private static bool OutputEntryExists(
+        string directory,
+        string fileName) =>
+        Directory.Exists(directory) &&
+        Directory
+            .EnumerateFileSystemEntries(directory)
+            .Any(
+                path => string.Equals(
+                    Path.GetFileName(path),
+                    fileName,
+                    StringComparison.Ordinal));
+
+    private sealed record FileEvidence(long Length, string Sha256);
 
     private static string BuildMarkdown(CampaignReportBundle reports)
     {

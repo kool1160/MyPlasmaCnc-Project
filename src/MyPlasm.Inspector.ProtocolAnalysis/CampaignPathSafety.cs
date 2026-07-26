@@ -64,8 +64,8 @@ internal static class CampaignPathSafety
             string resolvedOutput = ResolveExistingLinks(fullOutput);
             foreach ((string fullInput, string resolvedInput) in inputs)
             {
-                if (Overlaps(fullInput, fullOutput) ||
-                    Overlaps(resolvedInput, resolvedOutput))
+                if (PathsOverlap(fullInput, fullOutput) ||
+                    PathsOverlap(resolvedInput, resolvedOutput))
                 {
                     throw new CampaignPathCollisionException(
                         "The comparison output directory overlaps an input analysis directory. " +
@@ -117,7 +117,7 @@ internal static class CampaignPathSafety
     internal static string Normalize(string path) =>
         Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
 
-    private static bool Overlaps(string first, string second) =>
+    internal static bool PathsOverlap(string first, string second) =>
         IsSameOrDescendant(first, second) ||
         IsSameOrDescendant(second, first);
 

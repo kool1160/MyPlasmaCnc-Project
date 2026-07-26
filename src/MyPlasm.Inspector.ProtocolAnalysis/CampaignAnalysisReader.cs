@@ -73,12 +73,13 @@ internal static class CampaignAnalysisReader
     ];
 
     public static async Task<CampaignAnalysisSet> ReadAsync(
-        string directory,
+        CampaignEvidenceSet evidence,
+        CampaignEvidenceGuard guard,
         CancellationToken cancellationToken)
     {
         try
         {
-            return await ReadCoreAsync(directory, cancellationToken)
+            return await ReadCoreAsync(evidence, guard, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (CampaignInputValidationException)
@@ -97,26 +98,20 @@ internal static class CampaignAnalysisReader
     }
 
     private static async Task<CampaignAnalysisSet> ReadCoreAsync(
-        string directory,
+        CampaignEvidenceSet evidence,
+        CampaignEvidenceGuard guard,
         CancellationToken cancellationToken)
     {
-        ValidateExactFileSet(directory);
-        Dictionary<string, string> paths = RequiredReportFileNames.ToDictionary(
-            name => name,
-            name => Path.Combine(directory, name),
-            StringComparer.Ordinal);
-        ValidateUnambiguousFiles(paths);
+        guard.NotifyAfterInitialHashes(evidence);
+        IReadOnlyDictionary<string, string> paths = evidence.Paths;
 
         IReadOnlyDictionary<string, string> manifest =
             ParseManifest(paths["hashes.sha256"]);
         SortedDictionary<string, string> actualHashes =
             new(StringComparer.Ordinal);
-        foreach (string name in RequiredReportFileNames.Order(StringComparer.Ordinal))
+        foreach ((string name, string hash) in evidence.InitialHashes)
         {
-            actualHashes[name] = await CaptureAnalyzer.CalculateSha256Async(
-                    paths[name],
-                    cancellationToken)
-                .ConfigureAwait(false);
+            actualHashes[name] = hash;
         }
 
         foreach (string name in ManifestReportFileNames)
@@ -139,6 +134,8 @@ internal static class CampaignAnalysisReader
             ParseTransactionClasses(paths["transaction-classes.csv"]);
         IReadOnlyDictionary<string, CampaignVariabilityFamily> families =
             ParseVariability(paths["payload-variability.json"]);
+        await evidence.VerifyStableAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         SortedDictionary<string, long> phaseCounts = new(StringComparer.Ordinal);
         foreach (CampaignPhase phase in phases)
@@ -177,44 +174,6 @@ internal static class CampaignAnalysisReader
             families,
             phases,
             summary.TransactionClassCountsBySession);
-    }
-
-    private static void ValidateExactFileSet(string directory)
-    {
-        string[] actual = Directory
-            .EnumerateFileSystemEntries(directory)
-            .Select(Path.GetFileName)
-            .Order(StringComparer.Ordinal)
-            .ToArray()!;
-        string[] expected = RequiredReportFileNames
-            .Order(StringComparer.Ordinal)
-            .ToArray();
-        if (!actual.SequenceEqual(expected, StringComparer.Ordinal))
-        {
-            throw new CampaignInputValidationException(
-                "Each analysis directory must contain exactly the six sanitized analyzer outputs and no other files or directories.");
-        }
-    }
-
-    private static void ValidateUnambiguousFiles(
-        IReadOnlyDictionary<string, string> paths)
-    {
-        HashSet<string> resolved = new(StringComparer.OrdinalIgnoreCase);
-        foreach ((string name, string path) in paths)
-        {
-            if (!File.Exists(path))
-            {
-                throw new CampaignInputValidationException(
-                    $"Required sanitized report {name} is missing.");
-            }
-
-            string identity = CampaignPathSafety.ResolveExistingLinks(path);
-            if (!resolved.Add(identity))
-            {
-                throw new CampaignInputValidationException(
-                    "Two required analysis reports resolve to the same file.");
-            }
-        }
     }
 
     private static IReadOnlyDictionary<string, string> ParseManifest(string path)

@@ -168,8 +168,10 @@ has not occurred.
 - Issue #13 adds an exactly-three-set comparison over the six sanitized
   analyzer reports.
 - Synthetic evidence confirms manifest validation, canonical
-  argument-order-independent output, structural class presence and frequency
-  comparison, variability comparison, and path/privacy guards.
+  all-six-permutation output, structural class presence and frequency
+  comparison, variability comparison, per-file identity locking, post-parse
+  stability verification, duplicate-evidence rejection, transactional
+  publication/rollback, and path/privacy guards.
 - The comparison neither reads raw captures nor accesses hardware, D2XX,
   transports, controller bytes, or the production command policy.
 - Packet framing, fields, counters, checksums, semantics, command safety,

@@ -175,6 +175,15 @@ The application fails closed:
   containing only the analyzer's six sanitized outputs.
 - Raw captures, binaries, archives, payload files, duplicate inputs, and
   normalized or link-resolved input/output collisions fail closed.
+- Every required input report is individually identity-locked. Report-file
+  links and reparse points are rejected; scoped hard-link aliases are detected
+  through protected handles. Paths, lengths, timestamps, and hashes are
+  verified again after parsing and immediately before publication.
+- Byte-identical complete report sets are rejected as duplicate evidence, even
+  when copied into different directories.
+- The six campaign outputs are staged and verified as one transaction. A
+  publication failure restores the prior known set byte-for-byte or leaves no
+  partial set, while preserving unrelated output files.
 - Comparison has no D2XX, hardware, native-library, transport, replay, or
   command-generation path and never modifies an input report set.
 - `Stable across all three captures` means only exact sanitized fingerprint

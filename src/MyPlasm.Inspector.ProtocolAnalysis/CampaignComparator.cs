@@ -2,8 +2,19 @@ namespace MyPlasm.Inspector.ProtocolAnalysis;
 
 public sealed class CampaignComparator
 {
+    private readonly ICampaignComparisonTestHook? _testHook;
+
     public const string ToolVersion = "1.0.0";
     public const int ComparisonSchemaVersion = 1;
+
+    public CampaignComparator()
+    {
+    }
+
+    internal CampaignComparator(ICampaignComparisonTestHook testHook)
+    {
+        _testHook = testHook;
+    }
 
     public async Task<CampaignComparisonResult> CompareAsync(
         CampaignComparisonRequest request,
@@ -13,16 +24,35 @@ public sealed class CampaignComparator
         CampaignPathSet paths = CampaignPathSafety.Validate(
             request.AnalysisDirectories,
             request.OutputDirectory);
+        using CampaignEvidenceGuard evidence =
+            await CampaignEvidenceGuard.OpenAsync(
+                    paths,
+                    _testHook,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        evidence.ValidateOutputIdentity(request.Overwrite);
 
         List<CampaignAnalysisSet> loaded = [];
-        foreach (string directory in paths.AnalysisDirectories)
+        foreach (CampaignEvidenceSet set in evidence.Sets)
         {
             loaded.Add(
-                await CampaignAnalysisReader.ReadAsync(directory, cancellationToken)
+                await CampaignAnalysisReader.ReadAsync(
+                        set,
+                        evidence,
+                        cancellationToken)
                     .ConfigureAwait(false));
         }
 
         ValidateCompatibility(loaded);
+        if (loaded
+                .Select(set => set.CanonicalFingerprint)
+                .Distinct(StringComparer.Ordinal)
+                .Count() != 3)
+        {
+            throw new CampaignInputValidationException(
+                "Duplicate complete sanitized analysis sets are not permitted; all three canonical evidence fingerprints must be distinct.");
+        }
+
         CampaignAnalysisSet[] sets = loaded
             .OrderBy(set => set.CanonicalFingerprint, StringComparer.Ordinal)
             .ThenBy(set => set.InputCaptureSha256, StringComparer.Ordinal)
@@ -51,10 +81,11 @@ public sealed class CampaignComparator
                 "Packet framing, fields, counters, checksums, semantics, command safety, and replay suitability remain unknown."));
 
         CampaignReportBundle bundle = new(summary, classes, variability);
+        await evidence.VerifyStableAsync(cancellationToken)
+            .ConfigureAwait(false);
         IReadOnlyDictionary<string, string> hashes =
             await CampaignReportWriter.WriteAsync(
-                    paths.AnalysisDirectories,
-                    paths.OutputDirectory,
+                    evidence,
                     request.Overwrite,
                     bundle,
                     cancellationToken)
