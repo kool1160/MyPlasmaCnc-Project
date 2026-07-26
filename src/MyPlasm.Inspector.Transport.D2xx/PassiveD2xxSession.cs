@@ -108,9 +108,30 @@ public sealed class PassiveD2xxSession : IAsyncDisposable
                     "Close the original MyPlasm software before opening the device.");
             }
 
-            D2xxStatus openStatus = _nativeApi.OpenExBySerialNumber(
-                SelectedDevice.SerialNumber,
-                out nint rawHandle);
+            nint rawHandle = 0;
+            D2xxStatus openStatus;
+            try
+            {
+                openStatus = _nativeApi.OpenExBySerialNumber(
+                    SelectedDevice.SerialNumber,
+                    out rawHandle);
+            }
+            catch (Exception exception)
+            {
+                AddEvent(
+                    PassiveOperations.Open,
+                    status: D2xxStatus.OtherError,
+                    error:
+                        $"FT_OpenEx threw {exception.GetType().Name}: " +
+                        exception.Message);
+                string cleanup = CloseUnexpectedFailedOpenHandle(rawHandle);
+                return ValueTask.FromException(
+                    new InvalidOperationException(
+                        "FT_OpenEx threw before a successful open was confirmed." +
+                        cleanup,
+                        exception));
+            }
+
             AddEvent(
                 PassiveOperations.Open,
                 status: openStatus,

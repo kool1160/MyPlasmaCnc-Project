@@ -123,9 +123,10 @@ not access a controller.
 - Exact-candidate selection requires a nonempty serial and a present nonzero
   location identifier. Missing and zero native location values fail closed
   before `FT_OpenEx`.
-- A valid native handle returned alongside a failed `FT_OpenEx` status is
-  immediately owned and closed exactly once. An unresolved cleanup is terminal
-  for that process.
+- A valid native handle returned alongside a failed `FT_OpenEx` status, or
+  assigned before `FT_OpenEx` throws, is immediately owned and closed exactly
+  once through the shared safe-handle cleanup policy. An unresolved cleanup is
+  terminal for that process.
 - No `FT_Write`, communication configuration, reset, purge, EEPROM, firmware,
   controller request, protocol decoder, or replay function is present.
 - Native injection and the process-detector bypass are internal test seams, not
@@ -137,6 +138,7 @@ not access a controller.
   or open.
 - Export streams raw bytes and compact JSONL, omits local D2XX source paths
   from structured metadata, assigns unique contiguous event sequence numbers,
+  reports event count, sequence range, uniqueness, monotonicity, and contiguity,
   records the packaged source commit in hashed evidence, hashes every evidence
   file, validates a staged ZIP by reopening it, and publishes the final ZIP
   only after validation.

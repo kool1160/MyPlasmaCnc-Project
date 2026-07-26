@@ -164,6 +164,16 @@ public sealed class CaptureExporter
             capture.TotalBytes,
             capture.Chunks.Count,
             capture.QueuePollCount,
+            capture.Events.Count,
+            capture.Events.Count == 0
+                ? null
+                : capture.Events[0].Sequence,
+            capture.Events.Count == 0
+                ? null
+                : capture.Events[^1].Sequence,
+            true,
+            true,
+            true,
             capture.CaptureByteLimit,
             capture.CaptureEventLimit,
             capture.CaptureChunkLimit,
@@ -190,6 +200,12 @@ public sealed class CaptureExporter
         Total received bytes: {session.TotalBytes}
         Read chunks: {session.ReadChunkCount}
         Queue polls: {session.QueuePollCount}
+        Event count: {session.EventCount}
+        First event sequence: {session.FirstEventSequence?.ToString() ?? "None"}
+        Last event sequence: {session.LastEventSequence?.ToString() ?? "None"}
+        Event sequences unique: {session.EventSequencesUnique}
+        Event sequences monotonic: {session.EventSequencesMonotonic}
+        Event sequences contiguous: {session.EventSequencesContiguous}
         Capture byte limit: {session.CaptureByteLimit}
         Capture event limit: {session.CaptureEventLimit}
         Capture chunk limit: {session.CaptureChunkLimit}
@@ -526,6 +542,12 @@ public sealed class CaptureExporter
         long TotalBytes,
         int ReadChunkCount,
         int QueuePollCount,
+        int EventCount,
+        long? FirstEventSequence,
+        long? LastEventSequence,
+        bool EventSequencesUnique,
+        bool EventSequencesMonotonic,
+        bool EventSequencesContiguous,
         long CaptureByteLimit,
         int CaptureEventLimit,
         int CaptureChunkLimit,

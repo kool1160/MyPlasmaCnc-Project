@@ -246,6 +246,117 @@ public sealed class PassiveD2xxAcceptanceTests
     }
 
     [Fact]
+    public async Task ThrowingOpenUnexpectedHandleIsClosedExactlyOnce()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.OpenHandleOverride = 123;
+        native.OpenException = new EntryPointNotFoundException(
+            "synthetic open exception");
+        await using PassiveD2xxSession session = Session(native);
+
+        InvalidOperationException exception =
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => session.OpenAsync().AsTask());
+
+        Assert.Contains(
+            "FT_OpenEx threw before a successful open was confirmed.",
+            exception.Message,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "unexpected native handle was closed",
+            exception.Message,
+            StringComparison.Ordinal);
+        EntryPointNotFoundException inner =
+            Assert.IsType<EntryPointNotFoundException>(
+                exception.InnerException);
+        Assert.Equal("synthetic open exception", inner.Message);
+        Assert.Equal(1, native.OpenCalls);
+        Assert.Equal(1, native.CloseCalls);
+        Assert.Equal(0, native.DriverVersionCalls);
+        Assert.False(session.IsOpen);
+        Assert.False(session.HasUnresolvedCloseFailure);
+        Assert.Collection(
+            session.Events,
+            item =>
+            {
+                Assert.Equal(PassiveOperations.Open, item.Operation);
+                Assert.Equal(D2xxStatus.OtherError, item.Status);
+                Assert.Contains(
+                    "EntryPointNotFoundException: synthetic open exception",
+                    item.ErrorMessage,
+                    StringComparison.Ordinal);
+            },
+            item =>
+            {
+                Assert.Equal(PassiveOperations.Close, item.Operation);
+                Assert.Equal(D2xxStatus.Ok, item.Status);
+            });
+
+        await session.DisposeAsync();
+        Assert.Equal(1, native.CloseCalls);
+    }
+
+    [Fact]
+    public async Task ThrowingOpenUnresolvedUnexpectedHandleBlocksReuse()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.OpenHandleOverride = 123;
+        native.OpenException = new DllNotFoundException(
+            "synthetic open exception");
+        native.CloseStatus = D2xxStatus.IoError;
+        await using D2xxInspectionTransport transport = new(native);
+        await transport.EnumerateDevicesAsync();
+        PassiveD2xxSession session =
+            transport.CreatePassiveSession(new FixedProcessDetector(false));
+
+        InvalidOperationException exception =
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => session.OpenAsync().AsTask());
+
+        Assert.Contains(
+            "cleanup is unresolved",
+            exception.Message,
+            StringComparison.Ordinal);
+        Assert.IsType<DllNotFoundException>(exception.InnerException);
+        Assert.True(session.HasUnresolvedCloseFailure);
+        Assert.True(transport.IsOpen);
+        Assert.False(transport.CanCreatePassiveSession);
+        Assert.Equal(1, native.OpenCalls);
+        Assert.Equal(1, native.CloseCalls);
+        Assert.Equal(
+            [PassiveOperations.Open, PassiveOperations.Close],
+            session.Events.Select(item => item.Operation));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => transport.EnumerateDevicesAsync().AsTask());
+
+        await session.DisposeAsync();
+        Assert.Equal(1, native.CloseCalls);
+    }
+
+    [Fact]
+    public async Task ThrowingOpenWithoutHandleDoesNotCallClose()
+    {
+        ScriptedNativeApi native = NativeWithDevices(ExactDevice());
+        native.OpenHandleOverride = 0;
+        native.OpenException = new InvalidOperationException(
+            "synthetic open exception");
+        await using PassiveD2xxSession session = Session(native);
+
+        InvalidOperationException exception =
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => session.OpenAsync().AsTask());
+
+        Assert.IsType<InvalidOperationException>(exception.InnerException);
+        Assert.Equal(1, native.OpenCalls);
+        Assert.Equal(0, native.CloseCalls);
+        Assert.False(session.IsOpen);
+        Assert.False(session.HasUnresolvedCloseFailure);
+        PassiveSessionEvent open = Assert.Single(session.Events);
+        Assert.Equal(PassiveOperations.Open, open.Operation);
+        Assert.Equal(D2xxStatus.OtherError, open.Status);
+    }
+
+    [Fact]
     public async Task SecondOpenIsRejected()
     {
         ScriptedNativeApi native = NativeWithDevices(ExactDevice());
@@ -664,12 +775,51 @@ public sealed class PassiveD2xxAcceptanceTests
             "selectedDevice", "serialNumber", "description", "deviceType", "vendorId",
             "productId", "locationId", "openTimestampUtc", "captureStartTimestampUtc",
             "captureStopTimestampUtc", "closeTimestampUtc", "stopReason", "duration",
-            "totalBytes", "readChunkCount", "queuePollCount", "captureByteLimit",
+            "totalBytes", "readChunkCount", "queuePollCount", "eventCount",
+            "firstEventSequence", "lastEventSequence", "eventSequencesUnique",
+            "eventSequencesMonotonic", "eventSequencesContiguous", "captureByteLimit",
             "captureEventLimit", "captureChunkLimit", "d2xxErrors",
             "closeFailure", "transmitCount",
             "productionAllowlistCount"
         ];
         Assert.All(metadata, name => Assert.True(session.RootElement.TryGetProperty(name, out _), name));
+        int eventCount =
+            session.RootElement.GetProperty("eventCount").GetInt32();
+        Assert.Equal(capture.Events.Count, eventCount);
+        Assert.Equal(
+            capture.Events[0].Sequence,
+            session.RootElement
+                .GetProperty("firstEventSequence")
+                .GetInt64());
+        Assert.Equal(
+            capture.Events[^1].Sequence,
+            session.RootElement
+                .GetProperty("lastEventSequence")
+                .GetInt64());
+        Assert.True(
+            session.RootElement
+                .GetProperty("eventSequencesUnique")
+                .GetBoolean());
+        Assert.True(
+            session.RootElement
+                .GetProperty("eventSequencesMonotonic")
+                .GetBoolean());
+        Assert.True(
+            session.RootElement
+                .GetProperty("eventSequencesContiguous")
+                .GetBoolean());
+        string report = await File.ReadAllTextAsync(
+            Path.Combine(result.CaptureDirectory, "report.txt"));
+        Assert.Contains($"Event count: {capture.Events.Count}", report);
+        Assert.Contains(
+            $"First event sequence: {capture.Events[0].Sequence}",
+            report);
+        Assert.Contains(
+            $"Last event sequence: {capture.Events[^1].Sequence}",
+            report);
+        Assert.Contains("Event sequences unique: True", report);
+        Assert.Contains("Event sequences monotonic: True", report);
+        Assert.Contains("Event sequences contiguous: True", report);
         Assert.Equal(0, new FileInfo(Path.Combine(result.CaptureDirectory, "rx.bin")).Length);
         Assert.Equal(
             TestSourceCommit + "\n",
@@ -1164,6 +1314,8 @@ public sealed class PassiveD2xxAcceptanceTests
 
         public nint? OpenHandleOverride { get; set; }
 
+        public Exception? OpenException { get; set; }
+
         public D2xxStatus CloseStatus { get; set; } = D2xxStatus.Ok;
 
         public int OpenCalls { get; private set; }
@@ -1205,6 +1357,11 @@ public sealed class PassiveD2xxAcceptanceTests
             OpenSerials.Add(serialNumber);
             handle = OpenHandleOverride ??
                 (OpenStatus == D2xxStatus.Ok ? 123 : 0);
+            if (OpenException is not null)
+            {
+                throw OpenException;
+            }
+
             return OpenStatus;
         }
 

@@ -45,6 +45,8 @@ capture manually. A capture stops after 5 minutes, 64 MiB, 100,000 events, or
 16,384 receive chunks, whichever occurs first. Close the device before export.
 If native close fails, the app refuses another open or enumeration until it is
 restarted.
+If FT_OpenEx assigns a handle and then throws, that unexpected handle is owned
+and closed exactly once; unresolved cleanup also blocks reuse until restart.
 
 Startup logs are written to:
 %LOCALAPPDATA%\MyPlasm Inspector\Logs\
@@ -57,6 +59,8 @@ application hash, safety scope, and verified D2XX architecture, version, size,
 and SHA-256. Do not edit or remove that manifest.
 Every exported capture also records that source commit in session.json,
 report.txt, and source-commit.txt; hashes.sha256 covers the source-commit file.
+session.json and report.txt also record the event count, first and last event
+sequence, and explicit unique, monotonic, and contiguous sequence results.
 
 Startup file logging is best effort and can never block the application from
 starting. If the first window says file logging is unavailable, diagnostics

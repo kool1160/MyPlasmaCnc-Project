@@ -143,9 +143,10 @@ The application fails closed:
   no running `MyPlasmCNC` process.
 - Only the enumerated serial reaches `FT_OpenEx`; there is no arbitrary serial
   input and no public native-injection surface.
-- A nonzero handle returned with a failed `FT_OpenEx` status is treated as
-  unexpectedly live and closed exactly once. Failed cleanup is recorded as
-  unresolved and blocks all later open or enumeration work in that process.
+- A nonzero handle returned with a failed `FT_OpenEx` status, or assigned before
+  `FT_OpenEx` throws, is treated as unexpectedly live and closed exactly once
+  through the same cleanup policy. Failed cleanup is recorded as unresolved
+  and blocks all later open or enumeration work in that process.
 - Capture is limited to five minutes, 64 MiB of retained bytes, 100,000
   capture events, and 16,384 receive chunks. Elapsed duration uses a monotonic
   clock.
@@ -158,10 +159,12 @@ The application fails closed:
   open or enumeration is allowed in that process.
 - Raw bytes and events are streamed to unique export files. Event sequence
   numbers are allocated under the event lock and are unique and contiguous.
-  JSONL contains one compact object per line. The exact packaged source commit
-  is recorded in `session.json`, `report.txt`, and `source-commit.txt`, which is
-  covered by `hashes.sha256`. A staged ZIP is reopened and every entry hash is
-  compared with its source before the final ZIP name is published.
+  JSONL contains one compact object per line. `session.json` and `report.txt`
+  include event count, first and last sequence, and explicit unique, monotonic,
+  and contiguous results. The exact packaged source commit is recorded in
+  `session.json`, `report.txt`, and `source-commit.txt`, which is covered by
+  `hashes.sha256`. A staged ZIP is reopened and every entry hash is compared
+  with its source before the final ZIP name is published.
 - Export failure preserves the unique raw evidence directory. Local D2XX source
   paths are not written to structured metadata.
 - Transmit count and production allowlist count remain fixed at zero.
